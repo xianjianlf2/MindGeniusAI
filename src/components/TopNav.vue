@@ -16,14 +16,14 @@ const router = useRouter()
       <a-button type="text">
         <template #icon>
           <div class="items-center justify-center flex">
-            <Icon icon="bx:save" width="24" />
+            <Icon icon="bx:save" width="24" color="white" />
           </div>
         </template>
       </a-button>
       <a-button type="text">
         <template #icon>
           <div class="items-center justify-center flex">
-            <Icon icon="mdi:cog" width="24" />
+            <Icon icon="mdi:cog" width="24" color="white" />
           </div>
         </template>
       </a-button>

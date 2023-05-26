@@ -10,9 +10,11 @@
     ],
     "skipLibCheck": true,
     /* Bundler mode */
-    "moduleResolution": "bundler",
-    "allowImportingTsExtensions": true,
-    "resolveJsonModule": true,
+    // "moduleResolution": "bundler",
+    // "allowImportingTsExtensions": true,
+    // "resolveJsonModule": true,
+
+    "moduleResolution": "node",
     "isolatedModules": true,
     "noEmit": true,
     "jsx": "preserve",
