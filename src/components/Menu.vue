@@ -9,7 +9,9 @@ const modelValue = defineModel<boolean>()
     <div class="flex h-full flex-col">
       <a-button ghost>
         <template #icon>
-          <Icon icon="material-symbols:folder-open-outline-rounded" color="white" width="18" />
+          <span class="button-icon">
+            <Icon icon="material-symbols:folder-open-outline-rounded" width="18" />
+          </span>
         </template>
         <span class="font-semibold">
           导入文件
@@ -17,7 +19,9 @@ const modelValue = defineModel<boolean>()
       </a-button>
       <a-button ghost>
         <template #icon>
-          <Icon icon="material-symbols:output-rounded" color="white" :rotate="3" width="18" />
+          <span class="button-icon">
+            <Icon icon="material-symbols:output-rounded" width="18" />
+          </span>
         </template>
         <span class="font-semibold">
           导出文件

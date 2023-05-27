@@ -12,19 +12,19 @@ const router = useRouter()
       <span class="font-semibold">DOC FILE SEARCH</span>
     </div>
 
-    <div class="flex gap-2">
+    <div class="flex gap-2 justify-center items-center">
       <a-button type="text">
         <template #icon>
-          <div class="items-center justify-center flex">
+          <span class="button-icon">
             <Icon icon="bx:save" width="24" color="white" />
-          </div>
+          </span>
         </template>
       </a-button>
       <a-button type="text">
         <template #icon>
-          <div class="items-center justify-center flex">
-            <Icon icon="mdi:cog" width="24" color="white" />
-          </div>
+          <span class="button-icon">
+            <Icon icon="mdi:cog" width="24" />
+          </span>
         </template>
       </a-button>
     </div>

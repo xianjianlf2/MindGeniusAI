@@ -24,8 +24,10 @@
     "@types/koa": "^2.13.6",
     "@types/koa-router": "^7.4.4",
     "@types/koa__multer": "^2.0.4",
+    "@types/mime-types": "^2.1.1",
     "dotenv": "^16.0.3",
     "langchain": "^0.0.72",
+    "mime-types": "^2.1.35",
     "nodemon": "^2.0.22",
     "ts-node": "^10.9.1"
   }

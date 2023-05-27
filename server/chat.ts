@@ -1,6 +1,5 @@
 import { PineconeClient } from '@pinecone-database/pinecone'
 import dotenv from 'dotenv'
-import type { Context } from 'koa'
 import { ConversationalRetrievalQAChain } from 'langchain/chains'
 import { OpenAIEmbeddings } from 'langchain/embeddings/openai'
 import { OpenAI } from 'langchain/llms/openai'
@@ -43,7 +42,7 @@ const chains = ConversationalRetrievalQAChain.fromLLM(
   },
 )
 
-export async function chat(ctx: Context) {
+export async function chat(ctx: any) {
   const { message, history } = ctx.request.body
   const res = await chains.call({
     question: message,

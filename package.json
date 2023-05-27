@@ -11,6 +11,8 @@
     "lint:fix": "eslint . --fix"
   },
   "dependencies": {
+    "@iconify-icons/bi": "^1.2.16",
+    "@microsoft/fetch-event-source": "^2.0.1",
     "@vue-flow/background": "^1.2.0",
     "@vue-flow/core": "^1.20.0",
     "@vueuse/core": "^10.1.2",
@@ -19,6 +21,7 @@
     "axios": "^1.4.0",
     "pinia": "^2.1.3",
     "router-view": "^1.1.7",
+    "uuid": "^9.0.0",
     "vue": "^3.3.4",
     "vue-router": "4"
   },
@@ -27,6 +30,7 @@
     "@iconify-icons/mdi": "^1.2.46",
     "@iconify/vue": "^4.1.1",
     "@types/node": "^20.2.3",
+    "@types/uuid": "^9.0.1",
     "@unocss/reset": "^0.52.3",
     "@vitejs/plugin-vue": "^4.2.3",
     "eslint": "^8.41.0",

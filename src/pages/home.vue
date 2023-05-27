@@ -51,7 +51,7 @@ onMounted(() => {
         @click="isShowUploadPanel = !isShowUploadPanel"
       >
         <template #icon>
-          <div class="flex justify-center items-center">
+          <div class="flex justify-center items-center ">
             <Icon icon="material-symbols:menu" color="white" width="24" />
           </div>
         </template>
