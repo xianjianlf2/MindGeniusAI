@@ -1,24 +1,62 @@
 // import axios from 'axios'
-import { fetchEventSource } from '@microsoft/fetch-event-source'
+import { EventStreamContentType, fetchEventSource } from '@microsoft/fetch-event-source'
+import { useChatStore } from '../stores'
+import type { Message } from '../stores/useChatStore'
 
 // export function fetchChat(message: string, messageHistory: string[]) {
 //   return axios.post('/api/chat', { message, messageHistory })
 // }
-export function fetchChatStream(message: string, messageHistory: string[]) {
-  const ctrl = new AbortController()
+
+enum MessageStatus {
+  PENDING = 'pending',
+  DONE = 'done',
+  FAILED = 'failed',
+}
+class RetriableError extends Error { }
+class FatalError extends Error { }
+export function fetchChatStream(messages: Message[]) {
+  const chatStore = useChatStore()
+  const controller = new AbortController()
   fetchEventSource('/api/chat', {
     method: 'POST',
+    body: JSON.stringify({ messages }),
     headers: {
       'Content-Type': 'application/json',
     },
-    body: JSON.stringify({
-      message,
-    }),
-    signal: ctrl.signal,
-    onmessage: (e) => {
-      // eslint-disable-next-line no-console
-      console.log(e.data)
+    signal: controller.signal,
+    async onopen(response) {
+      if (response.ok && response.headers.get('content-type') === EventStreamContentType) {
+        // everything's good
+      }
+      else if (response.status >= 400 && response.status < 500 && response.status !== 429) {
+        // client-side errors are usually non-retriable:
+        throw new FatalError()
+      }
+      else {
+        throw new RetriableError()
+      }
+    },
+    onmessage(msg) {
+      const { status, data } = JSON.parse(msg.data)
+      if (status === MessageStatus.PENDING)
+        chatStore.appendMessage(data)
+
+      else if (status === MessageStatus.DONE)
+        controller.abort()
+    },
+    onclose() {
+      // if the server closes the connection unexpectedly, retry:
+      throw new RetriableError()
+    },
+    onerror(err) {
+      if (err instanceof FatalError) {
+        throw err // rethrow to stop the operation
+      }
+      else {
+        // do nothing to automatically retry. You can also
+        // return a specific retry interval here.
+      }
     },
   })
-  return ctrl
+  return controller
 }

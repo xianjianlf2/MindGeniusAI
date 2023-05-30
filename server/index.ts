@@ -1,10 +1,17 @@
 /* eslint-disable no-console */
+import { PassThrough } from 'node:stream'
 import Koa from 'koa'
 import { koaBody } from 'koa-body'
 import Router from 'koa-router'
 import multer from '@koa/multer'
 import { validateFileFormat } from './utils/validateFileFormat.ts'
 import { chatStream } from './chatStream.ts'
+
+enum MessageStatus {
+  PENDING = 'pending',
+  DONE = 'done',
+  FAILED = 'failed',
+}
 
 const storage = multer.diskStorage({
   destination(req, file, cb) {
@@ -33,24 +40,59 @@ router.get('/', (ctx) => {
 })
 
 router.post('/chat', async (ctx) => {
-  ctx.header['content-type'] = 'text/event-stream'
-  ctx.header['cache-control'] = 'no-cache'
-  ctx.header.connection = 'keep-alive'
-  ctx.status = 200
+  let { messages } = ctx.request.body
+  if (!messages)
+    ctx.throw(400, 'No message')
+
+  if (!Array.isArray(messages) && typeof messages === 'string')
+    messages = [messages]
+
+  const headers = {
+    'Content-Type': 'text/event-stream',
+    'Cache-Control': 'no-cache',
+    'Connection': 'keep-alive',
+  }
+  ctx.set(headers)
+  const sseStream = new PassThrough()
+  ctx.body = sseStream
+  const sendData = (data: string) => {
+    sseStream.write(`id: ${Date.now()}\n`)
+    sseStream.write('type: message\n')
+    sseStream.write(`data: ${data}\n\n`)
+  }
   function messageSend(token: string) {
-    ctx.body = {
-      status: 'pending',
-      message: token,
+    const message = {
+      status: MessageStatus.PENDING,
+      data: token,
     }
+    sendData(JSON.stringify(message))
   }
   function messageDone() {
-    ctx.body = {
-      statue: 'done',
-      message: '',
+    const message = {
+      status: MessageStatus.DONE,
     }
+    sendData(JSON.stringify(message))
+    sseStream.end()
   }
-  const res = await chatStream(ctx, messageSend, messageDone)
-  // ctx.body = res
+  chatStream(messages, messageSend, messageDone)
+})
+
+router.post('/chatWithFile', async (ctx) => {
+  let { messages } = ctx.request.body
+  if (!messages)
+    ctx.throw(400, 'No message')
+
+  if (!Array.isArray(messages) && typeof messages === 'string')
+    messages = [messages]
+
+  const headers = {
+    'Content-Type': 'text/event-stream',
+    'Cache-Control': 'no-cache',
+    'Connection': 'keep-alive',
+  }
+  ctx.set(headers)
+  const sseStream = new PassThrough()
+  ctx.body = sseStream
 })
 
 router.post('/upload', upload.single('file'), async (ctx) => {

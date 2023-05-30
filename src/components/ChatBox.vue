@@ -2,7 +2,7 @@
 import { computed, ref } from 'vue'
 import { Icon } from '@iconify/vue'
 import { useChatStore } from '../stores'
-import { fetchChatStream } from '../api'
+import { useLocalTimeString } from '../utils'
 
 // show chat box
 const modelValue = defineModel<boolean>()
@@ -17,11 +17,11 @@ const chatStore = useChatStore()
 function sendMessage() {
   if (newMessage.value.trim() !== '') {
     chatStore.addMessage({
-      name: 'Mark',
-      avatar: 'https://randomuser.me/api/portraits/men/1.jpg',
+      role: 'user',
       content: newMessage.value.trim(),
+      time: useLocalTimeString(),
     })
-    fetchChatStream(newMessage.value.trim(), [])
+    chatStore.fetchMessage()
     newMessage.value = ''
   }
 }
@@ -38,18 +38,20 @@ function handleEnter(e: any) {
 </script>
 
 <template>
-  <div v-show="modelValue" class="border h-[600px] w-[400px] mt-2 shadow-box glass">
+  <div v-show="modelValue" class="border h-[600px] sm:w-full mt-2 shadow-box glass max-w-[400px]">
     <div class="flex flex-col h-full p-3">
       <div v-if="chatStore.messages" class="flex-1 overflow-y-auto">
-        <div v-for="message in chatStore.messages" :key="message.id" class="flex items-start mb-4">
+        <div
+          v-for="message in chatStore.messages" :key="message.id" class="flex items-start mb-4"
+        >
           <div class="flex-shrink-0">
-            <img :src="message.avatar" alt="avatar" class="w-8 h-8 rounded-full">
+            <!-- <img :src="message.avatar" alt="avatar" class="w-8 h-8 rounded-full"> -->
           </div>
           <div class="ml-3">
-            <div class="text-sm font-medium text-gray-900">
-              {{ message.name }}
+            <div class="text-base font-semibold">
+              {{ message.role }}
             </div>
-            <div class="mt-1 text-sm text-gray-700">
+            <div class="mt-1 text-sm  inline-block break-words">
               {{ message.content }}
             </div>
           </div>

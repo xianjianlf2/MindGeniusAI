@@ -1,32 +1,22 @@
 import { defineStore } from 'pinia'
 import { ref } from 'vue'
 import { v4 as uuidv4 } from 'uuid'
+import { useLocalTimeString } from '../utils'
+import { fetchChatStream } from '../api'
 
 export interface Message {
   id: string
-  name: string
-  avatar: string
+  role: 'user' | 'assistant' | 'system'
   content: string
+  time: string
 }
 export const useChatStore = defineStore('chatStore', () => {
-  const messages = ref([
+  const messages = ref<Message[]>([
     {
-      id: '1',
-      name: 'Mark',
-      avatar: 'https://randomuser.me/api/portraits/men/1.jpg',
+      id: uuidv4(),
+      role: 'assistant',
       content: 'Hello! How can I assist you today?',
-    },
-    {
-      id: '2',
-      name: 'GPT',
-      avatar: 'https://randomuser.me/api/portraits/women/1.jpg',
-      content: 'I am doing well, thank you. How about you?',
-    },
-    {
-      id: '3',
-      name: 'Mark',
-      avatar: 'https://randomuser.me/api/portraits/men/1.jpg',
-      content: 'I am doing great, thanks for asking!',
+      time: useLocalTimeString(),
     },
   ])
 
@@ -37,14 +27,35 @@ export const useChatStore = defineStore('chatStore', () => {
     })
   }
 
+  function fetchMessage() {
+    return fetchChatStream(messages.value.slice(-3))
+  }
+
+  function appendMessage(message: string) {
+    const length = messages.value.length - 1
+    if (messages.value[length].role !== 'assistant') {
+      messages.value.push({
+        id: uuidv4(),
+        role: 'assistant',
+        content: message,
+        time: useLocalTimeString(),
+      })
+    }
+    else {
+      messages.value[length].content = messages.value[length].content + message
+    }
+  }
+
   function removeMessage(id: string) {
-    messages.value = messages.value.filter((message: Message) => message.id !== id)
+    messages.value = messages.value.filter((item: Message) => item.id !== id)
   }
 
   return {
     messages,
     addMessage,
     removeMessage,
+    appendMessage,
+    fetchMessage,
   }
 },
 )
