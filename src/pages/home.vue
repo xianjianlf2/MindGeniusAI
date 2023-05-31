@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { Panel, PanelPosition, VueFlow, useVueFlow } from '@vue-flow/core'
+import { Panel, PanelPosition, Position, VueFlow, useVueFlow } from '@vue-flow/core'
 import { Background } from '@vue-flow/background'
 import { onMounted, ref } from 'vue'
 import { Icon } from '@iconify/vue'
@@ -7,28 +7,36 @@ import ChatBox from '../components/ChatBox.vue'
 
 const isShowChatBox = ref(false)
 const elements = ref([
-  { id: '1', label: '纳瓦尔宝典', position: { x: 250, y: 5 } },
-  { id: '2', label: '简介', position: { x: 100, y: 100 } },
-  { id: '3', label: '历史背景', position: { x: 400, y: 100 } },
-  { id: '4', label: '内容概述', position: { x: 250, y: 200 } },
-  { id: '5', label: '主要章节', position: { x: 100, y: 300 } },
-  { id: '6', label: '结论', position: { x: 400, y: 300 } },
-
-  // 将其关联
+  { id: '1', label: 'Front-End Tech Roadmap', position: { x: 0, y: 50 }, sourcePosition: Position.Right },
+  { id: '2', label: 'HTML/CSS', position: { x: 200, y: 50 }, targetPosition: Position.Left, sourcePosition: Position.Right },
+  { id: '3', label: 'Semantic HTML', position: { x: 500, y: 50 }, targetPosition: Position.Left },
+  { id: '4', label: 'CSS Preprocessors', position: { x: 500, y: 200 }, targetPosition: Position.Left },
+  { id: '5', label: 'JavaScript', position: { x: 200, y: 200 }, targetPosition: Position.Left, sourcePosition: Position.Right },
+  { id: '6', label: 'ES6+', position: { x: 500, y: 350 }, targetPosition: Position.Left },
+  { id: '7', label: 'React', position: { x: 200, y: 350 }, targetPosition: Position.Left, sourcePosition: Position.Right },
+  { id: '8', label: 'Redux', position: { x: 500, y: 500 }, targetPosition: Position.Left },
+  { id: '9', label: 'TypeScript', position: { x: 200, y: 500 }, targetPosition: Position.Left, sourcePosition: Position.Right },
+  { id: '10', label: 'Vue', position: { x: 200, y: 650 }, targetPosition: Position.Left, sourcePosition: Position.Right },
+  { id: '11', label: 'Angular', position: { x: 200, y: 800 }, targetPosition: Position.Left, sourcePosition: Position.Right },
+  { id: '12', label: 'Webpack', position: { x: 500, y: 650 }, targetPosition: Position.Left },
+  { id: '13', label: 'Babel', position: { x: 500, y: 800 }, targetPosition: Position.Left },
   // Edges
-  // Most basic edge, only consists of an id, source-id and target-id
   { id: 'e1-2', source: '1', target: '2' },
-  { id: 'e1-3', source: '1', target: '3' },
-  { id: 'e1-4', source: '1', target: '4' },
-  { id: 'e4-5', source: '4', target: '5' },
-  { id: 'e4-6', source: '4', target: '6' },
-])
+  { id: 'e1-5', source: '1', target: '5' },
+  { id: 'e2-3', source: '2', target: '3' },
+  { id: 'e2-4', source: '2', target: '4' },
+  { id: 'e5-6', source: '5', target: '6' },
+  { id: 'e5-7', source: '5', target: '7' },
+  { id: 'e7-8', source: '7', target: '8' },
+  { id: 'e9-5', source: '9', target: '5' },
+  { id: 'e10-5', source: '10', target: '5' },
+  { id: 'e11-5', source: '11', target: '5' },
+  { id: 'e12-5', source: '12', target: '5' },
+  { id: 'e13-5', source: '13', target: '5' },
+],
+)
 
-const { onPaneReady, fitView, zoomIn, zoomOut } = useVueFlow()
-
-onPaneReady(({ fitView }) => {
-  fitView()
-})
+const { fitView, zoomIn, zoomOut } = useVueFlow()
 
 onMounted(() => {
   isShowChatBox.value = true
@@ -36,7 +44,7 @@ onMounted(() => {
 </script>
 
 <template>
-  <VueFlow v-model="elements" :min-zoom="0.2" :max-zoom="2">
+  <VueFlow v-model="elements" :min-zoom="0.2" :max-zoom="2" fit-view-on-init>
     <Panel :position="PanelPosition.TopLeft">
       <a-button type="primary" size="large" @click="isShowChatBox = !isShowChatBox">
         <template #icon>

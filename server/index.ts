@@ -6,6 +6,7 @@ import Router from 'koa-router'
 import multer from '@koa/multer'
 import { validateFileFormat } from './utils/validateFileFormat.ts'
 import { chatStream } from './chatStream.ts'
+import { chatMindMap } from './chatMindMap.ts'
 
 enum MessageStatus {
   PENDING = 'pending',
@@ -95,6 +96,13 @@ router.post('/chatWithFile', async (ctx) => {
   ctx.body = sseStream
 })
 
+router.post('/generateMindMap', async (ctx) => {
+  const { topic } = ctx.request.body
+  if (!topic)
+    ctx.throw(400, 'No topic')
+  const res = await chatMindMap(topic)
+  ctx.body = res
+})
 router.post('/upload', upload.single('file'), async (ctx) => {
   const file = ctx.file
   if (!file)

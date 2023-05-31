@@ -2,6 +2,7 @@ import dotenv from 'dotenv'
 import { ChatOpenAI } from 'langchain/chat_models/openai'
 import { AIChatMessage, HumanChatMessage, SystemChatMessage } from 'langchain/schema'
 import { CallbackManager } from 'langchain/callbacks'
+import { useOpenAIProxy } from './utils/useOpenAIProxy.ts'
 
 dotenv.config()
 
@@ -30,29 +31,28 @@ function chat(messageSend: Function, messageDone: Function) {
       },
     }),
   },
-  {
-    basePath: process.env.OPENAI_PROXY_URL,
-    apiKey: process.env.OPENAI_API_KEY,
-  })
+  useOpenAIProxy())
 }
 
 export async function chatStream(messages: Message[], messageSend: Function, messageDone: Function) {
-  const messageList = messages.map((message) => {
-    switch (message.role) {
-      case 'system': {
-        return new SystemChatMessage(message.content)
+  const messageList = useGenerateMessage(messages)
+  function useGenerateMessage(messages: Message[]) {
+    return messages.map((message) => {
+      switch (message.role) {
+        case 'system': {
+          return new SystemChatMessage(message.content)
+        }
+        case 'user': {
+          return new HumanChatMessage(message.content)
+        }
+        case 'assistant': {
+          return new AIChatMessage(message.content)
+        }
+        default: {
+          return new HumanChatMessage(message.content)
+        }
       }
-      case 'user': {
-        return new HumanChatMessage(message.content)
-      }
-      case 'assistant': {
-        return new AIChatMessage(message.content)
-      }
-      default: {
-        return new HumanChatMessage(message.content)
-      }
-    }
-  })
-
+    })
+  }
   return chat(messageSend, messageDone).call(messageList)
 }

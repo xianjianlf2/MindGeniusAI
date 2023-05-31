@@ -4,6 +4,7 @@ import { UnstructuredLoader } from 'langchain/document_loaders/fs/unstructured'
 import { OpenAIEmbeddings } from 'langchain/embeddings/openai'
 import { RecursiveCharacterTextSplitter } from 'langchain/text_splitter'
 import { PineconeStore } from 'langchain/vectorstores/pinecone'
+import { useOpenAIProxy } from './utils/useOpenAIProxy.ts'
 
 // Load environment variables
 dotenv.config()
@@ -30,10 +31,7 @@ await pineconeClient.init({
 const pineconeIndex = await pineconeClient.Index(process.env.PINECONE_INDEX!)
 
 try {
-  PineconeStore.fromDocuments(docs, new OpenAIEmbeddings(undefined, {
-    basePath: process.env.OPENAI_PROXY_URL,
-    apiKey: process.env.OPENAI_API_KEY,
-  }), {
+  PineconeStore.fromDocuments(docs, new OpenAIEmbeddings(undefined, useOpenAIProxy()), {
     pineconeIndex,
     textKey: 'text',
     namespace: 'teach-vue3-document',
