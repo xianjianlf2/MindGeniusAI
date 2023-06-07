@@ -1,35 +1,36 @@
 import { ChatOpenAI } from 'langchain/chat_models/openai'
 
-import { AIChatMessage, HumanChatMessage } from 'langchain/schema'
+import { HumanChatMessage } from 'langchain/schema'
+import { CallbackManager } from 'langchain/callbacks'
 import { useOpenAIProxy } from './utils/useOpenAIProxy.ts'
 
-export async function chatMindMap(topic: string) {
-  const prompt = `Please create a mind map about ${topic}?`
-  const fewShot = [
-    new HumanChatMessage(
-            `create a front end tech road map
-                requirement:
-                1.only out put code without codeblock
-                2.Nodes of the same level align in the same vertical
-                3.refine it to the third level and transform to:
-        [
-            { id: '1', label: 'Front-End Tech Road Map',level:1},
-            { id: '2', label: 'HTML/CSS',level:2},
-            { id: '3', label: 'Semantic HTML',level:3},
-            { id: '4', label: 'CSS Preprocessors',level:3},
-            // Edges
-            { id: 'e1-2', source: '1', target: '2' },
-            { id: 'e2-3', source: '2', target: '3' },
-            { id: 'e2-4', source: '2', target: '4' },
-        ]`),
-  ]
+export async function chatMindMap(topic: string, messageSend: Function, messageDone: Function) {
+  let result = ''
+  const prompt = new HumanChatMessage(
+            `create a road map / guide line for the topic ${topic}
+              requirement:
+              1.use markdown
+              2.when guide line is started, please use '[START]' to mark the start point
+              3.short language is preferred
+              4.usually, there are 3 levels
+            `)
   const chat = new ChatOpenAI({
     maxTokens: 1024,
     streaming: true,
     temperature: 0.9,
+    callbackManager: CallbackManager.fromHandlers({
+      async handleLLMNewToken(token: string) {
+        result += token
+        messageSend(token)
+      },
+      async handleLLMEnd(output) {
+        // eslint-disable-next-line no-console
+        console.log('End of stream.', result)
+        messageDone()
+      },
+    }),
   },
   useOpenAIProxy())
 
-  const res = await chat.call([...fewShot, new AIChatMessage(prompt)])
-  return res
+  return chat.call([prompt])
 }

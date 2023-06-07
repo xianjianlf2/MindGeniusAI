@@ -40,14 +40,7 @@ router.get('/', (ctx) => {
   ctx.body = 'hello server'
 })
 
-router.post('/chat', async (ctx) => {
-  let { messages } = ctx.request.body
-  if (!messages)
-    ctx.throw(400, 'No message')
-
-  if (!Array.isArray(messages) && typeof messages === 'string')
-    messages = [messages]
-
+function useChatSteam(ctx: Koa.ParameterizedContext<any, Router.IRouterParamContext<any, {}>, any>) {
   const headers = {
     'Content-Type': 'text/event-stream',
     'Cache-Control': 'no-cache',
@@ -75,6 +68,22 @@ router.post('/chat', async (ctx) => {
     sendData(JSON.stringify(message))
     sseStream.end()
   }
+
+  return {
+    messageSend,
+    messageDone,
+  }
+}
+
+router.post('/chat', async (ctx) => {
+  let { messages } = ctx.request.body
+  if (!messages)
+    ctx.throw(400, 'No message')
+
+  if (!Array.isArray(messages) && typeof messages === 'string')
+    messages = [messages]
+
+  const { messageSend, messageDone } = useChatSteam(ctx)
   chatStream(messages, messageSend, messageDone)
 })
 
@@ -96,12 +105,12 @@ router.post('/chatWithFile', async (ctx) => {
   ctx.body = sseStream
 })
 
-router.post('/generateMindMap', async (ctx) => {
+router.post('/chatMindMap', async (ctx) => {
   const { topic } = ctx.request.body
   if (!topic)
     ctx.throw(400, 'No topic')
-  const res = await chatMindMap(topic)
-  ctx.body = res
+  const { messageSend, messageDone } = useChatSteam(ctx)
+  chatMindMap(topic, messageSend, messageDone)
 })
 router.post('/upload', upload.single('file'), async (ctx) => {
   const file = ctx.file

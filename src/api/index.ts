@@ -1,4 +1,3 @@
-// import axios from 'axios'
 import { EventStreamContentType, fetchEventSource } from '@microsoft/fetch-event-source'
 import { useChatStore } from '../stores'
 import type { Message } from '../stores/useChatStore'
@@ -14,12 +13,13 @@ enum MessageStatus {
 }
 class RetriableError extends Error { }
 class FatalError extends Error { }
-export function fetchChatStream(messages: Message[]) {
+
+function fetchChat(url: string, data: any) {
   const chatStore = useChatStore()
   const controller = new AbortController()
-  fetchEventSource('/api/chat', {
+  fetchEventSource(url, {
     method: 'POST',
-    body: JSON.stringify({ messages }),
+    body: JSON.stringify(data),
     headers: {
       'Content-Type': 'application/json',
     },
@@ -58,5 +58,14 @@ export function fetchChatStream(messages: Message[]) {
       }
     },
   })
+  return controller
+}
+export function fetchChatStream(messages: Message[]) {
+  const controller = fetchChat ('/api/chat', { messages })
+  return controller
+}
+
+export function chatWithMindMapRequest(topic: string) {
+  const controller = fetchChat ('/api/chatMindMap', { topic })
   return controller
 }

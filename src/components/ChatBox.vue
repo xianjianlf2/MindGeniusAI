@@ -3,9 +3,8 @@ import { computed, ref } from 'vue'
 import { Icon } from '@iconify/vue'
 import { useChatStore } from '../stores'
 import { useLocalTimeString } from '../utils'
+import RobotMessage from './RobotMessage.vue'
 
-// show chat box
-const modelValue = defineModel<boolean>()
 const inputWrapper = ref<HTMLElement | null>(null)
 
 // message control
@@ -21,7 +20,8 @@ function sendMessage() {
       content: newMessage.value.trim(),
       time: useLocalTimeString(),
     })
-    chatStore.fetchMessage()
+    // chatStore.fetchMessage()
+    chatStore.chatWithMindMap(newMessage.value.trim())
     newMessage.value = ''
   }
 }
@@ -38,7 +38,7 @@ function handleEnter(e: any) {
 </script>
 
 <template>
-  <div v-show="modelValue" class="border h-[600px] sm:w-full mt-2 shadow-box glass max-w-[400px]">
+  <div class="border h-[500px] mt-2 shadow-box glass">
     <div class="flex flex-col h-full p-3">
       <div v-if="chatStore.messages" class="flex-1 overflow-y-auto">
         <div
@@ -47,7 +47,7 @@ function handleEnter(e: any) {
           <div class="flex-shrink-0">
             <!-- <img :src="message.avatar" alt="avatar" class="w-8 h-8 rounded-full"> -->
           </div>
-          <div class="ml-3">
+          <div v-if="message.role === 'user'" class="ml-3">
             <div class="text-base font-semibold">
               {{ message.role }}
             </div>
@@ -55,6 +55,7 @@ function handleEnter(e: any) {
               {{ message.content }}
             </div>
           </div>
+          <RobotMessage v-else :message="message" />
         </div>
       </div>
       <div v-else class="flex justify-center items-center h-full">

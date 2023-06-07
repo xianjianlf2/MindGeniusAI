@@ -2,7 +2,7 @@ import { defineStore } from 'pinia'
 import { ref } from 'vue'
 import { v4 as uuidv4 } from 'uuid'
 import { useLocalTimeString } from '../utils'
-import { fetchChatStream } from '../api'
+import { chatWithMindMapRequest, fetchChatStream } from '../api'
 
 export interface Message {
   id: string
@@ -15,7 +15,7 @@ export const useChatStore = defineStore('chatStore', () => {
     {
       id: uuidv4(),
       role: 'assistant',
-      content: 'Hello! How can I assist you today?',
+      content: 'Hello! Please write your topic you want to generate a mindmap',
       time: useLocalTimeString(),
     },
   ])
@@ -29,6 +29,10 @@ export const useChatStore = defineStore('chatStore', () => {
 
   function fetchMessage() {
     return fetchChatStream(messages.value.slice(-3))
+  }
+
+  function chatWithMindMap(topic: string) {
+    return chatWithMindMapRequest(topic)
   }
 
   function appendMessage(message: string) {
@@ -56,6 +60,7 @@ export const useChatStore = defineStore('chatStore', () => {
     removeMessage,
     appendMessage,
     fetchMessage,
+    chatWithMindMap,
   }
 },
 )

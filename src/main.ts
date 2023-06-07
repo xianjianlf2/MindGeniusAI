@@ -9,7 +9,6 @@ import 'virtual:uno.css'
 import '@vue-flow/core/dist/style.css'
 import '@vue-flow/core/dist/theme-default.css'
 import 'ant-design-vue/dist/reset.css'
-
 const pinia = createPinia()
 
 const app = createApp(App)
