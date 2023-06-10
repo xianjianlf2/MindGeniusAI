@@ -1,4 +1,4 @@
-<img src="https://gitee.com/mark_xian/graphic-bed/raw/master/202306101726087.png" alt="logo_transparent" style="zoom: 33%;" />
+![mindGenius](https://github.com/xianjianlf2/MindGeniusAI/blob/main/markdownImg/logo.png?raw=true)
 
 <center>An AI-powered tool for generating mind maps, enhancing productivity by streamlining idea organization.</center>
 
@@ -7,7 +7,7 @@
 - Generates mind maps automatically based on user input
 - Offers various customization options for the generated mind maps
 - Supports exporting the mind maps in various formats, such as PNG, PDF, and SVG
-![mindmap](https://gitee.com/mark_xian/graphic-bed/raw/master/202306101041874.gif)
+![mindmap](https://github.com/xianjianlf2/MindGeniusAI/blob/main/markdownImg/mindmap.gif?raw=true)
 
 ## Motivation
 ----
