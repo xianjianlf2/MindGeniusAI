@@ -1,8 +1,6 @@
-![image-20230610140346190](https://gitee.com/mark_xian/graphic-bed/raw/master/202306101403488.png)
+<img src="https://gitee.com/mark_xian/graphic-bed/raw/master/202306101726087.png" alt="logo_transparent" style="zoom: 33%;" />
 
 <center>An AI-powered tool for generating mind maps, enhancing productivity by streamlining idea organization.</center>
-
----
 
 ## Features
 ---
@@ -22,6 +20,18 @@ The motivation behind AI-powered mind map generator tools is to help users creat
 
 - [Flowise](https://github.com/FlowiseAI/Flowise)
 - Xmind
+
+## Installation
+
+---
+
+```bash
+git clone https://github.com/xianjianlf2/MindGeniusAI.git
+cd server
+# config your env file (which file name is .env)
+# run server and client
+# enjoy it
+```
 
 ## License
 
