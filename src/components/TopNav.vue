@@ -4,6 +4,10 @@ import { ref } from 'vue'
 import ChatBox from './ChatBox.vue'
 
 const showChatBox = ref(false)
+
+function handleOpenGitHub() {
+  window.open('https://github.com/xianjianlf2/MindGeniusAI', '_blank')
+}
 </script>
 
 <template>
@@ -13,8 +17,8 @@ const showChatBox = ref(false)
       <span>Create a mindMap</span>
     </div>
 
-    <!-- <div class="flex gap-2 justify-center items-center">
-      <a-button type="text">
+    <div class="flex gap-2 justify-center items-center">
+      <!-- <a-button type="text">
         <template #icon>
           <span class="button-icon">
             <Icon icon="bx:save" width="24" color="white" />
@@ -27,10 +31,17 @@ const showChatBox = ref(false)
             <Icon icon="mdi:cog" width="24" />
           </span>
         </template>
+      </a-button> -->
+      <a-button type="text" @click="handleOpenGitHub">
+        <template #icon>
+          <span class="button-icon">
+            <Icon icon="mdi:github" width="24" />
+          </span>
+        </template>
       </a-button>
-    </div> -->
+    </div>
   </div>
-  <a-modal v-model:open="showChatBox" title="Talking with gpt" :footer="null" :mask-closable="false">
+  <a-modal v-model:open="showChatBox" title="Talking with AI" :footer="null" :mask-closable="false">
     <ChatBox />
   </a-modal>
 </template>

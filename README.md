@@ -1,18 +1,30 @@
-# Vue 3 + TypeScript + Vite
+![image-20230610140346190](https://gitee.com/mark_xian/graphic-bed/raw/master/202306101403488.png)
 
-This template should help get you started developing with Vue 3 and TypeScript in Vite. The template uses Vue 3 `<script setup>` SFCs, check out the [script setup docs](https://v3.vuejs.org/api/sfc-script-setup.html#sfc-script-setup) to learn more.
+<center>An AI-powered tool for generating mind maps, enhancing productivity by streamlining idea organization.</center>
 
-## Recommended IDE Setup
+---
 
-- [VS Code](https://code.visualstudio.com/) + [Volar](https://marketplace.visualstudio.com/items?itemName=Vue.volar) (and disable Vetur) + [TypeScript Vue Plugin (Volar)](https://marketplace.visualstudio.com/items?itemName=Vue.vscode-typescript-vue-plugin).
+## Features
+---
+- Generates mind maps automatically based on user input
+- Offers various customization options for the generated mind maps
+- Supports exporting the mind maps in various formats, such as PNG, PDF, and SVG
+![mindmap](https://gitee.com/mark_xian/graphic-bed/raw/master/202306101041874.gif)
 
-## Type Support For `.vue` Imports in TS
+## Motivation
+----
 
-TypeScript cannot handle type information for `.vue` imports by default, so we replace the `tsc` CLI with `vue-tsc` for type checking. In editors, we need [TypeScript Vue Plugin (Volar)](https://marketplace.visualstudio.com/items?itemName=Vue.vscode-typescript-vue-plugin) to make the TypeScript language service aware of `.vue` types.
+The motivation behind AI-powered mind map generator tools is to help users create mind maps more quickly and efficiently. Traditional manual mind map creation requires a lot of time and effort, while using an AI-powered tool can greatly reduce the time needed and increase productivity. Additionally, AI-powered mind map generator tools can automatically generate related nodes and branches based on the keywords and information provided by the user, helping to streamline the mind mapping process.
 
-If the standalone TypeScript plugin doesn't feel fast enough to you, Volar has also implemented a [Take Over Mode](https://github.com/johnsoncodehk/volar/discussions/471#discussioncomment-1361669) that is more performant. You can enable it by the following steps:
+## Inspiration
 
-1. Disable the built-in TypeScript Extension
-   1. Run `Extensions: Show Built-in Extensions` from VSCode's command palette
-   2. Find `TypeScript and JavaScript Language Features`, right click and select `Disable (Workspace)`
-2. Reload the VSCode window by running `Developer: Reload Window` from the command palette.
+---
+
+- [Flowise](https://github.com/FlowiseAI/Flowise)
+- Xmind
+
+## License
+
+---
+
+Source code in this repository is made available under the [MIT License](https://github.com/xianjianlf2/MindGeniusAI/blob/main/LICENSE).

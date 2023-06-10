@@ -5,6 +5,7 @@ import { Snapline } from '@antv/x6-plugin-snapline'
 import Hierarchy from '@antv/hierarchy'
 import { Keyboard } from '@antv/x6-plugin-keyboard'
 import { Selection } from '@antv/x6-plugin-selection'
+import { cloneDeep } from 'lodash'
 import type { MindMapData } from '../stores'
 import { useNodeStore } from '../stores'
 
@@ -21,7 +22,7 @@ const graphRef = ref<Graph>()
 const containerRef = ref()
 const nodeStore = useNodeStore()
 watch(() => nodeStore.nodes, (nodes) => {
-  data.value = nodes
+  data.value = cloneDeep(nodes)
   if (nodes) {
     useBindingKeyBoard(graphRef.value!, render)
     render(graphRef.value!)
@@ -73,6 +74,16 @@ Graph.registerNode(
         fill: '#262626',
       },
     },
+    tools: [
+      {
+        name: 'node-editor',
+        args: {
+          attrs: {
+            backgroundColor: '#5F95FF',
+          },
+        },
+      },
+    ],
   },
   true,
 )
@@ -113,6 +124,16 @@ Graph.registerNode(
         d: 'M 0 15 L 60 15',
       },
     },
+    tools: [
+      {
+        name: 'node-editor',
+        args: {
+          attrs: {
+            backgroundColor: '#5F95FF',
+          },
+        },
+      },
+    ],
   },
   true,
 )
@@ -266,7 +287,7 @@ function addChildNode(id: string, type: any) {
       item = {
         id: `${id}-${length + 1}`,
         type: 'topic-branch',
-        label: `分支主题${length + 1}`,
+        label: `topic-branch-${length + 1}`,
         width: 100,
         height: 40,
       }
@@ -275,7 +296,7 @@ function addChildNode(id: string, type: any) {
       item = {
         id: `${id}-${length + 1}`,
         type: 'topic-child',
-        label: `子主题${length + 1}`,
+        label: `topic-child-${length + 1}`,
         width: 60,
         height: 30,
       }
@@ -307,28 +328,22 @@ function removeNode(id: string) {
 function useInitMindMap() {
   const graph = new Graph({
     container: containerRef.value,
-    background: {
-      color: '#F2F7FA',
-    },
     mousewheel: true,
     autoResize: true,
     panning: true,
   })
-  graph.use(
-    new Snapline({
-      enabled: true,
-    }),
-  )
-  graph.use(
-    new Keyboard({
-      enabled: true,
-    }),
-  )
-  graph.use(
-    new Selection({
-      enabled: true,
-    }),
-  )
+  graph.use(new Snapline())
+  graph.use(new Selection(
+    {
+      multiple: true,
+      modifiers: ['alt'],
+      rubberband: true,
+      showNodeSelectionBox: true,
+      pointerEvents: 'none',
+    },
+  ))
+  graph.use(new Keyboard())
+
   return { graph }
 }
 
@@ -337,14 +352,14 @@ function useBindingKeyBoard(graph: Graph, render: any) {
     const { id } = node
     const type = node.prop('type')
     if (addChildNode(id, type))
-      render()
+      render(graph)
   })
   graph.bindKey(['backspace', 'delete'], () => {
     const selectedNodes = graph.getSelectedCells().filter(item => item.isNode())
     if (selectedNodes.length) {
       const { id } = selectedNodes[0]
       if (removeNode(id))
-        render()
+        render(graph)
     }
   })
 
@@ -355,7 +370,7 @@ function useBindingKeyBoard(graph: Graph, render: any) {
       const node = selectedNodes[0]
       const type = node.prop('type')
       if (addChildNode(node.id, type))
-        render()
+        render(graph)
     }
   })
 }
@@ -370,6 +385,4 @@ onMounted(() => {
   <div ref="containerRef" />
 </template>
 
-<style scoped>
-
-</style>
+<style scoped></style>

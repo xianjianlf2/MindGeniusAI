@@ -10,15 +10,14 @@ export interface MindMapData {
   width?: number
   height?: number
   children?: MindMapData[]
+  tools?: any[]
 }
 
 export const useNodeStore = defineStore('nodeStore', () => {
   const nodes = ref<MindMapData>()
 
   function generateNode(markdown: string) {
-    const regex = /(?<=\[START\]).*/
-    const cleanText = markdown.match(regex)
-    const result = getNodes(cleanText ? cleanText[0] : markdown)
+    const result = getNodes(markdown)
     if (result === undefined || result.length === 0) {
       message.info('There is no mindmap generated.')
       return

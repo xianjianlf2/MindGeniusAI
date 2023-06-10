@@ -5,5 +5,5 @@ export function measureText(text: string, font = '14px Arial') {
   const width = context!.measureText(text).width
   const height = parseInt(font, 10)
   const padding = 10
-  return { width: width + padding, height: height + padding }
+  return { width: width + padding, height: height + padding * 2 }
 }

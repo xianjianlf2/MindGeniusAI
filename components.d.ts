@@ -18,6 +18,7 @@ declare module '@vue/runtime-core' {
     ALayoutFooter: typeof import('ant-design-vue/es')['LayoutFooter']
     ALayoutHeader: typeof import('ant-design-vue/es')['LayoutHeader']
     AModal: typeof import('ant-design-vue/es')['Modal']
+    APopconfirm: typeof import('ant-design-vue/es')['Popconfirm']
     ARadioButton: typeof import('ant-design-vue/es')['RadioButton']
     ARadioGroup: typeof import('ant-design-vue/es')['RadioGroup']
     ASpin: typeof import('ant-design-vue/es')['Spin']

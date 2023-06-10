@@ -39,7 +39,7 @@ function fetchChat(url: string, data: any) {
     onmessage(msg) {
       const { status, data } = JSON.parse(msg.data)
       if (status === MessageStatus.PENDING)
-        chatStore.appendMessage(data)
+        chatStore.appendMessage(`${data}`)
 
       else if (status === MessageStatus.DONE)
         controller.abort()
