@@ -17,13 +17,19 @@ export const useNodeStore = defineStore('nodeStore', () => {
   const nodes = ref<MindMapData>()
 
   function generateNode(markdown: string) {
+    if (!markdown) {
+      message.info('There is no content')
+      return
+    }
     const result = getNodes(markdown)
     if (result === undefined || result.length === 0) {
       message.info('There is no mindmap generated.')
       return
     }
-    if (Array.isArray(result) && result.length > 0)
+    if (Array.isArray(result) && result.length > 0) {
+      message.success('Mindmap generated.')
       nodes.value = result[0]
+    }
   }
 
   return {
