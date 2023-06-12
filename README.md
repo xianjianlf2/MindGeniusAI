@@ -16,7 +16,7 @@
 - [ ] dark mode
 - [ ] change node style
 
-![mindmap](https://github.com/xianjianlf2/MindGeniusAI/blob/main/markdownImg/mindmap.gif?raw=true)
+![mindmap](https://github.com/xianjianlf2/MindGeniusAI/blob/main/markdownImg/MindMapSample.gif?raw=true)
 
 ![mindmap](https://github.com/xianjianlf2/MindGeniusAI/blob/main/markdownImg/ModifyNode.gif?raw=true)
 
