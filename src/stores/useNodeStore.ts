@@ -5,7 +5,7 @@ import { getNodes } from '../utils/useConvertMarkdown'
 
 export interface MindMapData {
   id: string
-  type: 'topic' | 'topic-branch' | 'topic-child'
+  type: 'topic' | 'topic-branch' | 'topic-child' | 'rect-xml'
   label: string
   width?: number
   height?: number

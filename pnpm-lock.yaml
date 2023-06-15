@@ -10,6 +10,9 @@ dependencies:
   '@antv/x6-plugin-selection':
     specifier: ^2.1.7
     version: 2.1.7(@antv/x6@2.11.1)
+  '@antv/x6-vue-shape':
+    specifier: ^2.0.11
+    version: 2.0.11(@antv/x6@2.11.1)(vue@3.3.4)
   '@iconify-icons/bi':
     specifier: ^1.2.17
     version: 1.2.17
@@ -312,6 +315,21 @@ packages:
     dependencies:
       '@antv/x6': 2.11.1
     dev: true
+
+  /@antv/x6-vue-shape@2.0.11(@antv/x6@2.11.1)(vue@3.3.4):
+    resolution: {integrity: sha512-LYNkvL9AjbeAi6ZzA2/aNRKv0E0+bgR5nMQlcqC+75bYoZtCpd7ZkECcOQhDU4s/DE2+EyyPX8aI1e2pA39Y/A==}
+    peerDependencies:
+      '@antv/x6': ^2.x
+      '@vue/composition-api': ^1.0.0-rc.1
+      vue: ^2.0.0 || >=3.0.0
+    peerDependenciesMeta:
+      '@vue/composition-api':
+        optional: true
+    dependencies:
+      '@antv/x6': 2.11.1
+      vue: 3.3.4
+      vue-demi: 0.14.5(vue@3.3.4)
+    dev: false
 
   /@antv/x6@2.11.1:
     resolution: {integrity: sha512-DwyuT/zuTEhwsnKwCj67cadwLeEbB5jfdCxrkTnEm6pg0+vT3FinbF71IK7SHoY8d4HOHl+sJt7ikJfr61JqLw==}

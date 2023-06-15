@@ -11,10 +11,9 @@ function handleOpenGitHub() {
 </script>
 
 <template>
-  <div class="flex justify-between items-center bg-gradient-to-r from-gray-700 via-gray-900 to-black p-3 ">
-    <div class="flex items-center justify-center gap-2 text-white cursor-pointer border border-1 border-dashed py-2 px-5 rounded-2xl" @click="showChatBox = true">
-      <Icon icon="ic:baseline-search" width="24" />
-      <span>Create a mindMap</span>
+  <div class="flex justify-between items-center header" @click="showChatBox = true">
+    <div class="card">
+      <span>create a mind map</span>
     </div>
 
     <div class="flex gap-2 justify-center items-center">
@@ -35,7 +34,7 @@ function handleOpenGitHub() {
       <a-button type="text" @click="handleOpenGitHub">
         <template #icon>
           <span class="button-icon">
-            <Icon icon="mdi:github" width="24" />
+            <Icon icon="mdi:github" width="24" color="white" />
           </span>
         </template>
       </a-button>
@@ -46,4 +45,37 @@ function handleOpenGitHub() {
   </a-modal>
 </template>
 
-<style scoped></style>
+<style scoped>
+.card {
+  background: linear-gradient(-90deg, #5EFCE8 10%, #736EFE 100%);
+  border-radius: 8px;
+  box-shadow: 0px 10px 20px 20px rgba(0, 0, 0, 0.17);
+  padding: 15px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.card:hover span {
+  color: #fff;
+}
+
+.card:hover {
+  animation-play-state: paused;
+  cursor: pointer;
+  ;
+}
+
+.card span {
+  font-family: 'Amatic SC';
+  color: #fff;
+  letter-spacing: 2px;
+  text-align: center;
+  font-weight: bold;
+}
+
+.header {
+  padding: 8px;
+  background-image: linear-gradient(135deg, #5EFCE8 10%, #736EFE 100%);
+}
+</style>

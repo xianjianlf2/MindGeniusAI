@@ -14,6 +14,7 @@
     "@antv/x6": "^2.11.1",
     "@antv/x6-plugin-keyboard": "^2.2.1",
     "@antv/x6-plugin-selection": "^2.1.7",
+    "@antv/x6-vue-shape": "^2.0.11",
     "@iconify-icons/bi": "^1.2.17",
     "@microsoft/fetch-event-source": "^2.0.1",
     "@vue-flow/background": "^1.2.0",

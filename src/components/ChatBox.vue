@@ -41,21 +41,11 @@ function handleEnter(e: any) {
   <div class="border h-[500px] mt-2 shadow-box glass">
     <div class="flex flex-col h-full p-3">
       <div v-if="chatStore.messages" class="flex-1 overflow-y-auto">
-        <div
-          v-for="message in chatStore.messages" :key="message.id" class="flex items-start mb-4"
-        >
+        <div v-for="message in chatStore.messages" :key="message.id" class="flex items-start mb-4">
           <div class="flex-shrink-0">
             <!-- <img :src="message.avatar" alt="avatar" class="w-8 h-8 rounded-full"> -->
           </div>
-          <div v-if="message.role === 'user'" class="ml-3">
-            <div class="text-base font-semibold">
-              {{ message.role }}
-            </div>
-            <div class="mt-1 text-sm  inline-block break-words">
-              {{ message.content }}
-            </div>
-          </div>
-          <RobotMessage v-else :message="message" />
+          <RobotMessage :message="message" />
         </div>
       </div>
       <div v-else class="flex justify-center items-center h-full">
@@ -85,3 +75,7 @@ function handleEnter(e: any) {
     </div>
   </div>
 </template>
+
+<style scoped>
+
+</style>

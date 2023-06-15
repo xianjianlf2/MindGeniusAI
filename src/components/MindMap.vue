@@ -6,8 +6,10 @@ import Hierarchy from '@antv/hierarchy'
 import { Keyboard } from '@antv/x6-plugin-keyboard'
 import { Selection } from '@antv/x6-plugin-selection'
 import { cloneDeep } from 'lodash'
+import { register } from '@antv/x6-vue-shape'
 import type { MindMapData } from '../stores'
 import { useNodeStore } from '../stores'
+import CustomerNode from './CustomerNode.vue'
 
 interface HierarchyResult {
   id: string
@@ -175,6 +177,13 @@ Graph.registerEdge(
   },
   true,
 )
+
+register({
+  shape: 'custom-vue-node',
+  width: 100,
+  height: 100,
+  component: CustomerNode,
+})
 
 function render(graph: Graph) {
   const result: HierarchyResult = Hierarchy.mindmap(data.value, {
@@ -378,6 +387,11 @@ function useBindingKeyBoard(graph: Graph, render: any) {
 onMounted(() => {
   const { graph } = useInitMindMap()
   graphRef.value = graph
+  graph.addNode({
+    shape: 'custom-vue-node',
+    x: 100,
+    y: 60,
+  })
 })
 </script>
 
