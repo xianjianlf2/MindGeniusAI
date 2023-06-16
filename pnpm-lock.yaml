@@ -4,6 +4,9 @@ dependencies:
   '@antv/x6':
     specifier: ^2.11.1
     version: 2.11.1
+  '@antv/x6-plugin-history':
+    specifier: ^2.2.3
+    version: 2.2.3(@antv/x6@2.11.1)
   '@antv/x6-plugin-keyboard':
     specifier: ^2.2.1
     version: 2.2.1(@antv/x6@2.11.1)
@@ -72,6 +75,9 @@ devDependencies:
   '@antv/x6-plugin-snapline':
     specifier: ^2.1.7
     version: 2.1.7(@antv/x6@2.11.1)
+  '@iconify-icons/carbon':
+    specifier: ^1.2.18
+    version: 1.2.18
   '@iconify-icons/mdi':
     specifier: ^1.2.46
     version: 1.2.46
@@ -290,6 +296,14 @@ packages:
 
   /@antv/x6-geometry@2.0.5:
     resolution: {integrity: sha512-MId6riEQkxphBpVeTcL4ZNXL4lScyvDEPLyIafvWMcWNTGK0jgkK7N20XSzqt8ltJb0mGUso5s56mrk8ysHu2A==}
+
+  /@antv/x6-plugin-history@2.2.3(@antv/x6@2.11.1):
+    resolution: {integrity: sha512-yiv5e7CQKm1HrJe7je4iWjkzDzU+I0WsyL8En2j0UwXJrUNaKYyv4BkRg2tvyi52hydxidMgi3tNnNQHEZwoMg==}
+    peerDependencies:
+      '@antv/x6': ^2.x
+    dependencies:
+      '@antv/x6': 2.11.1
+    dev: false
 
   /@antv/x6-plugin-keyboard@2.2.1(@antv/x6@2.11.1):
     resolution: {integrity: sha512-sqfN0h4txVO211uIeKBd3zQ/IN2zPzDThWNTEhRx7Lecg1fO7uRXWBbOA48j3EgpRFXVexdSzIEVJEx+IWUdYw==}
@@ -828,6 +842,12 @@ packages:
     dependencies:
       '@iconify/types': 2.0.0
     dev: false
+
+  /@iconify-icons/carbon@1.2.18:
+    resolution: {integrity: sha512-nRMiI6qftRMoZyFDd3DHkhiQntucC0D1nJZscDSjLIl1hTsFXVexh91p0TOTFIrAKeiSK/QL46v4l7US2m766A==}
+    dependencies:
+      '@iconify/types': 2.0.0
+    dev: true
 
   /@iconify-icons/mdi@1.2.46:
     resolution: {integrity: sha512-/8se1J8YqupamWqyTejcX6zIrWgZQ8A5+7hWhHXcJD5Rc5OteEM2nuEq2NI29loAs/W9JZP4mH38uz6w2CETkw==}

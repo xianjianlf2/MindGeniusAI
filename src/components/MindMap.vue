@@ -7,9 +7,12 @@ import { Keyboard } from '@antv/x6-plugin-keyboard'
 import { Selection } from '@antv/x6-plugin-selection'
 import { cloneDeep } from 'lodash'
 import { register } from '@antv/x6-vue-shape'
+import { History } from '@antv/x6-plugin-history'
 import type { MindMapData } from '../stores'
 import { useNodeStore } from '../stores'
 import CustomerNode from './CustomerNode.vue'
+import GraphToolbar from './GraphToolbar.vue'
+import type { HistoryState } from './types'
 
 interface HierarchyResult {
   id: string
@@ -23,10 +26,15 @@ const data = ref<MindMapData>()
 const graphRef = ref<Graph>()
 const containerRef = ref()
 const nodeStore = useNodeStore()
+const historyState = ref<HistoryState>({
+  canRedo: false,
+  canUndo: false,
+})
 watch(() => nodeStore.nodes, (nodes) => {
   data.value = cloneDeep(nodes)
   if (nodes) {
-    useBindingKeyBoard(graphRef.value!, render)
+    const { historyState: state } = useBindingKeyBoard(graphRef.value!, render)
+    historyState.value = state
     render(graphRef.value!)
     graphRef.value?.zoomToFit({ padding: 20 })
   }
@@ -352,17 +360,36 @@ function useInitMindMap() {
     },
   ))
   graph.use(new Keyboard())
+  graph.use(new History())
 
   return { graph }
 }
-
-function useBindingKeyBoard(graph: Graph, render: any) {
+function handleAddTopic(graph: Graph, render: any) {
   graph.on('add:topic', ({ node }: { node: any }) => {
     const { id } = node
     const type = node.prop('type')
     if (addChildNode(id, type))
       render(graph)
   })
+}
+
+function handleHistoryChange(graph: Graph) {
+  let historyState: HistoryState = {
+    canRedo: false,
+    canUndo: false,
+  }
+
+  graph.on('history:change', () => {
+    historyState = {
+      canRedo: graph.canRedo(),
+      canUndo: graph.canUndo(),
+    }
+  })
+
+  return historyState
+}
+
+function handleDeleteKey(graph: Graph, render: any) {
   graph.bindKey(['backspace', 'delete'], () => {
     const selectedNodes = graph.getSelectedCells().filter(item => item.isNode())
     if (selectedNodes.length) {
@@ -371,7 +398,9 @@ function useBindingKeyBoard(graph: Graph, render: any) {
         render(graph)
     }
   })
+}
 
+function handleTabKey(graph: Graph, render: any) {
   graph.bindKey('tab', (e) => {
     e.preventDefault()
     const selectedNodes = graph.getSelectedCells().filter(item => item.isNode())
@@ -382,6 +411,17 @@ function useBindingKeyBoard(graph: Graph, render: any) {
         render(graph)
     }
   })
+}
+
+function useBindingKeyBoard(graph: Graph, render: any) {
+  handleAddTopic(graph, render)
+  const historyState = handleHistoryChange(graph)
+  handleDeleteKey(graph, render)
+  handleTabKey(graph, render)
+
+  return {
+    historyState,
+  }
 }
 
 onMounted(() => {
@@ -396,7 +436,12 @@ onMounted(() => {
 </script>
 
 <template>
-  <div ref="containerRef" />
+  <div class="h-full w-full flex flex-col">
+    <div class="p-2 w-full flex justify-start items-center bg-white">
+      <GraphToolbar :graph="graphRef!" :history-state="historyState" />
+    </div>
+    <div ref="containerRef" />
+  </div>
 </template>
 
 <style scoped></style>
