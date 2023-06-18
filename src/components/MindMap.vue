@@ -11,7 +11,7 @@ import { History } from '@antv/x6-plugin-history'
 import type { MindMapData } from '../stores'
 import { useNodeStore } from '../stores'
 import CustomerNode from './CustomerNode.vue'
-import GraphToolbar from './GraphToolbar.vue'
+import GraphToolbar from './GraphToolBar.vue'
 import type { HistoryState } from './types'
 
 interface HierarchyResult {
@@ -30,15 +30,21 @@ const historyState = ref<HistoryState>({
   canRedo: false,
   canUndo: false,
 })
-watch(() => nodeStore.nodes, (nodes) => {
-  data.value = cloneDeep(nodes)
-  if (nodes) {
-    const { historyState: state } = useBindingKeyBoard(graphRef.value!, render)
-    historyState.value = state
-    render(graphRef.value!)
-    graphRef.value?.zoomToFit({ padding: 20 })
-  }
-})
+watch(
+  () => nodeStore.nodes,
+  (nodes) => {
+    data.value = cloneDeep(nodes)
+    if (nodes) {
+      const { historyState: state } = useBindingKeyBoard(
+        graphRef.value!,
+        render,
+      )
+      historyState.value = state
+      render(graphRef.value!)
+      graphRef.value?.zoomToFit({ padding: 20 })
+    }
+  },
+)
 
 // topic
 Graph.registerNode(
@@ -269,8 +275,10 @@ function render(graph: Graph) {
   graph.centerContent()
 }
 
-function findItem(obj: MindMapData,
-  id: string): {
+function findItem(
+  obj: MindMapData,
+  id: string,
+): {
     parent: MindMapData | null
     node: MindMapData | null
   } | null {
@@ -321,9 +329,7 @@ function addChildNode(id: string, type: any) {
     if (item) {
       if (dataItem.children)
         dataItem.children.push(item)
-
-      else
-        dataItem.children = [item]
+      else dataItem.children = [item]
 
       return item
     }
@@ -348,17 +354,20 @@ function useInitMindMap() {
     mousewheel: true,
     autoResize: true,
     panning: true,
+    background: {
+      color: '#0F1729',
+    },
   })
   graph.use(new Snapline())
-  graph.use(new Selection(
-    {
+  graph.use(
+    new Selection({
       multiple: true,
       modifiers: ['alt'],
       rubberband: true,
       showNodeSelectionBox: true,
       pointerEvents: 'none',
-    },
-  ))
+    }),
+  )
   graph.use(new Keyboard())
   graph.use(new History())
 
@@ -391,7 +400,9 @@ function handleHistoryChange(graph: Graph) {
 
 function handleDeleteKey(graph: Graph, render: any) {
   graph.bindKey(['backspace', 'delete'], () => {
-    const selectedNodes = graph.getSelectedCells().filter(item => item.isNode())
+    const selectedNodes = graph
+      .getSelectedCells()
+      .filter(item => item.isNode())
     if (selectedNodes.length) {
       const { id } = selectedNodes[0]
       if (removeNode(id))
@@ -403,7 +414,9 @@ function handleDeleteKey(graph: Graph, render: any) {
 function handleTabKey(graph: Graph, render: any) {
   graph.bindKey('tab', (e) => {
     e.preventDefault()
-    const selectedNodes = graph.getSelectedCells().filter(item => item.isNode())
+    const selectedNodes = graph
+      .getSelectedCells()
+      .filter(item => item.isNode())
     if (selectedNodes.length) {
       const node = selectedNodes[0]
       const type = node.prop('type')
@@ -437,11 +450,12 @@ onMounted(() => {
 
 <template>
   <div class="h-full w-full flex flex-col">
-    <div class="p-2 w-full flex justify-start items-center bg-white">
+    <div class="flex  items-center bg-#1e293b">
       <GraphToolbar :graph="graphRef!" :history-state="historyState" />
     </div>
     <div ref="containerRef" />
   </div>
 </template>
 
-<style scoped></style>
+<style scoped>
+</style>

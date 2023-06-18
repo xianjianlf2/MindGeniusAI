@@ -9,6 +9,7 @@ declare module 'vue' {
   export interface GlobalComponents {
     AAlert: typeof import('ant-design-vue/es')['Alert']
     AButton: typeof import('ant-design-vue/es')['Button']
+    AConfigProvider: typeof import('ant-design-vue/es')['ConfigProvider']
     AInput: typeof import('ant-design-vue/es')['Input']
     AInputGroup: typeof import('ant-design-vue/es')['InputGroup']
     ALayout: typeof import('ant-design-vue/es')['Layout']
@@ -34,6 +35,7 @@ declare module 'vue' {
     RobotMessage: typeof import('./src/components/RobotMessage.vue')['default']
     RouterLink: typeof import('vue-router')['RouterLink']
     RouterView: typeof import('vue-router')['RouterView']
+    ShareCard: typeof import('./src/components/ShareCard.vue')['default']
     TopNav: typeof import('./src/components/TopNav.vue')['default']
   }
 }

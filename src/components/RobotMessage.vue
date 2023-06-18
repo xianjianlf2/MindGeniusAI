@@ -34,16 +34,22 @@ const robotContent = computed(() => {
 </script>
 
 <template>
-  <div class="w-full" :class="props.message.role === 'user' ? 'user-bubble' : 'robot-bubble'" @mouseenter="showButtonGroup = true" @mouseleave="showButtonGroup = false">
+  <div
+    class="w-full" :class="props.message.role === 'user' ? 'user-bubble' : 'robot-bubble'"
+    @mouseenter="showButtonGroup = true" @mouseleave="showButtonGroup = false"
+  >
     <div class="w-full flex items-center justify-between p-2 ">
       <div class="text-base font-semibold text-sm h-[28px]">
         {{ props.message.role.toUpperCase() }}
       </div>
       <div v-show="showButtonGroup" class="flex justify-end items-center gap-2">
-        <a-button v-if="props.message.role === 'assistant'" type="primary" ghost size="small" @click="nodeStore.generateNode(props.message.content)">
+        <a-button
+          v-if="props.message.role === 'assistant'" type="primary" size="small"
+          @click="nodeStore.generateNode(props.message.content)"
+        >
           generate
         </a-button>
-        <a-button type="primary" ghost size="small" @click="useCopyText(props.message.content)">
+        <a-button type="primary" size="small" @click="useCopyText(props.message.content)">
           copy
         </a-button>
         <a-popconfirm
@@ -51,7 +57,7 @@ const robotContent = computed(() => {
           @confirm="confirm(props.message.id)"
         >
           <a href="#">
-            <a-button danger ghost size="small">
+            <a-button danger size="small" type="primary">
               delete
             </a-button></a>
         </a-popconfirm>
@@ -65,11 +71,12 @@ const robotContent = computed(() => {
 .robot-bubble {
   border-radius: 8px;
   padding: 8px;
-  background: radial-gradient(61.04% 89.69% at 100% 100%, rgba(200, 250, 255, .08) 0%, rgba(28, 210, 229, .08) 40.63%, rgba(28, 210, 229, 0) 100%), radial-gradient(43.78% 64.34% at 60.31% 100%, rgba(23, 74, 228, .08) 0%, rgba(23, 74, 228, 0) 100%), linear-gradient(180deg, rgba(23, 74, 228, 0) 29.44%, rgba(23, 74, 228, .06) 100%), linear-gradient(90deg, #f3f3f7 0%, #ebf0f9 100%)
+  background-image: linear-gradient(-20deg, #2b5876 0%, #4e4376 100%);
 }
+
 .user-bubble {
   border-radius: 8px;
   padding: 8px;
-  background-image: linear-gradient(135deg, #93a5cf 0%, #e4efe9 60%);
+  background-image: linear-gradient(to right, #243949 0%, #517fa4 100%);
 }
 </style>

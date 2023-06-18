@@ -55,7 +55,7 @@ function handleEnter(e: any) {
         </div>
       </div>
       <div class="flex-none">
-        <div ref="inputWrapper" class="flex items-center px-4 py-2 bg-gray-100 rounded-md relative">
+        <div ref="inputWrapper" class="flex items-center px-4 py-2 rounded-md relative">
           <div class="flex-1 mr-2">
             <a-textarea
               v-model:value="newMessage" type="text" class="w-full px-4 py-2 border border-gray-300 rounded-md"
