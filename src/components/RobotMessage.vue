@@ -1,41 +1,46 @@
 <script setup lang="ts">
 import type { PropType } from 'vue'
 import { computed, ref } from 'vue'
-import DOMPurify from 'dompurify'
-import { marked } from 'marked'
-import { mangle } from 'marked-mangle'
-import type { Message } from '../stores/useChatStore'
-import { useChatStore } from '../stores/useChatStore'
-import { useNodeStore } from '../stores'
+import type { Message } from '@/stores'
+import { useChatStore, useNodeStore } from '@/stores'
 import { useCopyText } from '@/utils'
+import { useGenerateMarkdown } from '@/hooks/useGenerateMarkdown'
 
 const props = defineProps({
   message: {
     type: Object as PropType<Message>,
     required: true,
   },
+  isLoading: {
+    type: Boolean,
+    default: false,
+  },
 })
 
 const showButtonGroup = ref(false)
-
 const nodeStore = useNodeStore()
 const chatStore = useChatStore()
-
-marked.use(mangle())
 
 function confirm(id: Message['id']) {
   chatStore.removeMessage(id)
 }
 
-const robotContent = computed(() => {
-  const markdownString = DOMPurify.sanitize(props.message.content)
-  return marked.parse(markdownString)
-})
+const robotContent = computed(() => useGenerateMarkdown(props.message.content))
+
+function handleBubbleStyle() {
+  if (props.message.role === 'user')
+    return 'user-bubble'
+
+  else if (props.isLoading)
+    return 'robot-bubble bubble-transition'
+  else
+    return 'robot-bubble'
+}
 </script>
 
 <template>
   <div
-    class="w-full" :class="props.message.role === 'user' ? 'user-bubble' : 'robot-bubble'"
+    class="w-full" :class="handleBubbleStyle()"
     @mouseenter="showButtonGroup = true" @mouseleave="showButtonGroup = false"
   >
     <div class="w-full flex items-center justify-between p-2 ">
@@ -68,10 +73,26 @@ const robotContent = computed(() => {
 </template>
 
 <style scoped>
+@keyframes placeholderShimmer {
+  0% {
+    background-position: -468px 0;
+  }
+
+  100% {
+    background-position: 468px 0;
+  }
+}
+
 .robot-bubble {
   border-radius: 8px;
   padding: 8px;
   background-image: linear-gradient(-20deg, #2b5876 0%, #4e4376 100%);
+
+}
+
+.bubble-transition {
+  animation: placeholderShimmer 8s infinite ease-in-out;
+  background-size: 800px 104px;
 }
 
 .user-bubble {

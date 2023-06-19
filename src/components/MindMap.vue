@@ -41,163 +41,172 @@ watch(
       )
       historyState.value = state
       render(graphRef.value!)
-      graphRef.value?.zoomToFit({ padding: 20 })
+      graphRef.value!.addNode({
+        shape: 'custom-vue-node',
+        position: { x: 0, y: 0 },
+      })
+      graphRef.value?.zoomToFit({
+        padding: 20,
+        minScale: 0.5,
+        maxScale: 1,
+      })
     }
   },
 )
-
-// topic
-Graph.registerNode(
-  'topic',
-  {
-    inherit: 'rect',
-    markup: [
-      {
-        tagName: 'rect',
-        selector: 'body',
-      },
-      {
-        tagName: 'image',
-        selector: 'img',
-      },
-      {
-        tagName: 'text',
-        selector: 'label',
-      },
-    ],
-    attrs: {
-      body: {
-        rx: 6,
-        ry: 6,
-        stroke: '#5F95FF',
-        fill: '#EFF4FF',
-        strokeWidth: 1,
-      },
-      img: {
-        'ref': 'body',
-        'refX': '100%',
-        'refY': '50%',
-        'refY2': -8,
-        'width': 16,
-        'height': 16,
-        'xlink:href':
-          'https://gw.alipayobjects.com/mdn/rms_43231b/afts/img/A*SYCuQ6HHs5cAAAAAAAAAAAAAARQnAQ',
-        'event': 'add:topic',
-        'class': 'topic-image',
-      },
-      label: {
-        fontSize: 14,
-        fill: '#262626',
-      },
-    },
-    tools: [
-      {
-        name: 'node-editor',
-        args: {
-          attrs: {
-            backgroundColor: '#5F95FF',
-          },
+function useRegister() {
+  // topic
+  Graph.registerNode(
+    'topic',
+    {
+      inherit: 'rect',
+      markup: [
+        {
+          tagName: 'rect',
+          selector: 'body',
+        },
+        {
+          tagName: 'image',
+          selector: 'img',
+        },
+        {
+          tagName: 'text',
+          selector: 'label',
+        },
+      ],
+      attrs: {
+        body: {
+          rx: 6,
+          ry: 6,
+          stroke: '#5F95FF',
+          fill: '#EFF4FF',
+          strokeWidth: 1,
+        },
+        img: {
+          'ref': 'body',
+          'refX': '100%',
+          'refY': '50%',
+          'refY2': -8,
+          'width': 16,
+          'height': 16,
+          'xlink:href':
+            'https://gw.alipayobjects.com/mdn/rms_43231b/afts/img/A*SYCuQ6HHs5cAAAAAAAAAAAAAARQnAQ',
+          'event': 'add:topic',
+          'class': 'topic-image',
+        },
+        label: {
+          fontSize: 14,
+          fill: '#262626',
         },
       },
-    ],
-  },
-  true,
-)
-
-// child topic
-Graph.registerNode(
-  'topic-child',
-  {
-    inherit: 'rect',
-    markup: [
-      {
-        tagName: 'rect',
-        selector: 'body',
-      },
-      {
-        tagName: 'text',
-        selector: 'label',
-      },
-      {
-        tagName: 'path',
-        selector: 'line',
-      },
-    ],
-    attrs: {
-      body: {
-        fill: '#ffffff',
-        strokeWidth: 0,
-        stroke: '#5F95FF',
-      },
-      label: {
-        fontSize: 14,
-        fill: '#262626',
-        textVerticalAnchor: 'bottom',
-      },
-      line: {
-        stroke: '#5F95FF',
-        strokeWidth: 2,
-        d: 'M 0 15 L 60 15',
-      },
-    },
-    tools: [
-      {
-        name: 'node-editor',
-        args: {
-          attrs: {
-            backgroundColor: '#5F95FF',
+      tools: [
+        {
+          name: 'node-editor',
+          args: {
+            attrs: {
+              backgroundColor: '#5F95FF',
+            },
           },
         },
-      },
-    ],
-  },
-  true,
-)
+      ],
+    },
+    true,
+  )
 
-// Connector
-Graph.registerConnector(
-  'mindmap',
-  (sourcePoint, targetPoint, _routerPoints, options) => {
-    const midX = sourcePoint.x + 10
-    const midY = sourcePoint.y
-    const ctrX = (targetPoint.x - midX) / 5 + midX
-    const ctrY = targetPoint.y
-    const pathData = `
+  // child topic
+  Graph.registerNode(
+    'topic-child',
+    {
+      inherit: 'rect',
+      markup: [
+        {
+          tagName: 'rect',
+          selector: 'body',
+        },
+        {
+          tagName: 'text',
+          selector: 'label',
+        },
+        {
+          tagName: 'path',
+          selector: 'line',
+        },
+      ],
+      attrs: {
+        body: {
+          fill: '#ffffff',
+          strokeWidth: 0,
+          stroke: '#5F95FF',
+        },
+        label: {
+          fontSize: 14,
+          fill: '#262626',
+          textVerticalAnchor: 'bottom',
+        },
+        line: {
+          stroke: '#5F95FF',
+          strokeWidth: 2,
+          d: 'M 0 15 L 60 15',
+        },
+      },
+      tools: [
+        {
+          name: 'node-editor',
+          args: {
+            attrs: {
+              backgroundColor: '#5F95FF',
+            },
+          },
+        },
+      ],
+    },
+    true,
+  )
+
+  // Connector
+  Graph.registerConnector(
+    'mindmap',
+    (sourcePoint, targetPoint, _routerPoints, options) => {
+      const midX = sourcePoint.x + 10
+      const midY = sourcePoint.y
+      const ctrX = (targetPoint.x - midX) / 5 + midX
+      const ctrY = targetPoint.y
+      const pathData = `
      M ${sourcePoint.x} ${sourcePoint.y}
      L ${midX} ${midY}
      Q ${ctrX} ${ctrY} ${targetPoint.x} ${targetPoint.y}
     `
-    return options.raw ? Path.parse(pathData) : pathData
-  },
-  true,
-)
-
-// edge
-Graph.registerEdge(
-  'mindmap-edge',
-  {
-    inherit: 'edge',
-    connector: {
-      name: 'mindmap',
+      return options.raw ? Path.parse(pathData) : pathData
     },
-    attrs: {
-      line: {
-        targetMarker: '',
-        stroke: '#A2B1C3',
-        strokeWidth: 2,
+    true,
+  )
+
+  // edge
+  Graph.registerEdge(
+    'mindmap-edge',
+    {
+      inherit: 'edge',
+      connector: {
+        name: 'mindmap',
       },
+      attrs: {
+        line: {
+          targetMarker: '',
+          stroke: '#A2B1C3',
+          strokeWidth: 2,
+        },
+      },
+      zIndex: 0,
     },
-    zIndex: 0,
-  },
-  true,
-)
-
-register({
-  shape: 'custom-vue-node',
-  width: 100,
-  height: 100,
-  component: CustomerNode,
-})
+    true,
+  )
+  // custom node
+  register({
+    shape: 'custom-vue-node',
+    width: 100,
+    height: 100,
+    component: CustomerNode,
+  })
+}
 
 function render(graph: Graph) {
   const result: HierarchyResult = Hierarchy.mindmap(data.value, {
@@ -351,7 +360,10 @@ function removeNode(id: string) {
 function useInitMindMap() {
   const graph = new Graph({
     container: containerRef.value,
-    mousewheel: true,
+    mousewheel: {
+      enabled: true,
+      // modifiers: ['ctrl', 'meta'],
+    },
     autoResize: true,
     panning: true,
     background: {
@@ -439,12 +451,8 @@ function useBindingKeyBoard(graph: Graph, render: any) {
 
 onMounted(() => {
   const { graph } = useInitMindMap()
+  useRegister()
   graphRef.value = graph
-  graph.addNode({
-    shape: 'custom-vue-node',
-    x: 100,
-    y: 60,
-  })
 })
 </script>
 
@@ -457,5 +465,4 @@ onMounted(() => {
   </div>
 </template>
 
-<style scoped>
-</style>
+<style scoped></style>

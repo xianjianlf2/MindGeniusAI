@@ -3,7 +3,10 @@ import type { Graph } from '@antv/x6'
 import type { PropType } from 'vue'
 import { ref } from 'vue'
 import { Icon } from '@iconify/vue'
+import { message } from 'ant-design-vue'
 import type { HistoryState } from './types'
+import GuideLine from './GuideLine.vue'
+import { useShowCurrentZoomMessage } from '@/hooks/useGraph'
 
 const props = defineProps({
   graph: {
@@ -16,6 +19,7 @@ const props = defineProps({
   },
 })
 
+const showGuideLine = ref(false)
 const buttonList = ref([
   {
     icon: 'ic:baseline-undo',
@@ -40,7 +44,8 @@ const buttonList = ref([
     text: 'zoom in',
     tooltip: 'zoom in',
     handler: () => {
-      props.graph.zoom(props.graph.zoom() + 0.1)
+      props.graph.zoom(0.1)
+      useShowCurrentZoomMessage(props.graph)
     },
   },
   {
@@ -49,6 +54,7 @@ const buttonList = ref([
     tooltip: 'zoom out',
     handler: () => {
       props.graph.zoom(-0.1)
+      useShowCurrentZoomMessage(props.graph)
     },
   },
   {
@@ -63,6 +69,17 @@ const buttonList = ref([
     icon: 'carbon:star-review',
     text: 'AI generate',
     tooltip: 'AI generate',
+    handler: () => {
+      message.info('coming soon')
+    },
+  },
+  {
+    icon: 'material-symbols:live-help-outline-rounded',
+    text: 'guide line',
+    tooltip: 'guide line',
+    handler: () => {
+      showGuideLine.value = true
+    },
   },
 ])
 </script>
@@ -81,6 +98,9 @@ const buttonList = ref([
       </a-button>
     </a-tooltip>
   </div>
+  <a-modal v-model:open="showGuideLine" title="GUIDE LINE" :footer="null" :mask-closable="false">
+    <GuideLine />
+  </a-modal>
 </template>
 
 <style scoped></style>

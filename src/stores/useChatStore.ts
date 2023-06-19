@@ -19,6 +19,11 @@ export const useChatStore = defineStore('chatStore', () => {
       time: useLocalTimeString(),
     },
   ])
+  const isLoading = ref(false)
+
+  function toggleLoading(val: boolean) {
+    isLoading.value = val
+  }
 
   function addMessage(message: Omit<Message, 'id'>) {
     messages.value.push({
@@ -56,6 +61,8 @@ export const useChatStore = defineStore('chatStore', () => {
 
   return {
     messages,
+    isLoading,
+    toggleLoading,
     addMessage,
     removeMessage,
     appendMessage,

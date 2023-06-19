@@ -1,20 +1,26 @@
 <!-- eslint-disable no-console -->
 <script setup lang="ts">
-import { inject, onMounted } from 'vue'
+import type { Node } from '@antv/x6'
+import { computed, inject, onMounted, ref } from 'vue'
+import { useNodeStore } from '@/stores'
+import { useGenerateMarkdown } from '@/hooks/useGenerateMarkdown'
 
 const getNode: any = inject('getNode')
+const containerRef = ref<HTMLElement | null>(null)
+const nodeStore = useNodeStore()
 
 onMounted(() => {
-  const node = getNode()
-  console.log(node)
+  const node: Node = getNode()
+  const { clientWidth, clientHeight } = containerRef.value!
+  node.resize(clientWidth, clientHeight)
 })
+
+const content = computed(() => useGenerateMarkdown(nodeStore.currentMarkdown))
 </script>
 
 <template>
-  <div class="sticky-note">
-    <div class="sticky-note-content">
-      This is a sticky note content, you can add the text or other elements you need here.
-    </div>
+  <div ref="containerRef" class="sticky-note">
+    <div class="sticky-note-content" v-html="content" />
     <div class="sticky-note-corner" />
   </div>
 </template>
@@ -23,8 +29,10 @@ onMounted(() => {
 .sticky-note {
   position: relative;
   display: inline-block;
-  width: 200px;
-  height: 200px;
+  width: auto;
+  height: auto;
+  min-width: 400px;
+  min-height: 200px;
   background-color: #f7dc6f;
   box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
   border-radius: 8px;
@@ -37,13 +45,9 @@ onMounted(() => {
 }
 
 .sticky-note-content {
-  position: absolute;
-  top: 20px;
-  left: 20px;
-  right: 20px;
-  bottom: 20px;
-  overflow-y: auto;
+  position: relative;
   font-size: 18px;
+  overflow-y: auto;
 }
 
 .sticky-note-corner {
