@@ -6,8 +6,12 @@ import Hierarchy from '@antv/hierarchy'
 import { Keyboard } from '@antv/x6-plugin-keyboard'
 import { Selection } from '@antv/x6-plugin-selection'
 import { cloneDeep } from 'lodash'
+import { register } from '@antv/x6-vue-shape'
+import { History } from '@antv/x6-plugin-history'
 import type { MindMapData } from '../stores'
 import { useNodeStore } from '../stores'
+import CustomerNode from './CustomerNode.vue'
+import GraphToolbar from './GraphToolBar.vue'
 
 interface HierarchyResult {
   id: string
@@ -21,160 +25,183 @@ const data = ref<MindMapData>()
 const graphRef = ref<Graph>()
 const containerRef = ref()
 const nodeStore = useNodeStore()
-watch(() => nodeStore.nodes, (nodes) => {
-  data.value = cloneDeep(nodes)
-  if (nodes) {
-    useBindingKeyBoard(graphRef.value!, render)
-    render(graphRef.value!)
-    graphRef.value?.zoomToFit({ padding: 20 })
-  }
-})
-
-// topic
-Graph.registerNode(
-  'topic',
-  {
-    inherit: 'rect',
-    markup: [
-      {
-        tagName: 'rect',
-        selector: 'body',
-      },
-      {
-        tagName: 'image',
-        selector: 'img',
-      },
-      {
-        tagName: 'text',
-        selector: 'label',
-      },
-    ],
-    attrs: {
-      body: {
-        rx: 6,
-        ry: 6,
-        stroke: '#5F95FF',
-        fill: '#EFF4FF',
-        strokeWidth: 1,
-      },
-      img: {
-        'ref': 'body',
-        'refX': '100%',
-        'refY': '50%',
-        'refY2': -8,
-        'width': 16,
-        'height': 16,
-        'xlink:href':
-          'https://gw.alipayobjects.com/mdn/rms_43231b/afts/img/A*SYCuQ6HHs5cAAAAAAAAAAAAAARQnAQ',
-        'event': 'add:topic',
-        'class': 'topic-image',
-      },
-      label: {
-        fontSize: 14,
-        fill: '#262626',
-      },
-    },
-    tools: [
-      {
-        name: 'node-editor',
-        args: {
-          attrs: {
-            backgroundColor: '#5F95FF',
-          },
+const historyStateRef = ref()
+watch(
+  () => nodeStore.nodes,
+  (nodes) => {
+    data.value = cloneDeep(nodes)
+    if (nodes) {
+      useBindingKeyBoard(
+        graphRef.value!,
+        render,
+      )
+      render(graphRef.value!)
+      graphRef.value!.addNode({
+        shape: 'custom-vue-node',
+        position: { x: 0, y: 0 },
+      })
+      graphRef.value?.zoomToFit({
+        padding: 20,
+        minScale: 0.5,
+        maxScale: 1,
+      })
+    }
+  },
+)
+function useRegister() {
+  // topic
+  Graph.registerNode(
+    'topic',
+    {
+      inherit: 'rect',
+      markup: [
+        {
+          tagName: 'rect',
+          selector: 'body',
+        },
+        {
+          tagName: 'image',
+          selector: 'img',
+        },
+        {
+          tagName: 'text',
+          selector: 'label',
+        },
+      ],
+      attrs: {
+        body: {
+          rx: 6,
+          ry: 6,
+          stroke: '#5F95FF',
+          fill: '#EFF4FF',
+          strokeWidth: 1,
+        },
+        img: {
+          'ref': 'body',
+          'refX': '100%',
+          'refY': '50%',
+          'refY2': -8,
+          'width': 16,
+          'height': 16,
+          'xlink:href':
+            'https://gw.alipayobjects.com/mdn/rms_43231b/afts/img/A*SYCuQ6HHs5cAAAAAAAAAAAAAARQnAQ',
+          'event': 'add:topic',
+          'class': 'topic-image',
+        },
+        label: {
+          fontSize: 14,
+          fill: '#262626',
         },
       },
-    ],
-  },
-  true,
-)
-
-// child topic
-Graph.registerNode(
-  'topic-child',
-  {
-    inherit: 'rect',
-    markup: [
-      {
-        tagName: 'rect',
-        selector: 'body',
-      },
-      {
-        tagName: 'text',
-        selector: 'label',
-      },
-      {
-        tagName: 'path',
-        selector: 'line',
-      },
-    ],
-    attrs: {
-      body: {
-        fill: '#ffffff',
-        strokeWidth: 0,
-        stroke: '#5F95FF',
-      },
-      label: {
-        fontSize: 14,
-        fill: '#262626',
-        textVerticalAnchor: 'bottom',
-      },
-      line: {
-        stroke: '#5F95FF',
-        strokeWidth: 2,
-        d: 'M 0 15 L 60 15',
-      },
-    },
-    tools: [
-      {
-        name: 'node-editor',
-        args: {
-          attrs: {
-            backgroundColor: '#5F95FF',
+      tools: [
+        {
+          name: 'node-editor',
+          args: {
+            attrs: {
+              backgroundColor: '#5F95FF',
+            },
           },
         },
-      },
-    ],
-  },
-  true,
-)
+      ],
+    },
+    true,
+  )
 
-// Connector
-Graph.registerConnector(
-  'mindmap',
-  (sourcePoint, targetPoint, _routerPoints, options) => {
-    const midX = sourcePoint.x + 10
-    const midY = sourcePoint.y
-    const ctrX = (targetPoint.x - midX) / 5 + midX
-    const ctrY = targetPoint.y
-    const pathData = `
+  // child topic
+  Graph.registerNode(
+    'topic-child',
+    {
+      inherit: 'rect',
+      markup: [
+        {
+          tagName: 'rect',
+          selector: 'body',
+        },
+        {
+          tagName: 'text',
+          selector: 'label',
+        },
+        {
+          tagName: 'path',
+          selector: 'line',
+        },
+      ],
+      attrs: {
+        body: {
+          fill: '#ffffff',
+          strokeWidth: 0,
+          stroke: '#5F95FF',
+        },
+        label: {
+          fontSize: 14,
+          fill: '#262626',
+          textVerticalAnchor: 'bottom',
+        },
+        line: {
+          stroke: '#5F95FF',
+          strokeWidth: 2,
+          d: 'M 0 15 L 60 15',
+        },
+      },
+      tools: [
+        {
+          name: 'node-editor',
+          args: {
+            attrs: {
+              backgroundColor: '#5F95FF',
+            },
+          },
+        },
+      ],
+    },
+    true,
+  )
+
+  // Connector
+  Graph.registerConnector(
+    'mindmap',
+    (sourcePoint, targetPoint, _routerPoints, options) => {
+      const midX = sourcePoint.x + 10
+      const midY = sourcePoint.y
+      const ctrX = (targetPoint.x - midX) / 5 + midX
+      const ctrY = targetPoint.y
+      const pathData = `
      M ${sourcePoint.x} ${sourcePoint.y}
      L ${midX} ${midY}
      Q ${ctrX} ${ctrY} ${targetPoint.x} ${targetPoint.y}
     `
-    return options.raw ? Path.parse(pathData) : pathData
-  },
-  true,
-)
+      return options.raw ? Path.parse(pathData) : pathData
+    },
+    true,
+  )
 
-// edge
-Graph.registerEdge(
-  'mindmap-edge',
-  {
-    inherit: 'edge',
-    connector: {
-      name: 'mindmap',
-    },
-    attrs: {
-      line: {
-        targetMarker: '',
-        stroke: '#A2B1C3',
-        strokeWidth: 2,
+  // edge
+  Graph.registerEdge(
+    'mindmap-edge',
+    {
+      inherit: 'edge',
+      connector: {
+        name: 'mindmap',
       },
+      attrs: {
+        line: {
+          targetMarker: '',
+          stroke: '#A2B1C3',
+          strokeWidth: 2,
+        },
+      },
+      zIndex: 0,
     },
-    zIndex: 0,
-  },
-  true,
-)
+    true,
+  )
+  // custom node
+  register({
+    shape: 'custom-vue-node',
+    width: 100,
+    height: 100,
+    component: CustomerNode,
+  })
+}
 
 function render(graph: Graph) {
   const result: HierarchyResult = Hierarchy.mindmap(data.value, {
@@ -252,8 +279,10 @@ function render(graph: Graph) {
   graph.centerContent()
 }
 
-function findItem(obj: MindMapData,
-  id: string): {
+function findItem(
+  obj: MindMapData,
+  id: string,
+): {
     parent: MindMapData | null
     node: MindMapData | null
   } | null {
@@ -304,9 +333,7 @@ function addChildNode(id: string, type: any) {
     if (item) {
       if (dataItem.children)
         dataItem.children.push(item)
-
-      else
-        dataItem.children = [item]
+      else dataItem.children = [item]
 
       return item
     }
@@ -328,44 +355,69 @@ function removeNode(id: string) {
 function useInitMindMap() {
   const graph = new Graph({
     container: containerRef.value,
-    mousewheel: true,
+    mousewheel: {
+      enabled: true,
+      // modifiers: ['ctrl', 'meta'],
+    },
     autoResize: true,
     panning: true,
+    background: {
+      color: '#0F1729',
+    },
   })
   graph.use(new Snapline())
-  graph.use(new Selection(
-    {
+  graph.use(
+    new Selection({
       multiple: true,
       modifiers: ['alt'],
       rubberband: true,
       showNodeSelectionBox: true,
       pointerEvents: 'none',
-    },
-  ))
+    }),
+  )
   graph.use(new Keyboard())
+  graph.use(new History())
 
   return { graph }
 }
-
-function useBindingKeyBoard(graph: Graph, render: any) {
+function handleAddTopic(graph: Graph, render: any) {
   graph.on('add:topic', ({ node }: { node: any }) => {
     const { id } = node
     const type = node.prop('type')
     if (addChildNode(id, type))
       render(graph)
   })
+}
+
+function handleHistoryChange(graph: Graph) {
+  graph.on('history:change', () => {
+    historyStateRef.value = {
+      canRedo: graph.canRedo(),
+      canUndo: graph.canUndo(),
+    }
+  })
+}
+
+function handleDeleteKey(graph: Graph, render: any) {
   graph.bindKey(['backspace', 'delete'], () => {
-    const selectedNodes = graph.getSelectedCells().filter(item => item.isNode())
+    const selectedNodes = graph
+      .getSelectedCells()
+      .filter(item => item.isNode())
     if (selectedNodes.length) {
       const { id } = selectedNodes[0]
       if (removeNode(id))
         render(graph)
+      graph.removeCells(selectedNodes)
     }
   })
+}
 
+function handleTabKey(graph: Graph, render: any) {
   graph.bindKey('tab', (e) => {
     e.preventDefault()
-    const selectedNodes = graph.getSelectedCells().filter(item => item.isNode())
+    const selectedNodes = graph
+      .getSelectedCells()
+      .filter(item => item.isNode())
     if (selectedNodes.length) {
       const node = selectedNodes[0]
       const type = node.prop('type')
@@ -375,14 +427,27 @@ function useBindingKeyBoard(graph: Graph, render: any) {
   })
 }
 
+function useBindingKeyBoard(graph: Graph, render: any) {
+  handleAddTopic(graph, render)
+  handleHistoryChange(graph)
+  handleDeleteKey(graph, render)
+  handleTabKey(graph, render)
+}
+
 onMounted(() => {
   const { graph } = useInitMindMap()
+  useRegister()
   graphRef.value = graph
 })
 </script>
 
 <template>
-  <div ref="containerRef" />
+  <div class="h-full w-full flex flex-col">
+    <div class="flex  items-center bg-#1e293b">
+      <GraphToolbar :graph="graphRef!" :history-state="historyStateRef" />
+    </div>
+    <div ref="containerRef" />
+  </div>
 </template>
 
 <style scoped></style>

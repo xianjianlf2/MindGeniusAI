@@ -1,5 +1,4 @@
-<img src="https://github.com/xianjianlf2/MindGeniusAI/blob/main/markdownImg/logo.png?raw=true" alt="mindGenius" style="zoom:50%;" />
-
+<center>MindGenius AI</center>
 <center>Auto generate MindMap with ChatGPT</center>
 
 ## Features
@@ -16,11 +15,7 @@
 - [ ] dark mode
 - [ ] change node style
 
-![mindmap](https://github.com/xianjianlf2/MindGeniusAI/blob/main/markdownImg/MindMapSample.gif?raw=true)
-
-![mindmap](https://github.com/xianjianlf2/MindGeniusAI/blob/main/markdownImg/ModifyNode.gif?raw=true)
-
-![mindmap](https://github.com/xianjianlf2/MindGeniusAI/blob/main/markdownImg/AddNode.gif?raw=true)
+![mindmap](https://github.com/xianjianlf2/MindGeniusAI/blob/main/markdownImg/Demo.gif?raw=true)
 
 ## Motivation
 

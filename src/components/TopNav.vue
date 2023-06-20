@@ -1,9 +1,11 @@
 <script setup lang="ts">
-import { Icon } from '@iconify/vue'
 import { ref } from 'vue'
+import { Icon } from '@iconify/vue'
 import ChatBox from './ChatBox.vue'
+import ShareCard from './ShareCard.vue'
 
 const showChatBox = ref(false)
+const showShareCard = ref(false)
 
 function handleOpenGitHub() {
   window.open('https://github.com/xianjianlf2/MindGeniusAI', '_blank')
@@ -11,39 +13,83 @@ function handleOpenGitHub() {
 </script>
 
 <template>
-  <div class="flex justify-between items-center bg-gradient-to-r from-gray-700 via-gray-900 to-black p-3 ">
-    <div class="flex items-center justify-center gap-2 text-white cursor-pointer border border-1 border-dashed py-2 px-5 rounded-2xl" @click="showChatBox = true">
-      <Icon icon="ic:baseline-search" width="24" />
-      <span>Create a mindMap</span>
+  <div class="bg-#1e293b flex justify-between items-center p-3">
+    <div class="button" @click="showChatBox = true">
+      <span>
+        Get Start
+      </span>
     </div>
-
-    <div class="flex gap-2 justify-center items-center">
-      <!-- <a-button type="text">
+    <div class="items-center flex justify-center gap-2">
+      <a-button type="text" @click="showShareCard = true">
         <template #icon>
           <span class="button-icon">
-            <Icon icon="bx:save" width="24" color="white" />
+            <Icon icon="material-symbols:share" width="24" color="white" />
           </span>
         </template>
       </a-button>
-      <a-button type="text">
-        <template #icon>
-          <span class="button-icon">
-            <Icon icon="mdi:cog" width="24" />
-          </span>
-        </template>
-      </a-button> -->
       <a-button type="text" @click="handleOpenGitHub">
         <template #icon>
           <span class="button-icon">
-            <Icon icon="mdi:github" width="24" />
+            <Icon icon="mdi:github" width="24" color="white" />
           </span>
         </template>
       </a-button>
     </div>
   </div>
+
   <a-modal v-model:open="showChatBox" title="Talking with AI" :footer="null" :mask-closable="false">
     <ChatBox />
   </a-modal>
+  <a-modal v-model:open="showShareCard" :footer="null">
+    <ShareCard />
+  </a-modal>
 </template>
 
-<style scoped></style>
+<style scoped>
+@keyframes rotate {
+  from {
+    transform: rotate(0deg);
+  }
+
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.button {
+  --border-width: 2px;
+  --border-radius: 0.35rem;
+  --background-spread: 200px;
+  font-weight: bold;
+  font-size: 16px;
+  letter-spacing: -0.02rem;
+  position: relative;
+  color: #fff;
+  border: 0;
+  z-index: 0;
+  border-radius: var(--border-radius);
+  background-color: transparent;
+  overflow: hidden;
+  padding: var(--border-width);
+  cursor: pointer;
+}
+
+.button::after {
+  content: '';
+  position: absolute;
+  background: conic-gradient(from 180deg at 50% 50%, rgba(0, 209, 255, 0) 0deg, rgba(0, 209, 255, 0) 153.75deg, #00D1FF 345deg, rgba(0, 209, 255, 0) 360deg);
+  top: calc(var(--background-spread) * -1);
+  right: calc(var(--background-spread) * -1);
+  bottom: calc(var(--background-spread) * -1);
+  left: calc(var(--background-spread) * -1);
+  z-index: -1;
+  animation: 3s rotate linear infinite;
+}
+
+.button span {
+  display: block;
+  background-color: #000;
+  padding: 10px 20px;
+  border-radius: calc(var(--border-radius) - var(--border-width) / 2);
+}
+</style>
