@@ -12,7 +12,6 @@ import type { MindMapData } from '../stores'
 import { useNodeStore } from '../stores'
 import CustomerNode from './CustomerNode.vue'
 import GraphToolbar from './GraphToolBar.vue'
-import type { HistoryState } from './types'
 
 interface HierarchyResult {
   id: string
@@ -26,20 +25,16 @@ const data = ref<MindMapData>()
 const graphRef = ref<Graph>()
 const containerRef = ref()
 const nodeStore = useNodeStore()
-const historyState = ref<HistoryState>({
-  canRedo: false,
-  canUndo: false,
-})
+const historyStateRef = ref()
 watch(
   () => nodeStore.nodes,
   (nodes) => {
     data.value = cloneDeep(nodes)
     if (nodes) {
-      const { historyState: state } = useBindingKeyBoard(
+      useBindingKeyBoard(
         graphRef.value!,
         render,
       )
-      historyState.value = state
       render(graphRef.value!)
       graphRef.value!.addNode({
         shape: 'custom-vue-node',
@@ -395,19 +390,12 @@ function handleAddTopic(graph: Graph, render: any) {
 }
 
 function handleHistoryChange(graph: Graph) {
-  let historyState: HistoryState = {
-    canRedo: false,
-    canUndo: false,
-  }
-
   graph.on('history:change', () => {
-    historyState = {
+    historyStateRef.value = {
       canRedo: graph.canRedo(),
       canUndo: graph.canUndo(),
     }
   })
-
-  return historyState
 }
 
 function handleDeleteKey(graph: Graph, render: any) {
@@ -419,6 +407,7 @@ function handleDeleteKey(graph: Graph, render: any) {
       const { id } = selectedNodes[0]
       if (removeNode(id))
         render(graph)
+      graph.removeCells(selectedNodes)
     }
   })
 }
@@ -440,13 +429,9 @@ function handleTabKey(graph: Graph, render: any) {
 
 function useBindingKeyBoard(graph: Graph, render: any) {
   handleAddTopic(graph, render)
-  const historyState = handleHistoryChange(graph)
+  handleHistoryChange(graph)
   handleDeleteKey(graph, render)
   handleTabKey(graph, render)
-
-  return {
-    historyState,
-  }
 }
 
 onMounted(() => {
@@ -459,7 +444,7 @@ onMounted(() => {
 <template>
   <div class="h-full w-full flex flex-col">
     <div class="flex  items-center bg-#1e293b">
-      <GraphToolbar :graph="graphRef!" :history-state="historyState" />
+      <GraphToolbar :graph="graphRef!" :history-state="historyStateRef" />
     </div>
     <div ref="containerRef" />
   </div>

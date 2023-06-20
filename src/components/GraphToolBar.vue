@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import type { Graph } from '@antv/x6'
 import type { PropType } from 'vue'
-import { ref } from 'vue'
+import { ref, watch } from 'vue'
 import { Icon } from '@iconify/vue'
 import { message } from 'ant-design-vue'
 import type { HistoryState } from './types'
@@ -25,7 +25,7 @@ const buttonList = ref([
     icon: 'ic:baseline-undo',
     text: 'undo',
     tooltip: 'undo',
-    enabled: props.historyState.canUndo,
+    enabled: true,
     handler: () => {
       props.graph.undo()
     },
@@ -34,7 +34,7 @@ const buttonList = ref([
     icon: 'ic:baseline-redo',
     text: 'redo',
     tooltip: 'redo',
-    enabled: props.historyState.canRedo,
+    enabled: true,
     handler: () => {
       props.graph.redo()
     },
@@ -82,6 +82,16 @@ const buttonList = ref([
     },
   },
 ])
+watch(
+  () => props.historyState,
+  (val) => {
+    if (val) {
+      buttonList.value[0].enabled = !val.canUndo
+      buttonList.value[1].enabled = !val.canRedo
+    }
+  },
+  { immediate: true, deep: true },
+)
 </script>
 
 <template>

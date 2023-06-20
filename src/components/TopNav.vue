@@ -14,9 +14,11 @@ function handleOpenGitHub() {
 
 <template>
   <div class="bg-#1e293b flex justify-between items-center p-3">
-    <a-button type="primary" @click="showChatBox = true">
-      Get Start
-    </a-button>
+    <div class="button" @click="showChatBox = true">
+      <span>
+        Get Start
+      </span>
+    </div>
     <div class="items-center flex justify-center gap-2">
       <a-button type="text" @click="showShareCard = true">
         <template #icon>
@@ -44,5 +46,50 @@ function handleOpenGitHub() {
 </template>
 
 <style scoped>
+@keyframes rotate {
+  from {
+    transform: rotate(0deg);
+  }
 
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.button {
+  --border-width: 2px;
+  --border-radius: 0.35rem;
+  --background-spread: 200px;
+  font-weight: bold;
+  font-size: 16px;
+  letter-spacing: -0.02rem;
+  position: relative;
+  color: #fff;
+  border: 0;
+  z-index: 0;
+  border-radius: var(--border-radius);
+  background-color: transparent;
+  overflow: hidden;
+  padding: var(--border-width);
+  cursor: pointer;
+}
+
+.button::after {
+  content: '';
+  position: absolute;
+  background: conic-gradient(from 180deg at 50% 50%, rgba(0, 209, 255, 0) 0deg, rgba(0, 209, 255, 0) 153.75deg, #00D1FF 345deg, rgba(0, 209, 255, 0) 360deg);
+  top: calc(var(--background-spread) * -1);
+  right: calc(var(--background-spread) * -1);
+  bottom: calc(var(--background-spread) * -1);
+  left: calc(var(--background-spread) * -1);
+  z-index: -1;
+  animation: 3s rotate linear infinite;
+}
+
+.button span {
+  display: block;
+  background-color: #000;
+  padding: 10px 20px;
+  border-radius: calc(var(--border-radius) - var(--border-width) / 2);
+}
 </style>
