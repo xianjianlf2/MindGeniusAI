@@ -7,7 +7,7 @@
 - [x] Delete unnecessary nodes
 - [x] Modify generated nodes.
 - [x] Return result markdown rendering
-- [ ] Export result to picture, json
+- [x] Export result to picture, json
 - [ ] node support add picture
 - [ ] Automatically summarize web-linked articles
 - [ ] support chat
@@ -15,6 +15,7 @@
 - [ ] dark mode
 - [ ] change node style
 
+![mindmap](https://github.com/xianjianlf2/MindGeniusAI/blob/main/markdownImg/sample.png?raw=true)
 ![mindmap](https://github.com/xianjianlf2/MindGeniusAI/blob/main/markdownImg/Demo.gif?raw=true)
 
 ## Motivation

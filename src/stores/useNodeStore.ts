@@ -5,7 +5,7 @@ import { getNodes } from '../utils/useConvertMarkdown'
 
 export interface MindMapData {
   id: string
-  type: 'topic' | 'topic-branch' | 'topic-child' | 'rect-xml'
+  type: 'topic' | 'topic-branch' | 'topic-child'
   label: string
   width?: number
   height?: number
@@ -15,10 +15,10 @@ export interface MindMapData {
 
 export const useNodeStore = defineStore('nodeStore', () => {
   const nodes = ref<MindMapData>()
-  const currentMarkdown = ref<string>('')
+  const noteContent = ref<string>()
 
   function generateNode(markdown: string) {
-    currentMarkdown.value = ''
+    noteContent.value = undefined
     if (!markdown) {
       message.info('There is no content')
       return
@@ -31,13 +31,13 @@ export const useNodeStore = defineStore('nodeStore', () => {
     if (Array.isArray(result) && result.length > 0) {
       message.success('Mind map generated.')
       nodes.value = result[0]
-      currentMarkdown.value = markdown
+      noteContent.value = markdown
     }
   }
 
   return {
     nodes,
-    currentMarkdown,
+    noteContent,
     generateNode,
   }
 })
