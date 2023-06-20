@@ -8,14 +8,13 @@ import { useGenerateMarkdown } from '@/hooks/useGenerateMarkdown'
 const getNode: any = inject('getNode')
 const containerRef = ref<HTMLElement | null>(null)
 const nodeStore = useNodeStore()
+const content = computed(() => useGenerateMarkdown(nodeStore.noteContent ?? ''))
 
 onMounted(() => {
   const node: Node = getNode()
   const { clientWidth, clientHeight } = containerRef.value!
   node.resize(clientWidth, clientHeight)
 })
-
-const content = computed(() => useGenerateMarkdown(nodeStore.currentMarkdown))
 </script>
 
 <template>
