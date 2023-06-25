@@ -1,19 +1,19 @@
 <!-- eslint-disable no-console -->
 <script setup lang="ts">
 import type { Node } from '@antv/x6'
-import { computed, inject, onMounted, ref } from 'vue'
+import { computed, inject, onMounted } from 'vue'
+import { useContainer } from './useContainer'
 import { useNodeStore } from '@/stores'
 import { useGenerateMarkdown } from '@/hooks/useGenerateMarkdown'
 
-const getNode: any = inject('getNode')
-const containerRef = ref<HTMLElement | null>(null)
+const getNode: (() => Node | undefined) | undefined = inject('getNode')
+const { containerRef, updateContainerSize } = useContainer()
 const nodeStore = useNodeStore()
 const content = computed(() => useGenerateMarkdown(nodeStore.noteContent ?? ''))
 
 onMounted(() => {
-  const node: Node = getNode()
-  const { clientWidth, clientHeight } = containerRef.value!
-  node.resize(clientWidth, clientHeight)
+  const node = getNode!()
+  updateContainerSize(node!)
 })
 </script>
 

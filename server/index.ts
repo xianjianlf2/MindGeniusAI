@@ -4,6 +4,7 @@ import Koa from 'koa'
 import { koaBody } from 'koa-body'
 import Router from 'koa-router'
 import multer from '@koa/multer'
+import { HumanChatMessage } from 'langchain/schema'
 import { validateFileFormat } from './utils/validateFileFormat.ts'
 import { chatStream } from './chatStream.ts'
 import { chatMindMap } from './chatMindMap.ts'
@@ -110,8 +111,61 @@ router.post('/chatMindMap', async (ctx) => {
   if (!topic)
     ctx.throw(400, 'No topic')
   const { messageSend, messageDone } = useChatSteam(ctx)
-  chatMindMap(topic, messageSend, messageDone)
+  function generatePrompt(topic: string) {
+    let prompt: HumanChatMessage
+    const pattern = /[\u4E00-\u9FA5]+/
+    if (pattern.test(topic)) {
+      prompt = new HumanChatMessage(
+      `为主题${topic}创建一个思维导图/指南
+        要求：
+        1.使用markdown
+        2.语言简洁
+        3.通常有3个级别
+      `)
+    }
+    else {
+      prompt = new HumanChatMessage(
+      `create a road map / guide line for the topic ${topic}
+        requirement:
+        1.use markdown
+        2.short language is preferred
+        3.usually, there are 3 levels
+      `)
+    }
+    return prompt
+  }
+  chatMindMap(generatePrompt(topic), messageSend, messageDone)
 })
+
+router.post('/chatNode', async (ctx) => {
+  const { content } = ctx.request.body
+  if (!content)
+    ctx.throw(400, 'No content')
+  const { messageSend, messageDone } = useChatSteam(ctx)
+  function generatePrompt(content: string) {
+    let prompt: HumanChatMessage
+    const pattern = /[\u4E00-\u9FA5]+/
+    if (pattern.test(content)) {
+      prompt = new HumanChatMessage(
+      `为${content}创建三点
+        要求：
+        1.使用markdown
+        2.语言简洁
+      `)
+    }
+    else {
+      prompt = new HumanChatMessage(
+      `create three points for ${content}
+        requirement:
+        1.use markdown
+        2.short language is preferred
+      `)
+    }
+    return prompt
+  }
+  chatMindMap(generatePrompt(content), messageSend, messageDone)
+})
+
 router.post('/upload', upload.single('file'), async (ctx) => {
   const file = ctx.file
   if (!file)

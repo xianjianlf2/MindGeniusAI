@@ -6,8 +6,6 @@ import { MotionPlugin } from '@vueuse/motion'
 import App from './App.vue'
 import router from './router'
 import 'virtual:uno.css'
-import '@vue-flow/core/dist/style.css'
-import '@vue-flow/core/dist/theme-default.css'
 import 'ant-design-vue/dist/reset.css'
 import './assets/style/main.css'
 

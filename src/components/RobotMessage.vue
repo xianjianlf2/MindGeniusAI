@@ -40,8 +40,8 @@ function handleBubbleStyle() {
 
 <template>
   <div
-    class="w-full" :class="handleBubbleStyle()"
-    @mouseenter="showButtonGroup = true" @mouseleave="showButtonGroup = false"
+    class="w-full" :class="handleBubbleStyle()" @mouseenter="showButtonGroup = true"
+    @mouseleave="showButtonGroup = false"
   >
     <div class="w-full flex items-center justify-between p-2 ">
       <div class="text-base font-semibold text-sm h-[28px]">
@@ -73,13 +73,20 @@ function handleBubbleStyle() {
 </template>
 
 <style scoped>
-@keyframes placeholderShimmer {
+@keyframes loading-animation {
   0% {
-    background-position: -468px 0;
+    background-image: linear-gradient(-20deg, #2b5876 0%, #4e4376 100%);
+    background-position: 0% 50%;
+  }
+
+  50% {
+    background-image: linear-gradient(160deg, #2b5876 0%, #4e4376 100%);
+    background-position: 100% 50%;
   }
 
   100% {
-    background-position: 468px 0;
+    background-image: linear-gradient(-20deg, #2b5876 0%, #4e4376 100%);
+    background-position: 0% 50%;
   }
 }
 
@@ -87,12 +94,10 @@ function handleBubbleStyle() {
   border-radius: 8px;
   padding: 8px;
   background-image: linear-gradient(-20deg, #2b5876 0%, #4e4376 100%);
-
 }
 
 .bubble-transition {
-  animation: placeholderShimmer 8s infinite ease-in-out;
-  background-size: 800px 104px;
+  animation: loading-animation 1.5s infinite;
 }
 
 .user-bubble {

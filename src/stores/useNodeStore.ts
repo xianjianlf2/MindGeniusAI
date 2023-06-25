@@ -2,6 +2,7 @@ import { defineStore } from 'pinia'
 import { ref } from 'vue'
 import { message } from 'ant-design-vue'
 import { getNodes } from '../utils/useConvertMarkdown'
+import { fetchChatNode } from '@/api/chatNode'
 
 export interface MindMapData {
   id: string
@@ -16,6 +17,8 @@ export interface MindMapData {
 export const useNodeStore = defineStore('nodeStore', () => {
   const nodes = ref<MindMapData>()
   const noteContent = ref<string>()
+  const currentNodeContent = ref('')
+  const isLoading = ref(false)
 
   function generateNode(markdown: string) {
     noteContent.value = undefined
@@ -35,9 +38,30 @@ export const useNodeStore = defineStore('nodeStore', () => {
     }
   }
 
+  function toggleLoading(val: boolean) {
+    isLoading.value = val
+  }
+
+  function appendMessage(message: string) {
+    currentNodeContent.value += message
+  }
+
+  function clearMessage() {
+    currentNodeContent.value = ''
+  }
+
+  function getCurrentNodeContent(content: string) {
+    return fetchChatNode(content)
+  }
+
   return {
     nodes,
     noteContent,
+    currentNodeContent,
     generateNode,
+    toggleLoading,
+    appendMessage,
+    clearMessage,
+    getCurrentNodeContent,
   }
 })

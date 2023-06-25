@@ -11,8 +11,10 @@ import { History } from '@antv/x6-plugin-history'
 import { Export } from '@antv/x6-plugin-export'
 import type { MindMapData } from '../stores'
 import { useNodeStore } from '../stores'
-import CustomerNode from './CustomerNode.vue'
 import GraphToolbar from './GraphToolBar.vue'
+import NoteNode from '@/components/Nodes/NoteNode.vue'
+import TopicChildNode from '@/components/Nodes/TopicChildNode.vue'
+import TopicNode from '@/components/Nodes/TopicNode.vue'
 
 interface HierarchyResult {
   id: string
@@ -52,87 +54,87 @@ watch(
 )
 function useRegister() {
   // topic
-  Graph.registerNode(
-    'topic',
-    {
-      inherit: 'rect',
-      markup: [
-        {
-          tagName: 'rect',
-          selector: 'body',
-        },
-        {
-          tagName: 'image',
-          selector: 'img',
-        },
-        {
-          tagName: 'text',
-          selector: 'label',
-        },
-      ],
-      attrs: {
-        body: {
-          rx: 6,
-          ry: 6,
-          stroke: '#5F95FF',
-          fill: '#EFF4FF',
-          strokeWidth: 1,
-        },
-        img: {
-          'ref': 'body',
-          'refX': '100%',
-          'refY': '50%',
-          'refY2': -8,
-          'width': 16,
-          'height': 16,
-          'xlink:href':
-            'https://gw.alipayobjects.com/mdn/rms_43231b/afts/img/A*SYCuQ6HHs5cAAAAAAAAAAAAAARQnAQ',
-          'event': 'add:topic',
-          'class': 'topic-image',
-        },
-        label: {
-          fontSize: 14,
-          fill: '#262626',
-        },
-      },
-    },
-    true,
-  )
+  // Graph.registerNode(
+  //   'topic',
+  //   {
+  //     inherit: 'rect',
+  //     markup: [
+  //       {
+  //         tagName: 'rect',
+  //         selector: 'body',
+  //       },
+  //       {
+  //         tagName: 'image',
+  //         selector: 'img',
+  //       },
+  //       {
+  //         tagName: 'text',
+  //         selector: 'label',
+  //       },
+  //     ],
+  //     attrs: {
+  //       body: {
+  //         rx: 6,
+  //         ry: 6,
+  //         stroke: '#5F95FF',
+  //         fill: '#EFF4FF',
+  //         strokeWidth: 1,
+  //       },
+  //       img: {
+  //         'ref': 'body',
+  //         'refX': '100%',
+  //         'refY': '50%',
+  //         'refY2': -8,
+  //         'width': 16,
+  //         'height': 16,
+  //         'xlink:href':
+  //           'https://gw.alipayobjects.com/mdn/rms_43231b/afts/img/A*SYCuQ6HHs5cAAAAAAAAAAAAAARQnAQ',
+  //         'event': 'add:topic',
+  //         'class': 'topic-image',
+  //       },
+  //       label: {
+  //         fontSize: 14,
+  //         fill: '#262626',
+  //       },
+  //     },
+  //   },
+  //   true,
+  // )
 
   // child topic
-  Graph.registerNode(
-    'topic-child',
-    {
-      inherit: 'rect',
-      markup: [
-        {
-          tagName: 'rect',
-          selector: 'body',
-        },
-        {
-          tagName: 'text',
-          selector: 'label',
-        },
-        {
-          tagName: 'path',
-          selector: 'line',
-        },
-      ],
-      attrs: {
-        body: {
-          fill: '#fff',
-          rx: 6,
-          ry: 6,
-        },
-        label: {
-          fontSize: 16,
-          fill: '#262626',
-          textVerticalAnchor: 'bottom',
-        },
-      },
-    },
-    true,
-  )
+  // Graph.registerNode(
+  //   'topic-child',
+  //   {
+  //     inherit: 'rect',
+  //     markup: [
+  //       {
+  //         tagName: 'rect',
+  //         selector: 'body',
+  //       },
+  //       {
+  //         tagName: 'text',
+  //         selector: 'label',
+  //       },
+  //       {
+  //         tagName: 'path',
+  //         selector: 'line',
+  //       },
+  //     ],
+  //     attrs: {
+  //       body: {
+  //         fill: '#fff',
+  //         rx: 6,
+  //         ry: 6,
+  //       },
+  //       label: {
+  //         fontSize: 16,
+  //         fill: '#262626',
+  //         textVerticalAnchor: 'bottom',
+  //       },
+  //     },
+  //   },
+  //   true,
+  // )
 
   // Connector
   Graph.registerConnector(
@@ -176,7 +178,19 @@ function useRegister() {
     shape: 'note-node',
     width: 100,
     height: 100,
-    component: CustomerNode,
+    component: NoteNode,
+  })
+  register({
+    shape: 'topic-child',
+    width: 100,
+    height: 100,
+    component: TopicChildNode,
+  })
+  register({
+    shape: 'topic',
+    width: 100,
+    height: 100,
+    component: TopicNode,
   })
 }
 
@@ -203,18 +217,20 @@ function render(graph: Graph) {
   const traverse = (hierarchyItem: HierarchyResult) => {
     if (hierarchyItem) {
       const { data, children } = hierarchyItem
+      const node = graph.createNode({
+        id: data.id,
+        shape: data.type === 'topic-child' ? 'topic-child' : 'topic',
+        x: hierarchyItem.x,
+        y: hierarchyItem.y,
+        width: data.width,
+        height: data.height,
+        type: data.type,
+      })
+      node.setData({
+        data: data.label,
+      })
       cells.push(
-        graph.createNode({
-          id: data.id,
-          shape: data.type === 'topic-child' ? 'topic-child' : 'topic',
-          x: hierarchyItem.x,
-          y: hierarchyItem.y,
-          width: data.width,
-          height: data.height,
-          label: data.label,
-          type: data.type,
-          tools: ['node-editor'],
-        }),
+        node,
       )
       if (children) {
         children.forEach((item: HierarchyResult) => {
