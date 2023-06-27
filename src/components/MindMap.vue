@@ -2,47 +2,40 @@
 import { onMounted, ref, watch } from 'vue'
 import { Graph, Path } from '@antv/x6'
 import { Snapline } from '@antv/x6-plugin-snapline'
-import Hierarchy from '@antv/hierarchy'
 import { Keyboard } from '@antv/x6-plugin-keyboard'
 import { Selection } from '@antv/x6-plugin-selection'
 import { cloneDeep } from 'lodash'
 import { register } from '@antv/x6-vue-shape'
 import { History } from '@antv/x6-plugin-history'
 import { Export } from '@antv/x6-plugin-export'
-import type { MindMapData } from '../stores'
 import { useNodeStore } from '../stores'
-import CustomerNode from './CustomerNode.vue'
 import GraphToolbar from './GraphToolBar.vue'
+import NoteNode from '@/components/Nodes/NoteNode.vue'
+import TopicChildNode from '@/components/Nodes/TopicChildNode.vue'
+import TopicNode from '@/components/Nodes/TopicNode.vue'
+import { useNodeOperate } from '@/hooks/useNodeOperate'
 
-interface HierarchyResult {
-  id: string
-  x: number
-  y: number
-  data: MindMapData
-  children?: HierarchyResult[]
-}
-
-const data = ref<MindMapData>()
-const graphRef = ref<Graph>()
 const containerRef = ref()
 const nodeStore = useNodeStore()
 const historyStateRef = ref()
+const { render, removeNode, addChildNode, dataRef, graphRef } = useNodeOperate()
+
 watch(
   () => nodeStore.nodes,
   (nodes) => {
-    data.value = cloneDeep(nodes)
-    if (nodes) {
+    dataRef.value = cloneDeep(nodes)
+    if (nodes && graphRef.value) {
       useBindingKeyBoard(
-        graphRef.value!,
+        graphRef.value,
         render,
       )
-      render(graphRef.value!)
-      graphRef.value!.addNode({
+      render()
+      graphRef.value.addNode({
         shape: 'note-node',
         position: { x: 0, y: 0 },
       })
 
-      graphRef.value?.zoomToFit({
+      graphRef.value.zoomToFit({
         padding: 20,
         minScale: 0.5,
         maxScale: 1,
@@ -51,89 +44,6 @@ watch(
   },
 )
 function useRegister() {
-  // topic
-  Graph.registerNode(
-    'topic',
-    {
-      inherit: 'rect',
-      markup: [
-        {
-          tagName: 'rect',
-          selector: 'body',
-        },
-        {
-          tagName: 'image',
-          selector: 'img',
-        },
-        {
-          tagName: 'text',
-          selector: 'label',
-        },
-      ],
-      attrs: {
-        body: {
-          rx: 6,
-          ry: 6,
-          stroke: '#5F95FF',
-          fill: '#EFF4FF',
-          strokeWidth: 1,
-        },
-        img: {
-          'ref': 'body',
-          'refX': '100%',
-          'refY': '50%',
-          'refY2': -8,
-          'width': 16,
-          'height': 16,
-          'xlink:href':
-            'https://gw.alipayobjects.com/mdn/rms_43231b/afts/img/A*SYCuQ6HHs5cAAAAAAAAAAAAAARQnAQ',
-          'event': 'add:topic',
-          'class': 'topic-image',
-        },
-        label: {
-          fontSize: 14,
-          fill: '#262626',
-        },
-      },
-    },
-    true,
-  )
-
-  // child topic
-  Graph.registerNode(
-    'topic-child',
-    {
-      inherit: 'rect',
-      markup: [
-        {
-          tagName: 'rect',
-          selector: 'body',
-        },
-        {
-          tagName: 'text',
-          selector: 'label',
-        },
-        {
-          tagName: 'path',
-          selector: 'line',
-        },
-      ],
-      attrs: {
-        body: {
-          fill: '#fff',
-          rx: 6,
-          ry: 6,
-        },
-        label: {
-          fontSize: 16,
-          fill: '#262626',
-          textVerticalAnchor: 'bottom',
-        },
-      },
-    },
-    true,
-  )
-
   // Connector
   Graph.registerConnector(
     'mindmap',
@@ -176,158 +86,20 @@ function useRegister() {
     shape: 'note-node',
     width: 100,
     height: 100,
-    component: CustomerNode,
+    component: NoteNode,
   })
-}
-
-function render(graph: Graph) {
-  const result: HierarchyResult = Hierarchy.mindmap(data.value, {
-    direction: 'H',
-    getHeight(d: MindMapData) {
-      return d.height
-    },
-    getWidth(d: MindMapData) {
-      return d.width
-    },
-    getHGap() {
-      return 40
-    },
-    getVGap() {
-      return 20
-    },
-    getSide: () => {
-      return 'right'
-    },
+  register({
+    shape: 'topic-child',
+    width: 100,
+    height: 100,
+    component: TopicChildNode,
   })
-  const cells: any[] = []
-  const traverse = (hierarchyItem: HierarchyResult) => {
-    if (hierarchyItem) {
-      const { data, children } = hierarchyItem
-      cells.push(
-        graph.createNode({
-          id: data.id,
-          shape: data.type === 'topic-child' ? 'topic-child' : 'topic',
-          x: hierarchyItem.x,
-          y: hierarchyItem.y,
-          width: data.width,
-          height: data.height,
-          label: data.label,
-          type: data.type,
-          tools: ['node-editor'],
-        }),
-      )
-      if (children) {
-        children.forEach((item: HierarchyResult) => {
-          const { id, data } = item
-          cells.push(
-            graph.createEdge({
-              shape: 'mindmap-edge',
-              source: {
-                cell: hierarchyItem.id,
-                anchor:
-                  data.type === 'topic-child'
-                    ? {
-                        name: 'right',
-                        args: {
-                          dx: -16,
-                        },
-                      }
-                    : {
-                        name: 'center',
-                        args: {
-                          dx: '25%',
-                        },
-                      },
-              },
-              target: {
-                cell: id,
-                anchor: {
-                  name: 'left',
-                },
-              },
-            }),
-          )
-          traverse(item)
-        })
-      }
-    }
-  }
-  traverse(result)
-  graph.resetCells(cells)
-  graph.centerContent()
-}
-
-function findItem(
-  obj: MindMapData,
-  id: string,
-): {
-    parent: MindMapData | null
-    node: MindMapData | null
-  } | null {
-  if (obj.id === id) {
-    return {
-      parent: null,
-      node: obj,
-    }
-  }
-  const { children } = obj
-  if (children) {
-    for (let i = 0, len = children.length; i < len; i++) {
-      const res = findItem(children[i], id)
-      if (res) {
-        return {
-          parent: res.parent || obj,
-          node: res.node,
-        }
-      }
-    }
-  }
-  return null
-}
-function addChildNode(id: string, type: any) {
-  const res = findItem(data.value!, id)
-  const dataItem = res?.node
-  if (dataItem) {
-    let item: MindMapData | null = null
-    const length = dataItem.children ? dataItem.children.length : 0
-    if (type === 'topic') {
-      item = {
-        id: `${id}-${length + 1}`,
-        type: 'topic-branch',
-        label: `topic-branch-${length + 1}`,
-        width: 100,
-        height: 40,
-      }
-    }
-    else if (type === 'topic-branch') {
-      item = {
-        id: `${id}-${length + 1}`,
-        type: 'topic-child',
-        label: `topic-child-${length + 1}`,
-        width: 60,
-        height: 30,
-      }
-    }
-    if (item) {
-      if (dataItem.children)
-        dataItem.children.push(item)
-      else dataItem.children = [item]
-
-      return item
-    }
-  }
-  return null
-}
-
-function removeNode(id: string) {
-  const res = findItem(data.value!, id)
-  const dataItem = res?.parent
-  if (dataItem && dataItem.children) {
-    const { children } = dataItem
-    const index = children.findIndex(item => item.id === id)
-    return children.splice(index, 1)
-  }
-  return null
+  register({
+    shape: 'topic',
+    width: 100,
+    height: 100,
+    component: TopicNode,
+  })
 }
 
 function useRegisterPlugins(graph: Graph) {
@@ -364,14 +136,14 @@ function useInitMindMap() {
   return { graph }
 }
 
-function handleAddTopic(graph: Graph, render: any) {
-  graph.on('add:topic', ({ node }: { node: any }) => {
-    const { id } = node
-    const type = node.prop('type')
-    if (addChildNode(id, type))
-      render(graph)
-  })
-}
+// function handleAddTopic(graph: Graph, render: any) {
+//   graph.on('add:topic', ({ node }: { node: any }) => {
+//     const { id } = node
+//     const type = node.prop('type')
+//     if (addChildNode(id, type))
+//       render(graph)
+//   })
+// }
 
 function handleHistoryChange(graph: Graph) {
   graph.on('history:change', () => {
@@ -412,7 +184,7 @@ function handleTabKey(graph: Graph, render: any) {
 }
 
 function useBindingKeyBoard(graph: Graph, render: any) {
-  handleAddTopic(graph, render)
+  // handleAddTopic(graph, render)
   handleHistoryChange(graph)
   handleDeleteKey(graph, render)
   handleTabKey(graph, render)

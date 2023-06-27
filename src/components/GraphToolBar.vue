@@ -4,7 +4,6 @@ import { DataUri } from '@antv/x6'
 import type { PropType } from 'vue'
 import { ref, watch } from 'vue'
 import { Icon } from '@iconify/vue'
-import { message } from 'ant-design-vue'
 import type { HistoryState } from './types'
 import GuideLine from './GuideLine.vue'
 import { useShowCurrentZoomMessage } from '@/hooks/useGraph'
@@ -103,14 +102,14 @@ const buttonList = ref([
       props.graph.zoomToFit({ padding: 20 })
     },
   },
-  {
-    icon: 'carbon:star-review',
-    text: 'AI generate',
-    tooltip: 'AI generate',
-    handler: () => {
-      message.info('coming soon')
-    },
-  },
+  // {
+  //   icon: 'carbon:star-review',
+  //   text: 'AI generate',
+  //   tooltip: 'AI generate',
+  //   handler: () => {
+  //     message.info('coming soon')
+  //   },
+  // },
   {
     icon: 'material-symbols:output-rounded',
     rotate: 3,

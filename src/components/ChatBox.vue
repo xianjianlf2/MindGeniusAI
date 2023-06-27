@@ -4,40 +4,28 @@ import { Icon } from '@iconify/vue'
 import { useChatStore } from '../stores'
 import { useLocalTimeString } from '../utils'
 import RobotMessage from './RobotMessage.vue'
-
-const inputWrapper = ref<HTMLElement | null>(null)
+import InputBox from './InputBox.vue'
 
 // message control
 const newMessage = ref('')
-const isCanClick = computed(() => newMessage.value.trim() !== '')
 const chatStore = useChatStore()
 const isLoading = computed(() => chatStore.isLoading)
 
-function sendMessage() {
-  if (newMessage.value.trim() !== '') {
-    chatStore.addMessage({
-      role: 'user',
-      content: newMessage.value.trim(),
-      time: useLocalTimeString(),
-    })
-    chatStore.chatWithMindMap(newMessage.value.trim())
-    newMessage.value = ''
-  }
+function sendMessage(message: string) {
+  chatStore.addMessage({
+    role: 'user',
+    content: message,
+    time: useLocalTimeString(),
+  })
+  chatStore.chatWithMindMap(message)
 }
-
-function handleEnter(e: any) {
-  if (e.key === 'Enter' && e.altKey) {
-    newMessage.value = `${newMessage.value}\n`
-  }
-  else if (e.key === 'Enter' && !e.altKey) {
-    e.preventDefault()
-    sendMessage()
-  }
+function handleStopGenerate() {
+  chatStore.stopGenerate()
 }
 </script>
 
 <template>
-  <div class="border h-[500px] mt-2 shadow-box glass">
+  <div class="border h-[500px] mt-2 shadow-box glass relative">
     <div class="flex flex-col h-full p-3">
       <div v-if="chatStore.messages" class="flex-1 overflow-y-auto">
         <div v-for="(message, index) in chatStore.messages" :key="message.id" class="flex items-start mb-4">
@@ -51,24 +39,15 @@ function handleEnter(e: any) {
         </div>
       </div>
       <div class="flex-none">
-        <div ref="inputWrapper" class="flex items-center px-4 py-2 rounded-md relative">
-          <div class="flex-1 mr-2">
-            <a-spin tip="wait a minute..." :spinning="isLoading">
-              <a-textarea
-                v-model:value="newMessage" type="text" class="w-full px-4 py-2 border border-gray-300 rounded-md"
-                placeholder="Type your message..." auto-size @keydown="handleEnter"
-              />
-            </a-spin>
-          </div>
-          <a-button type="primary" :disabled="!isCanClick" @click="sendMessage">
-            <template #icon>
-              <span class="button-icon mr-1">
-                <Icon icon="bi:send-fill" width="14" />
-              </span>
-            </template>
-            Send
-          </a-button>
-        </div>
+        <InputBox :message="newMessage" :is-loading="isLoading" @send-message="sendMessage" />
+      </div>
+      <div v-show="isLoading" class="absolute bottom-18 w-full items-center justify-center flex">
+        <a-button type="primary" style="display:flex;justify-content: center;align-items: center;" @click="handleStopGenerate">
+          <template #icon>
+            <Icon icon="mdi:stop" width="24" />
+          </template>
+          Stop generating
+        </a-button>
       </div>
     </div>
   </div>

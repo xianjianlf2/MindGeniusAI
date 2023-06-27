@@ -7,19 +7,20 @@ import ShareCard from './ShareCard.vue'
 const showChatBox = ref(false)
 const showShareCard = ref(false)
 
+const GITHUB_URL = 'https://github.com/xianjianlf2/MindGeniusAI'
 function handleOpenGitHub() {
-  window.open('https://github.com/xianjianlf2/MindGeniusAI', '_blank')
+  window.open(GITHUB_URL, '_blank')
 }
 </script>
 
 <template>
   <div class="bg-#1e293b flex justify-between items-center p-3">
     <div class="button" @click="showChatBox = true">
-      <span>
+      <span class="bg-via-gray-900 ">
         Get Start
       </span>
     </div>
-    <div class="items-center flex justify-center gap-2">
+    <div class="items-center flex justify-center gap-2 bg-gradient-to-r ">
       <a-button type="text" @click="showShareCard = true">
         <template #icon>
           <span class="button-icon">
@@ -72,6 +73,7 @@ function handleOpenGitHub() {
   overflow: hidden;
   padding: var(--border-width);
   cursor: pointer;
+  user-select: none;
 }
 
 .button::after {

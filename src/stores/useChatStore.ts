@@ -2,7 +2,7 @@ import { defineStore } from 'pinia'
 import { ref } from 'vue'
 import { v4 as uuidv4 } from 'uuid'
 import { useLocalTimeString } from '../utils'
-import { chatWithMindMapRequest, fetchChatStream } from '../api'
+import { chatWithMindMapRequest } from '@/api/chatMindmap'
 
 export interface Message {
   id: string
@@ -18,11 +18,16 @@ export const useChatStore = defineStore('chatStore', () => {
       content: 'Hello! Please write your topic you want to generate a mindmap',
       time: useLocalTimeString(),
     },
+
   ])
   const isLoading = ref(false)
+  const controller = ref<AbortController | null>(null)
 
   function toggleLoading(val: boolean) {
     isLoading.value = val
+  }
+  function setAbortController(val: AbortController) {
+    controller.value = val
   }
 
   function addMessage(message: Omit<Message, 'id'>) {
@@ -32,9 +37,14 @@ export const useChatStore = defineStore('chatStore', () => {
     })
   }
 
-  function fetchMessage() {
-    return fetchChatStream(messages.value.slice(-3))
+  function stopGenerate() {
+    controller.value?.abort()
+    toggleLoading(false)
   }
+  // todo: fetchMessage
+  // function fetchMessage() {
+  //   return fetchChatStream(messages.value.slice(-3))
+  // }
 
   function chatWithMindMap(topic: string) {
     return chatWithMindMapRequest(topic)
@@ -66,8 +76,10 @@ export const useChatStore = defineStore('chatStore', () => {
     addMessage,
     removeMessage,
     appendMessage,
-    fetchMessage,
+    // fetchMessage,
     chatWithMindMap,
+    stopGenerate,
+    setAbortController,
   }
 },
 )

@@ -1,7 +1,11 @@
 import { defineStore } from 'pinia'
 import { ref } from 'vue'
 import { message } from 'ant-design-vue'
-import { getNodes } from '../utils/useConvertMarkdown'
+import { v4 as uuidv4 } from 'uuid'
+import type { marked } from 'marked'
+import { getNodes, getSingleNode } from '../utils/useConvertMarkdown'
+import { fetchChatNode } from '@/api/chatNode'
+import { measureText } from '@/utils'
 
 export interface MindMapData {
   id: string
@@ -16,9 +20,16 @@ export interface MindMapData {
 export const useNodeStore = defineStore('nodeStore', () => {
   const nodes = ref<MindMapData>()
   const noteContent = ref<string>()
+  const nodeList = ref<any>([])
+  const currentNodeContent = ref('')
+  const isLoading = ref(false)
 
+  function resetSingleNode() {
+    currentNodeContent.value = ''
+    nodeList.value = []
+  }
   function generateNode(markdown: string) {
-    noteContent.value = undefined
+    resetSingleNode()
     if (!markdown) {
       message.info('There is no content')
       return
@@ -35,9 +46,53 @@ export const useNodeStore = defineStore('nodeStore', () => {
     }
   }
 
+  function toggleLoading(val: boolean) {
+    isLoading.value = val
+  }
+
+  function appendMessage(message: string) {
+    currentNodeContent.value += message
+  }
+
+  function clearMessage() {
+    currentNodeContent.value = ''
+  }
+
+  function getCurrentNodeContent(content: string) {
+    return fetchChatNode(content)
+  }
+
+  function splitTextToNodes() {
+    const content = currentNodeContent.value
+    if (!content)
+      return
+    const tokens = getSingleNode(content)
+    const nodes = tokens.reduce((acc: any, token: marked.Token) => {
+      if (token.type === 'list') {
+        const items = token.items.map(item => ({
+          id: uuidv4(),
+          type: 'topic-branch',
+          label: item.text,
+          ...measureText(item.text),
+        }))
+        return [...acc, ...items]
+      }
+      return acc
+    }, [])
+    nodeList.value = nodes
+  }
+
   return {
     nodes,
     noteContent,
+    nodeList,
+    currentNodeContent,
+    isLoading,
     generateNode,
+    toggleLoading,
+    appendMessage,
+    clearMessage,
+    getCurrentNodeContent,
+    splitTextToNodes,
   }
 })

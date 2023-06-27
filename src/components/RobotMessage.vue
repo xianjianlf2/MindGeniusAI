@@ -40,8 +40,8 @@ function handleBubbleStyle() {
 
 <template>
   <div
-    class="w-full" :class="handleBubbleStyle()"
-    @mouseenter="showButtonGroup = true" @mouseleave="showButtonGroup = false"
+    class="w-full" :class="handleBubbleStyle()" @mouseenter="showButtonGroup = true"
+    @mouseleave="showButtonGroup = false"
   >
     <div class="w-full flex items-center justify-between p-2 ">
       <div class="text-base font-semibold text-sm h-[28px]">
@@ -73,26 +73,27 @@ function handleBubbleStyle() {
 </template>
 
 <style scoped>
-@keyframes placeholderShimmer {
+@keyframes highlight {
   0% {
-    background-position: -468px 0;
+    background-position: 100% 0;
   }
 
   100% {
-    background-position: 468px 0;
+    background-position: -100% 0;
   }
+}
+
+.bubble-transition {
+  background-image: linear-gradient(to right, #2b5876 0%, #4e4376 100%);
+  background-position: 100% 0;
+  background-size: 200% 100%;
+  animation: highlight 2s linear infinite;
 }
 
 .robot-bubble {
   border-radius: 8px;
   padding: 8px;
   background-image: linear-gradient(-20deg, #2b5876 0%, #4e4376 100%);
-
-}
-
-.bubble-transition {
-  animation: placeholderShimmer 8s infinite ease-in-out;
-  background-size: 800px 104px;
 }
 
 .user-bubble {
