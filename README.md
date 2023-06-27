@@ -1,4 +1,7 @@
-<center>MindGenius AI</center>
+
+
+## MindGenius AI
+
 <center>Auto generate MindMap with ChatGPT</center>
 
 ## Features
@@ -8,6 +11,8 @@
 - [x] Modify generated nodes.
 - [x] Return result markdown rendering
 - [x] Export result to picture, json
+- [x] Single node support ai generate
+- [x] Edit Node
 - [ ] node support add picture
 - [ ] Automatically summarize web-linked articles
 - [ ] support chat
@@ -15,8 +20,11 @@
 - [ ] dark mode
 - [ ] change node style
 
-![mindmap](https://github.com/xianjianlf2/MindGeniusAI/blob/main/markdownImg/sample.png?raw=true)
-![mindmap](https://github.com/xianjianlf2/MindGeniusAI/blob/main/markdownImg/Demo.gif?raw=true)
+![mindmap](https://github.com/xianjianlf2/MindGeniusAI/blob/main/markdownImg/newSample.png?raw=true)
+![mindmap](https://github.com/xianjianlf2/MindGeniusAI/blob/main/markdownImg/newDemo.gif?raw=true)
+![mindmap](https://github.com/xianjianlf2/MindGeniusAI/blob/main/markdownImg/brainStorm.gif?raw=true)
+![mindmap](https://github.com/xianjianlf2/MindGeniusAI/blob/main/markdownImg/editNode.gif?raw=true)
+
 
 ## Motivation
 

@@ -73,31 +73,27 @@ function handleBubbleStyle() {
 </template>
 
 <style scoped>
-@keyframes loading-animation {
+@keyframes highlight {
   0% {
-    background-image: linear-gradient(-20deg, #2b5876 0%, #4e4376 100%);
-    background-position: 0% 50%;
-  }
-
-  50% {
-    background-image: linear-gradient(160deg, #2b5876 0%, #4e4376 100%);
-    background-position: 100% 50%;
+    background-position: 100% 0;
   }
 
   100% {
-    background-image: linear-gradient(-20deg, #2b5876 0%, #4e4376 100%);
-    background-position: 0% 50%;
+    background-position: -100% 0;
   }
+}
+
+.bubble-transition {
+  background-image: linear-gradient(to right, #2b5876 0%, #4e4376 100%);
+  background-position: 100% 0;
+  background-size: 200% 100%;
+  animation: highlight 2s linear infinite;
 }
 
 .robot-bubble {
   border-radius: 8px;
   padding: 8px;
   background-image: linear-gradient(-20deg, #2b5876 0%, #4e4376 100%);
-}
-
-.bubble-transition {
-  animation: loading-animation 1.5s infinite;
 }
 
 .user-bubble {

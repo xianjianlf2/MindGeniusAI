@@ -2,11 +2,18 @@
 import type { Node } from '@antv/x6'
 import { inject, nextTick, onMounted, ref } from 'vue'
 import { useContainer } from './useContainer'
+import { useEditing } from '@/hooks/useNodeEdit'
 
 const getNode: (() => Node | undefined) | undefined = inject('getNode')
 const nodeRef = ref<Node>()
 const dataRef = ref()
 const { containerRef, updateContainerSize, listenDataChange } = useContainer()
+const {
+  isEditing,
+  inputValue,
+  handleDoubleClick,
+  handleKeydown,
+} = useEditing()
 
 function initData(node: Node) {
   nodeRef.value = node
@@ -34,13 +41,28 @@ onMounted(() => {
 
 <template>
   <div
-    ref="containerRef"
-    class="rounded-lg p-3 flex justify-center items-center bg-gradient-to-tl from-green-300 via-blue-500 to-purple-600 text-white h-auto w-auto min-h-[50px] min-w-[100px]"
+    ref="containerRef" class="rounded-lg p-3 box-border flex justify-center items-center bg-gradient-to-tl from-green-300 via-blue-500 to-purple-600
+  p-3 text-white
+  h-auto w-auto
+  min-h-[50px] min-w-[200px] max-w-[500px]
+  overflow-hidden
+  relative" @dblclick.prevent="() => handleDoubleClick(nodeRef!)"
   >
-    <span class="text-shadow-md text-lg">
+    <span class="text-shadow-md text-lg whitespace-pre-wrap w-full" :class="isEditing ? 'block-hidden' : 'block-visible'">
       {{ dataRef }}
     </span>
+    <div class="w-full flex" :class="isEditing ? 'block-visible' : 'block-hidden'">
+      <textarea v-model="inputValue" class="bg-black" :rows="4" @keydown="(e: KeyboardEvent) => handleKeydown(e, nodeRef!, dataRef)" />
+    </div>
   </div>
 </template>
 
-<style scoped></style>
+<style scoped>
+.block-hidden {
+  display: none;
+}
+
+.block-visible {
+  display: block;
+}
+</style>

@@ -64,3 +64,7 @@ function removeDepth(nodes: any[]): any {
 export function getNodes(markdown: string) {
   return removeDepth(buildTree(markdown))
 }
+
+export function getSingleNode(markdown: string) {
+  return marked.lexer(markdown)
+}

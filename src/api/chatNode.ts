@@ -16,6 +16,7 @@ function useNodeStoreConfig(data: any) {
     },
     messageDoneHandler: () => {
       nodeStore.toggleLoading(false)
+      nodeStore.splitTextToNodes()
     },
     messageCloseHandler: () => {
       nodeStore.toggleLoading(false)

@@ -18,6 +18,7 @@ export const useChatStore = defineStore('chatStore', () => {
       content: 'Hello! Please write your topic you want to generate a mindmap',
       time: useLocalTimeString(),
     },
+
   ])
   const isLoading = ref(false)
   const controller = ref<AbortController | null>(null)
