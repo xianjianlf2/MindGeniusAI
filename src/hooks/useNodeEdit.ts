@@ -4,8 +4,7 @@ import type { Node } from '@antv/x6'
 export function useEditing() {
   const isEditing = ref(false)
   const inputValue = ref('')
-  const inputAreaRef = ref<HTMLTextAreaElement>()
-  function handleKeydown(e: any, node: Node<Node.Properties>, data: string) {
+  function handleKeydown(e: any, node: Node<Node.Properties>) {
     if (e.key === 'Enter' && e.altKey) {
       inputValue.value = `${inputValue.value}\n`
     }
@@ -14,13 +13,6 @@ export function useEditing() {
       isEditing.value = false
       nextTick(() => {
         node.setData({ data: inputValue.value.trim() })
-      })
-    }
-    else if (e.key === 'Escape') {
-      inputAreaRef.value?.blur()
-      isEditing.value = false
-      nextTick(() => {
-        node.setData({ data })
       })
     }
   }

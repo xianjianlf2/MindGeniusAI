@@ -155,7 +155,7 @@ function useNodeMenu() {
         {{ dataRef }}
       </span>
       <div class="w-full flex" :class="isEditing ? 'block-visible' : 'block-hidden'">
-        <textarea v-model="inputValue" :rows="4" class="bg-black" @keydown="(e:KeyboardEvent) => handleKeydown(e, nodeRef!, dataRef)" />
+        <a-textarea v-model:value="inputValue" placeholder="Basic usage" :rows="4" @press-enter="(e:KeyboardEvent) => handleKeydown(e, nodeRef!)" />
       </div>
     </div>
     <div class="ml-2 flex extra-button">

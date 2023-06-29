@@ -1,16 +1,13 @@
-import fs from 'node:fs'
-import { marked } from 'marked'
 import { v4 as uuidv4 } from 'uuid'
+import { marked } from 'marked'
+import type { MindMapData } from '@/stores'
 
-const markdown = fs.readFileSync('./test.md', 'utf8')
-const tokens = marked.lexer(markdown)
-
-export function measureText(text, font = '12px Arial') {
+export function measureText(text: string, font = '12px Arial') {
   const canvas = document.createElement('canvas')
-  const context = canvas.getContext('2d')
+  const context = canvas.getContext('2d')!
   context.font = font
   const width = context.measureText(text).width
-  const height = parseInt(font, 10)
+  const height = Number.parseInt(font, 10)
   if (width > 120) {
     const words = text.split(' ')
     let line = ''
@@ -31,13 +28,14 @@ export function measureText(text, font = '12px Arial') {
   }
   return { width, height }
 }
+type Node = MindMapData & { depth: number } & { children: Node[] }
 
-export function buildTree(tokens) {
-  const root = {
+export function buildTree(tokens: marked.Token[]): Node[] {
+  const root: Node = {
     id: uuidv4(),
     label: '',
     children: [],
-    type: '',
+    type: 'topic',
     depth: 0,
   }
   const headingStack = [root]
@@ -46,7 +44,7 @@ export function buildTree(tokens) {
   for (const token of tokens) {
     if (token.type === 'heading') {
       const depth = token.depth
-      const heading = {
+      const heading: Node = {
         id: uuidv4(),
         label: token.text,
         children: [],
@@ -58,7 +56,7 @@ export function buildTree(tokens) {
         headingStack.pop()
 
       const parentHeading = headingStack[headingStack.length - 1]
-      parentHeading.children.push(heading)
+      ;(parentHeading.children as any).push(heading)
       headingStack.push(heading)
 
       if (depth > maxDepth)
@@ -72,14 +70,14 @@ export function buildTree(tokens) {
         label: item.text,
         depth: maxDepth + 1,
         ...measureText(item.text),
-      }))
+      })) as any
     }
   }
   return root.children
 }
 // remove node depth
-function removeDepth(nodes) {
-  return nodes.map((node) => {
+function removeDepth(nodes: Node[]): MindMapData[] {
+  return nodes.map((node: Node) => {
     const { depth, ...rest } = node
     if (node.children) {
       return {
@@ -91,6 +89,7 @@ function removeDepth(nodes) {
   })
 }
 
-export function getNodes() {
+export function getNodes(markdown: string) {
+  const tokens = marked.lexer(markdown)
   return removeDepth(buildTree(tokens))
 }
