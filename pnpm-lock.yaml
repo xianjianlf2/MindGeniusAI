@@ -25,9 +25,6 @@ dependencies:
   '@microsoft/fetch-event-source':
     specifier: ^2.0.1
     version: 2.0.1
-  '@vueuse/core':
-    specifier: ^10.2.0
-    version: 10.2.0(vue@3.3.4)
   '@vueuse/motion':
     specifier: ^2.0.0
     version: 2.0.0(vue@3.3.4)

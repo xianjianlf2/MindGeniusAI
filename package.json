@@ -19,7 +19,6 @@
     "@antv/x6-vue-shape": "^2.0.11",
     "@iconify-icons/bi": "^1.2.17",
     "@microsoft/fetch-event-source": "^2.0.1",
-    "@vueuse/core": "^10.2.0",
     "@vueuse/motion": "^2.0.0",
     "ant-design-vue": "4.0.0-rc.5",
     "axios": "^1.4.0",
