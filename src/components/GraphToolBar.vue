@@ -5,8 +5,6 @@ import type { PropType } from 'vue'
 import { ref, watch } from 'vue'
 import { Icon } from '@iconify/vue'
 import type { HistoryState } from './types'
-import GuideLine from './GuideLine.vue'
-import { useShowCurrentZoomMessage } from '@/hooks/useGraph'
 
 const props = defineProps({
   graph: {
@@ -56,7 +54,6 @@ const noteNodeStyle = `
         
         `
 
-const showGuideLine = ref(false)
 const buttonList = ref([
   {
     icon: 'ic:baseline-undo',
@@ -76,24 +73,24 @@ const buttonList = ref([
       props.graph.redo()
     },
   },
-  {
-    icon: 'ic:baseline-zoom-in',
-    text: 'zoom in',
-    tooltip: 'zoom in',
-    handler: () => {
-      props.graph.zoom(0.1)
-      useShowCurrentZoomMessage(props.graph)
-    },
-  },
-  {
-    icon: 'ic:baseline-zoom-out',
-    text: 'zoom out',
-    tooltip: 'zoom out',
-    handler: () => {
-      props.graph.zoom(-0.1)
-      useShowCurrentZoomMessage(props.graph)
-    },
-  },
+  // {
+  //   icon: 'ic:baseline-zoom-in',
+  //   text: 'zoom in',
+  //   tooltip: 'zoom in',
+  //   handler: () => {
+  //     props.graph.zoom(0.1)
+  //     useShowCurrentZoomMessage(props.graph)
+  //   },
+  // },
+  // {
+  //   icon: 'ic:baseline-zoom-out',
+  //   text: 'zoom out',
+  //   tooltip: 'zoom out',
+  //   handler: () => {
+  //     props.graph.zoom(-0.1)
+  //     useShowCurrentZoomMessage(props.graph)
+  //   },
+  // },
   {
     icon: 'ic:baseline-fit-screen',
     text: 'fit screen',
@@ -125,14 +122,14 @@ const buttonList = ref([
       })
     },
   },
-  {
-    icon: 'material-symbols:live-help-outline-rounded',
-    text: 'guide line',
-    tooltip: 'guide line',
-    handler: () => {
-      showGuideLine.value = true
-    },
-  },
+  // {
+  //   icon: 'material-symbols:live-help-outline-rounded',
+  //   text: 'guide line',
+  //   tooltip: 'guide line',
+  //   handler: () => {
+  //     showGuideLine.value = true
+  //   },
+  // },
 ])
 watch(
   () => props.historyState,
@@ -160,9 +157,6 @@ watch(
       </a-button>
     </a-tooltip>
   </div>
-  <a-modal v-model:open="showGuideLine" title="GUIDE LINE" :footer="null" :mask-closable="false">
-    <GuideLine />
-  </a-modal>
 </template>
 
 <style scoped></style>

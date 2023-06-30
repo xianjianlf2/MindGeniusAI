@@ -3,24 +3,66 @@ import { ref } from 'vue'
 
 const dataSource = ref([
   {
-    operate: 'generate mind map',
-    method: 'Get Start',
+    operateName: 'generate mind map',
+    operations: [
+      {
+        text: 'Click',
+      },
+      {
+        text: 'Get start',
+        type: 'keycap',
+      },
+    ],
   },
   {
-    operate: 'zoom in / zoom out',
-    method: 'Mouse Wheel',
+    operateName: 'zoom in / zoom out',
+    operations: [
+      {
+        text: 'Mouse scrolling',
+        type: 'keycap',
+      }],
   },
   {
-    operate: 'delete',
-    method: 'Delete / Backspace',
+    operateName: 'delete',
+    operations: [
+      {
+        text: 'Click',
+      },
+      {
+        text: 'Delete',
+        type: 'keycap',
+      },
+      {
+        text: 'or',
+      },
+      {
+        text: 'Backspace',
+        type: 'keycap',
+      },
+    ],
   },
   {
-    operate: 'drag',
-    method: 'Mouse Drag',
+    operateName: 'drag',
+    operations: [
+      {
+        text: 'Click and drag on the blank area',
+      },
+    ],
   },
   {
-    operate: 'select elements',
-    method: 'Alt + Mouse',
+    operateName: 'select elements',
+    operations: [
+      {
+        text: 'Hold down the',
+      },
+      {
+        text: 'alt',
+        type: 'keycap',
+      },
+      {
+        text: 'key and drag the mouse',
+      },
+    ],
   },
 ])
 
@@ -31,13 +73,13 @@ const columns = ref([
   },
   {
     title: 'Operate',
-    dataIndex: 'operate',
-    key: 'operate',
+    dataIndex: 'operateName',
+    key: 'operateName',
   },
   {
-    title: 'Method',
-    dataIndex: 'method',
-    key: 'method',
+    title: 'Operations',
+    dataIndex: 'operations',
+    key: 'operations',
   },
 ])
 </script>
@@ -45,11 +87,11 @@ const columns = ref([
 <template>
   <a-table :data-source="dataSource" :columns="columns" bordered>
     <template #bodyCell="{ column, text }">
-      <template v-if="column.dataIndex === 'method'">
-        <div class="keycap-container">
-          <div class="keycap">
-            {{ text }}
-          </div>
+      <template v-if="column.dataIndex === 'operations'">
+        <div class="flex items-center justify-start">
+          <span v-for="item in text" :key="item" :class="item.type ? 'keycap' : ''">
+            {{ item.text }}
+          </span>
         </div>
       </template>
     </template>
