@@ -136,21 +136,18 @@ function useInitMindMap() {
   return { graph }
 }
 
-// function handleAddTopic(graph: Graph, render: any) {
-//   graph.on('add:topic', ({ node }: { node: any }) => {
-//     const { id } = node
-//     const type = node.prop('type')
-//     if (addChildNode(id, type))
-//       render(graph)
-//   })
-// }
-
 function handleHistoryChange(graph: Graph) {
   graph.on('history:change', () => {
     historyStateRef.value = {
       canRedo: graph.canRedo(),
       canUndo: graph.canUndo(),
     }
+  })
+}
+
+function handleHideNode(graph: Graph) {
+  graph.on('blank:click', () => {
+    nodeStore.setCurrentEditingNode('')
   })
 }
 
@@ -185,6 +182,7 @@ function handleTabKey(graph: Graph, render: any) {
 
 function useBindingKeyBoard(graph: Graph, render: any) {
   // handleAddTopic(graph, render)
+  handleHideNode(graph)
   handleHistoryChange(graph)
   handleDeleteKey(graph, render)
   handleTabKey(graph, render)

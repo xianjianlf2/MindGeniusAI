@@ -91,7 +91,6 @@ export function useNodeOperate() {
         }
       }
     }
-
     traverse(result)
     graphRef.value!.resetCells(cells)
     graphRef.value!.centerContent()
