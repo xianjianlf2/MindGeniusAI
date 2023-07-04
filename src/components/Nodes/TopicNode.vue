@@ -6,7 +6,6 @@ import { message } from 'ant-design-vue'
 import InputBox from '../InputBox.vue'
 import { useContainer } from './useContainer'
 import ExtraButton from './ExtraButton.vue'
-import SingleNodeWithToolTip from '@/components/SingleNodeWithToolTip.vue'
 import { useNodeStore } from '@/stores'
 import { useGenerateMarkdown } from '@/hooks/useGenerateMarkdown'
 import { useEditing } from '@/hooks/useNodeEdit'
@@ -16,10 +15,11 @@ const nodeRef = ref<Node>()
 const dataRef = ref()
 const { containerRef, updateContainerSize, listenDataChange } = useContainer()
 const {
-  isEditing,
+  isCanEditNode,
   inputValue,
   handleDoubleClick,
   handleKeydown,
+  handleBlur,
 } = useEditing()
 
 const {
@@ -86,9 +86,12 @@ function useNodeMenu() {
       },
     },
   ])
+  const lastMessage = ref('')
 
   function sendMessage(message: string) {
-    nodeStore.getCurrentNodeContent(message)
+    if (message)
+      lastMessage.value = message
+    nodeStore.getCurrentNodeContent(lastMessage.value)
   }
   function initModal() {
     const { data } = nodeRef.value?.getData()
@@ -137,28 +140,32 @@ function useNodeMenu() {
 </script>
 
 <template>
-  <div class="flex flex-row items-center pr-3" @dblclick.prevent="() => handleDoubleClick(nodeRef!)">
+  <div class="flex flex-row items-center" @dblclick.prevent="() => handleDoubleClick(nodeRef!)">
     <div
-      ref="containerRef" class="bg-gradient-to-tr from-purple-600 via-blue-500 to-green-300
+      ref="containerRef" class="bg-gradient-to-r from-blue-500 to-teal-400
   rounded-lg
   box-border
   p-3
   flex justify-center
-  items-center text-white
+  items-center
   h-auto w-auto
   min-h-[50px] min-w-[200px] max-w-[500px]
   overflow-hidden
   relative
+  node-text
   "
     >
-      <span class="text-shadow-md text-lg whitespace-pre-wrap w-full" :class="isEditing ? 'block-hidden' : 'block-visible'">
+      <span
+        class="text-shadow-md text-lg whitespace-pre-wrap w-full"
+        :class="isCanEditNode(nodeRef!) ? 'block-hidden' : 'block-visible'"
+      >
         {{ dataRef }}
       </span>
-      <div class="w-full flex" :class="isEditing ? 'block-visible' : 'block-hidden'">
-        <a-textarea v-model:value="inputValue" placeholder="Basic usage" :rows="4" @press-enter="(e:KeyboardEvent) => handleKeydown(e, nodeRef!)" />
+      <div class="w-full flex" :class="isCanEditNode(nodeRef!) ? 'block-visible' : 'block-hidden'">
+        <a-textarea v-model:value="inputValue" :rows="4" @press-enter="(e: KeyboardEvent) => handleKeydown(e, nodeRef!)" @blur="handleBlur(nodeRef!)" />
       </div>
     </div>
-    <div class="ml-2 flex extra-button">
+    <div class="flex extra-button ml-2">
       <ExtraButton :menu-items="menuItems" />
     </div>
   </div>
@@ -168,9 +175,23 @@ function useNodeMenu() {
       v-html="nodeContent"
     />
     <div v-else>
-      <div v-for="item in nodeList" :key="item.id">
-        <SingleNodeWithToolTip :item="item" tip="Add to map" @click="handleNodeClick" />
-      </div>
+      <a-list item-layout="horizontal" :data-source="nodeList">
+        <template #loadMore>
+          <div v-if="!isLoading" :style="{ textAlign: 'center', marginTop: '12px', height: '32px', lineHeight: '32px' }">
+            <a-button @click="() => sendMessage">
+              Regenerate
+            </a-button>
+          </div>
+        </template>
+        <template #renderItem="{ item }">
+          <a-list-item>
+            <template #actions>
+              <a key="list-loadmore-edit" @click="handleNodeClick(item)">append</a>
+            </template>
+            <a-list-item-meta :description="item.label" />
+          </a-list-item>
+        </template>
+      </a-list>
     </div>
 
     <InputBox v-model:message="aiInputBoxContent" :is-loading="isLoading" @send-message="sendMessage" />

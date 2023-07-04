@@ -23,6 +23,11 @@ export const useNodeStore = defineStore('nodeStore', () => {
   const nodeList = ref<any>([])
   const currentNodeContent = ref('')
   const isLoading = ref(false)
+  const currentEditNode = ref()
+
+  function setCurrentEditingNode(id: string) {
+    currentEditNode.value = id
+  }
 
   function resetSingleNode() {
     currentNodeContent.value = ''
@@ -88,11 +93,13 @@ export const useNodeStore = defineStore('nodeStore', () => {
     nodeList,
     currentNodeContent,
     isLoading,
+    currentEditNode,
     generateNode,
     toggleLoading,
     appendMessage,
     clearMessage,
     getCurrentNodeContent,
     splitTextToNodes,
+    setCurrentEditingNode,
   }
 })

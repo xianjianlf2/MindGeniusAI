@@ -8,6 +8,7 @@ import { HumanChatMessage } from 'langchain/schema'
 import { validateFileFormat } from './utils/validateFileFormat.ts'
 import { chatStream } from './chatStream.ts'
 import { chatMindMap } from './chatMindMap.ts'
+import { configureProxyEnvironment, isEmptyKey } from './utils/useOpenAIProxy.ts'
 
 enum MessageStatus {
   PENDING = 'pending',
@@ -30,6 +31,16 @@ const upload = multer({ storage })
 const PORT = 3000
 
 app.use(koaBody())
+app.use(async (ctx, next) => {
+  try {
+    await next()
+  }
+  catch (err: any) {
+    console.log(err)
+    // ctx.status = err.status || 500
+    // ctx.body = err.message
+  }
+})
 app.use(router.routes())
 app.use(router.allowedMethods())
 
@@ -69,10 +80,16 @@ function useChatSteam(ctx: Koa.ParameterizedContext<any, Router.IRouterParamCont
     sendData(JSON.stringify(message))
     sseStream.end()
   }
+  function messageError(e: string) {
+    ctx.status = 400
+    sseStream.write(e)
+    sseStream.end()
+  }
 
   return {
     messageSend,
     messageDone,
+    messageError,
   }
 }
 
@@ -110,7 +127,9 @@ router.post('/chatMindMap', async (ctx) => {
   const { topic } = ctx.request.body
   if (!topic)
     ctx.throw(400, 'No topic')
-  const { messageSend, messageDone } = useChatSteam(ctx)
+  if (isEmptyKey(ctx))
+    ctx.throw(400, 'Please set openai key')
+
   function generatePrompt(topic: string) {
     let prompt: HumanChatMessage
     const pattern = /[\u4E00-\u9FA5]+/
@@ -134,14 +153,17 @@ router.post('/chatMindMap', async (ctx) => {
     }
     return prompt
   }
-  chatMindMap(generatePrompt(topic), messageSend, messageDone)
+
+  chatMindMap(generatePrompt(topic), useChatSteam(ctx),
+    configureProxyEnvironment(ctx))
 })
 
 router.post('/chatNode', async (ctx) => {
   const { content } = ctx.request.body
   if (!content)
     ctx.throw(400, 'No content')
-  const { messageSend, messageDone } = useChatSteam(ctx)
+  if (isEmptyKey(ctx))
+    ctx.throw(400, 'Please set openai key')
   function generatePrompt(content: string) {
     let prompt: HumanChatMessage
     const pattern = /[\u4E00-\u9FA5]+/
@@ -163,7 +185,7 @@ router.post('/chatNode', async (ctx) => {
     }
     return prompt
   }
-  chatMindMap(generatePrompt(content), messageSend, messageDone)
+  chatMindMap(generatePrompt(content), useChatSteam(ctx), configureProxyEnvironment(ctx))
 })
 
 router.post('/upload', upload.single('file'), async (ctx) => {

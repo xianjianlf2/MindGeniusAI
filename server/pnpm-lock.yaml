@@ -5,8 +5,8 @@ dependencies:
     specifier: ^3.0.2
     version: 3.0.2(multer@1.4.5-lts.1)
   '@types/node':
-    specifier: ^20.3.0
-    version: 20.3.0
+    specifier: ^20.3.3
+    version: 20.3.3
   koa:
     specifier: ^2.14.2
     version: 2.14.2
@@ -17,8 +17,8 @@ dependencies:
     specifier: ^12.0.0
     version: 12.0.0
   typescript:
-    specifier: ^5.1.3
-    version: 5.1.3
+    specifier: ^5.1.6
+    version: 5.1.6
 
 devDependencies:
   '@pinecone-database/pinecone':
@@ -37,11 +37,11 @@ devDependencies:
     specifier: ^2.1.1
     version: 2.1.1
   dotenv:
-    specifier: ^16.1.4
-    version: 16.1.4
+    specifier: ^16.3.1
+    version: 16.3.1
   langchain:
-    specifier: ^0.0.92
-    version: 0.0.92(@pinecone-database/pinecone@0.1.6)
+    specifier: ^0.0.102
+    version: 0.0.102(@pinecone-database/pinecone@0.1.6)
   mime-types:
     specifier: ^2.1.35
     version: 2.1.35
@@ -50,7 +50,7 @@ devDependencies:
     version: 2.0.22
   ts-node:
     specifier: ^10.9.1
-    version: 10.9.1(@types/node@20.3.0)(typescript@5.1.3)
+    version: 10.9.1(@types/node@20.3.3)(typescript@5.1.6)
 
 packages:
 
@@ -400,25 +400,25 @@ packages:
   /@types/accepts@1.3.5:
     resolution: {integrity: sha512-jOdnI/3qTpHABjM5cx1Hc0sKsPoYCp+DP/GJRGtDlPd7fiV9oXGGIcjW/ZOxLIvjGz8MA+uMZI9metHlgqbgwQ==}
     dependencies:
-      '@types/node': 20.3.0
+      '@types/node': 20.3.3
 
   /@types/body-parser@1.19.2:
     resolution: {integrity: sha512-ALYone6pm6QmwZoAgeyNksccT9Q4AWZQ6PvfwR37GT6r6FWUPguq6sUmNGSMV2Wr761oQoBxwGGa6DR5o1DC9g==}
     dependencies:
       '@types/connect': 3.4.35
-      '@types/node': 20.3.0
+      '@types/node': 20.3.3
 
   /@types/co-body@6.1.0:
     resolution: {integrity: sha512-3e0q2jyDAnx/DSZi0z2H0yoZ2wt5yRDZ+P7ymcMObvq0ufWRT4tsajyO+Q1VwVWiv9PRR4W3YEjEzBjeZlhF+w==}
     dependencies:
-      '@types/node': 20.3.0
+      '@types/node': 20.3.3
       '@types/qs': 6.9.7
     dev: false
 
   /@types/connect@3.4.35:
     resolution: {integrity: sha512-cdeYyv4KWoEgpBISTxWvqYsVy444DOqehiF3fM3ne10AmJ62RSyNkUnxMJXHQWRQQX2eR94m5y1IZyDwBjV9FQ==}
     dependencies:
-      '@types/node': 20.3.0
+      '@types/node': 20.3.3
 
   /@types/content-disposition@0.5.5:
     resolution: {integrity: sha512-v6LCdKfK6BwcqMo+wYW05rLS12S0ZO0Fl4w1h4aaZMD7bqT3gVUns6FvLJKGZHQmYn3SX55JWGpziwJRwVgutA==}
@@ -429,12 +429,12 @@ packages:
       '@types/connect': 3.4.35
       '@types/express': 4.17.17
       '@types/keygrip': 1.0.2
-      '@types/node': 20.3.0
+      '@types/node': 20.3.3
 
   /@types/express-serve-static-core@4.17.34:
     resolution: {integrity: sha512-fvr49XlCGoUj2Pp730AItckfjat4WNb0lb3kfrLWffd+RLeoGAMsq7UOy04PAPtoL01uKwcp6u8nhzpgpDYr3w==}
     dependencies:
-      '@types/node': 20.3.0
+      '@types/node': 20.3.3
       '@types/qs': 6.9.7
       '@types/range-parser': 1.2.4
       '@types/send': 0.17.1
@@ -450,7 +450,7 @@ packages:
   /@types/formidable@2.0.6:
     resolution: {integrity: sha512-L4HcrA05IgQyNYJj6kItuIkXrInJvsXTPC5B1i64FggWKKqSL+4hgt7asiSNva75AoLQjq29oPxFfU4GAQ6Z2w==}
     dependencies:
-      '@types/node': 20.3.0
+      '@types/node': 20.3.3
     dev: false
 
   /@types/http-assert@1.5.3:
@@ -483,7 +483,7 @@ packages:
       '@types/http-errors': 2.0.1
       '@types/keygrip': 1.0.2
       '@types/koa-compose': 3.2.5
-      '@types/node': 20.3.0
+      '@types/node': 20.3.3
 
   /@types/koa__multer@2.0.4:
     resolution: {integrity: sha512-WRkshXhE5rpYFUbbtAjyMhdOOSdbu1XX+2AQlRNM6AZtgxd0/WXMU4lrP7e9tk5HWVTWbx8DOOsVBmfHjSGJ4w==}
@@ -501,8 +501,8 @@ packages:
   /@types/mime@3.0.1:
     resolution: {integrity: sha512-Y4XFY5VJAuw0FgAqPNd6NNoV44jbq9Bz2L7Rh/J6jLTiHBSBJa9fxqQIvkIld4GsoDOcCbvzOUAbLPsSKKg+uA==}
 
-  /@types/node@20.3.0:
-    resolution: {integrity: sha512-cumHmIAf6On83X7yP+LrsEyUOf/YlociZelmpRYaGFydoaPdxdt80MAbu6vWerQT2COCp2nPvHdsbD7tHn/YlQ==}
+  /@types/node@20.3.3:
+    resolution: {integrity: sha512-wheIYdr4NYML61AjC8MKj/2jrR/kDQri/CIpVoZwldwhnIrD/j9jIU5bJ8yBKuB2VhpFV7Ab6G2XkBjv9r9Zzw==}
 
   /@types/qs@6.9.7:
     resolution: {integrity: sha512-FGa1F62FT09qcrueBA6qYTrJPVDzah9a+493+o2PCXsesWHIn27G98TsSMs3WPNbZIEj4+VJf6saSFpvD+3Zsw==}
@@ -518,13 +518,17 @@ packages:
     resolution: {integrity: sha512-Cwo8LE/0rnvX7kIIa3QHCkcuF21c05Ayb0ZfxPiv0W8VRiZiNW/WuRupHKpqqGVGf7SUA44QSOUKaEd9lIrd/Q==}
     dependencies:
       '@types/mime': 1.3.2
-      '@types/node': 20.3.0
+      '@types/node': 20.3.3
 
   /@types/serve-static@1.15.1:
     resolution: {integrity: sha512-NUo5XNiAdULrJENtJXZZ3fHtfMolzZwczzBbnAeBbqBwG+LaG6YaJtuwzwGSQZ2wsCrxjEhNNjAkKigy3n8teQ==}
     dependencies:
       '@types/mime': 3.0.1
-      '@types/node': 20.3.0
+      '@types/node': 20.3.3
+
+  /@types/uuid@9.0.2:
+    resolution: {integrity: sha512-kNnC1GFBLuhImSnV7w4njQkUiJi0ZXUycu1rUaouPqiKlXkh77JKgdRnTAp1x5eBwcIwbtI+3otwzuIDEuDoxQ==}
+    dev: true
 
   /abbrev@1.1.1:
     resolution: {integrity: sha512-nne9/IiQ/hzIhY6pdDnbBtz7DjPTKrY00P/zvPSm5pOFkl6xuGrGnXn/VtTNNfNtAfZ9/1RtehkszU9qcTii0Q==}
@@ -575,6 +579,10 @@ packages:
 
   /arg@4.1.3:
     resolution: {integrity: sha512-58S9QDqG0Xx27YwPSt9fJxivjYl432YCwfDMfZ+71RAqUrZef7LrKQZ3LHLOwCS4FLNBplP533Zx895SeOCHvA==}
+    dev: true
+
+  /argparse@2.0.1:
+    resolution: {integrity: sha512-8+9WqebbFzpX9OR+Wa6O29asIogeRMzcGtAINdpMHHyAg10f05aSFVBbcEqGf/PXw1EjAZ+q2/bEBg3DvurK3Q==}
     dev: true
 
   /asap@2.0.6:
@@ -666,6 +674,11 @@ packages:
       get-intrinsic: 1.2.1
     dev: false
 
+  /camelcase@6.3.0:
+    resolution: {integrity: sha512-Gmy6FhYlCY7uOElZUSbxo2UCDH8owEk996gkbrpsgGtrJLM3J7jGxl9Ic7Qwwj4ivOE5AWZWRMecDdF7hqGjFA==}
+    engines: {node: '>=10'}
+    dev: true
+
   /caniuse-lite@1.0.30001489:
     resolution: {integrity: sha512-x1mgZEXK8jHIfAxm+xgdpHpk50IN3z3q3zP261/WS+uvePxW8izXuCu6AHz0lkuYTlATDehiZ/tNyYBdSQsOUQ==}
     dev: false
@@ -723,6 +736,11 @@ packages:
     engines: {node: '>= 0.8'}
     dependencies:
       delayed-stream: 1.0.0
+    dev: true
+
+  /commander@10.0.1:
+    resolution: {integrity: sha512-y4Mg2tXshplEbSGzx7amzPwKKOCGuoSRP/CjEdwwk0FOGlUbq6lKuoyDZTNZkmxHdJtp54hdfY/JUrdL7Xfdug==}
+    engines: {node: '>=14'}
     dev: true
 
   /concat-map@0.0.1:
@@ -803,6 +821,11 @@ packages:
       ms: 2.1.2
     dev: false
 
+  /decamelize@1.2.0:
+    resolution: {integrity: sha512-z2S+W9X73hAUUki+N+9Za2lBlun89zigOyGrsax+KUQ6wKW4ZoWpEYBkGhQjwAjjDCkWxhY0VKEhk8wzY7F5cA==}
+    engines: {node: '>=0.10.0'}
+    dev: true
+
   /deep-equal@1.0.1:
     resolution: {integrity: sha512-bHtC0iYvWhyaTzvV3CZgPeZQqCOBGyGsVV7v4eevpdkLHfiSrXUdBG+qAuSz4RI70sszvjQ1QSZ98An1yNwpSw==}
     dev: false
@@ -843,8 +866,8 @@ packages:
     engines: {node: '>=0.3.1'}
     dev: true
 
-  /dotenv@16.1.4:
-    resolution: {integrity: sha512-m55RtE8AsPeJBpOIFKihEmqUcoVncQIwo7x9U8ZwLEZw9ZpXboz2c+rvog+jUaJvVrZ5kBOeYQBX5+8Aa/OZQw==}
+  /dotenv@16.3.1:
+    resolution: {integrity: sha512-IPzF4w4/Rd94bA9imS68tZBaYyBWSCE47V1RGuMrB94iyTOIEwRmVL2x/4An+6mETpLrKJ5hQkB8W4kFAadeIQ==}
     engines: {node: '>=12'}
     dev: true
 
@@ -1098,8 +1121,8 @@ packages:
     resolution: {integrity: sha512-VLghIWNM6ELQzo7zwmcg0NmTVyWKYjvIeM83yjp0wRDTmUnrM678fQbcKBo6n2CJEF0szoG//ytg+TKla89ALQ==}
     dev: false
 
-  /js-tiktoken@1.0.6:
-    resolution: {integrity: sha512-lxHntEupgjWvSh37WxpAW4XN6UBXBtFJOpZZq5HN5oNjDfN7L/iJhHOKjyL/DFtuYXUwn5jfTciLtOWpgQmHjQ==}
+  /js-tiktoken@1.0.7:
+    resolution: {integrity: sha512-biba8u/clw7iesNEWLOLwrNGoBP2lA+hTaBLs/D45pJdUPFXyxD6nhcDVtADChghv4GgyAiMKYMiRx7x6h7Biw==}
     dependencies:
       base64-js: 1.5.1
     dev: true
@@ -1107,6 +1130,13 @@ packages:
   /js-tokens@4.0.0:
     resolution: {integrity: sha512-RdJUflcE3cUzKiMqQgsCu06FPu9UdIJO0beYbPhHN4k6apgJtifcoCtT9bcxOpYBtpD2kCM6Sbzg4CausW/PKQ==}
     dev: false
+
+  /js-yaml@4.1.0:
+    resolution: {integrity: sha512-wpxZs9NoxZaJESJGIZTyDEaYpl0FKSA+FB9aJiyemKhMwkxQg63h4T1KJgUGHpTqPDNRcmmYLugrRjJlBtWvRA==}
+    hasBin: true
+    dependencies:
+      argparse: 2.0.1
+    dev: true
 
   /jsesc@2.5.2:
     resolution: {integrity: sha512-OYu7XEzjkCQ3C5Ps3QIZsQfNpqoJyZZA99wd9aWd05NCtC5pWOkShK2mkL6HXQR6/Cy2lbNdPlZBpuQHXE63gA==}
@@ -1196,19 +1226,23 @@ packages:
       - supports-color
     dev: false
 
-  /langchain@0.0.92(@pinecone-database/pinecone@0.1.6):
-    resolution: {integrity: sha512-77528kXJu9C391qV1a5jDzZLEjIblq/VtpH7xd4BwavgvhRmeSXR9WkrHHmih/Phpae4Ss3dtb7pcyd78rp/YA==}
+  /langchain@0.0.102(@pinecone-database/pinecone@0.1.6):
+    resolution: {integrity: sha512-fAZP9YI3qOruPKYa9QrRwGIg2xr9qCAIonYLh0WUb58lkEDQnY8XbSapgWy4a6er5OCfEh9z6x4EPri1+HpD0g==}
     engines: {node: '>=18'}
     peerDependencies:
       '@aws-sdk/client-dynamodb': ^3.310.0
       '@aws-sdk/client-lambda': ^3.310.0
       '@aws-sdk/client-s3': ^3.310.0
       '@aws-sdk/client-sagemaker-runtime': ^3.310.0
+      '@aws-sdk/client-sfn': ^3.310.0
       '@clickhouse/client': ^0.0.14
+      '@elastic/elasticsearch': ^8.4.0
       '@getmetal/metal-sdk': '*'
-      '@getzep/zep-js': ^0.3.1
+      '@getzep/zep-js': ^0.4.1
       '@gomomento/sdk': ^1.23.0
+      '@google-cloud/storage': ^6.10.1
       '@huggingface/inference': ^1.5.1
+      '@notionhq/client': ^2.2.5
       '@opensearch-project/opensearch': '*'
       '@pinecone-database/pinecone': '*'
       '@qdrant/js-client-rest': ^1.2.0
@@ -1235,6 +1269,7 @@ packages:
       mammoth: '*'
       mongodb: ^5.2.0
       mysql2: ^3.3.3
+      notion-to-md: ^3.1.0
       pdf-parse: 1.1.1
       peggy: ^3.0.2
       pg: ^8.11.0
@@ -1245,6 +1280,8 @@ packages:
       replicate: ^0.9.0
       srt-parser-2: ^1.2.2
       typeorm: ^0.3.12
+      typesense: ^1.5.3
+      vectordb: ^0.1.4
       weaviate-ts-client: ^1.0.0
     peerDependenciesMeta:
       '@aws-sdk/client-dynamodb':
@@ -1255,7 +1292,11 @@ packages:
         optional: true
       '@aws-sdk/client-sagemaker-runtime':
         optional: true
+      '@aws-sdk/client-sfn':
+        optional: true
       '@clickhouse/client':
+        optional: true
+      '@elastic/elasticsearch':
         optional: true
       '@getmetal/metal-sdk':
         optional: true
@@ -1263,7 +1304,11 @@ packages:
         optional: true
       '@gomomento/sdk':
         optional: true
+      '@google-cloud/storage':
+        optional: true
       '@huggingface/inference':
+        optional: true
+      '@notionhq/client':
         optional: true
       '@opensearch-project/opensearch':
         optional: true
@@ -1317,6 +1362,8 @@ packages:
         optional: true
       mysql2:
         optional: true
+      notion-to-md:
+        optional: true
       pdf-parse:
         optional: true
       peggy:
@@ -1337,6 +1384,10 @@ packages:
         optional: true
       typeorm:
         optional: true
+      typesense:
+        optional: true
+      vectordb:
+        optional: true
       weaviate-ts-client:
         optional: true
     dependencies:
@@ -1344,13 +1395,18 @@ packages:
       '@pinecone-database/pinecone': 0.1.6
       ansi-styles: 5.2.0
       binary-extensions: 2.2.0
+      camelcase: 6.3.0
+      decamelize: 1.2.0
       expr-eval: 2.0.2
       flat: 5.0.2
-      js-tiktoken: 1.0.6
+      js-tiktoken: 1.0.7
+      js-yaml: 4.1.0
       jsonpointer: 5.0.1
+      langchainplus-sdk: 0.0.15
       ml-distance: 4.0.0
       object-hash: 3.0.0
-      openai: 3.2.1
+      openai: 3.3.0
+      openapi-types: 12.1.3
       p-queue: 6.6.2
       p-retry: 4.6.2
       uuid: 9.0.0
@@ -1360,6 +1416,17 @@ packages:
     transitivePeerDependencies:
       - debug
       - encoding
+    dev: true
+
+  /langchainplus-sdk@0.0.15:
+    resolution: {integrity: sha512-CWaTylvR2d17rErPqgLCBiAnY3UJMdV4c27itvL0CB0eurYnZspa75u3Xl4frmbMy0nhN2N94jWCnrAZX4YDjg==}
+    hasBin: true
+    dependencies:
+      '@types/uuid': 9.0.2
+      commander: 10.0.1
+      p-queue: 6.6.2
+      p-retry: 4.6.2
+      uuid: 9.0.0
     dev: true
 
   /lru-cache@5.1.1:
@@ -1547,13 +1614,17 @@ packages:
     resolution: {integrity: sha512-Fvw+Jemq5fjjyWz6CpKx6w9s7xxqo3+JCyM0WXWeCSOboZ8ABkyvP8ID4CZuChA/wxSx+XSJmdOm8rGVyJ1hdQ==}
     dev: false
 
-  /openai@3.2.1:
-    resolution: {integrity: sha512-762C9BNlJPbjjlWZi4WYK9iM2tAVAv0uUp1UmI34vb0CN5T2mjB/qM6RYBmNKMh/dN9fC+bxqPwWJZUTWW052A==}
+  /openai@3.3.0:
+    resolution: {integrity: sha512-uqxI/Au+aPRnsaQRe8CojU0eCR7I0mBiKjD3sNMzY6DaC1ZVrc85u98mtJW6voDug8fgGN+DIZmTDxTthxb7dQ==}
     dependencies:
       axios: 0.26.1
       form-data: 4.0.0
     transitivePeerDependencies:
       - debug
+    dev: true
+
+  /openapi-types@12.1.3:
+    resolution: {integrity: sha512-N4YtSYJqghVu4iek2ZUvcN/0aqH1kRDuNqzcycDxhOUpg7GdvLa2F3DgS6yBNhInhv2r/6I0Flkn7CqL8+nIcw==}
     dev: true
 
   /p-finally@1.0.0:
@@ -1752,7 +1823,7 @@ packages:
     resolution: {integrity: sha512-N3WMsuqV66lT30CrXNbEjx4GEwlow3v6rr4mCcv6prnfwhS01rkgyFdjPNBYd9br7LpXV1+Emh01fHnq2Gdgrw==}
     dev: true
 
-  /ts-node@10.9.1(@types/node@20.3.0)(typescript@5.1.3):
+  /ts-node@10.9.1(@types/node@20.3.3)(typescript@5.1.6):
     resolution: {integrity: sha512-NtVysVPkxxrwFGUUxGYhfux8k78pQB3JqYBXlLRZgdGUqTO5wU/UyHop5p70iEbGhB7q5KmiZiU0Y3KlJrScEw==}
     hasBin: true
     peerDependencies:
@@ -1771,14 +1842,14 @@ packages:
       '@tsconfig/node12': 1.0.11
       '@tsconfig/node14': 1.0.3
       '@tsconfig/node16': 1.0.4
-      '@types/node': 20.3.0
+      '@types/node': 20.3.3
       acorn: 8.8.2
       acorn-walk: 8.2.0
       arg: 4.1.3
       create-require: 1.1.1
       diff: 4.0.2
       make-error: 1.3.6
-      typescript: 5.1.3
+      typescript: 5.1.6
       v8-compile-cache-lib: 3.0.1
       yn: 3.1.1
     dev: true
@@ -1800,8 +1871,8 @@ packages:
     resolution: {integrity: sha512-/aCDEGatGvZ2BIk+HmLf4ifCJFwvKFNb9/JeZPMulfgFracn9QFcAf5GO8B/mweUjSoblS5In0cWhqpfs/5PQA==}
     dev: false
 
-  /typescript@5.1.3:
-    resolution: {integrity: sha512-XH627E9vkeqhlZFQuL+UsyAXEnibT0kWR2FWONlr4sTjvxyJYnyefgrkyECLzM5NenmKzRAy2rR/OlYLA1HkZw==}
+  /typescript@5.1.6:
+    resolution: {integrity: sha512-zaWCozRZ6DLEWAWFrVDz1H6FVXzUSfTy5FUMWsQlU8Ym5JP9eO4xkTIROFCQvhQf61z6O/G6ugw3SgAnvvm+HA==}
     engines: {node: '>=14.17'}
     hasBin: true
 

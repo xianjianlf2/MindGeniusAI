@@ -1,5 +1,7 @@
 import type { EventSourceMessage } from '@microsoft/fetch-event-source'
 import { EventStreamContentType, fetchEventSource } from '@microsoft/fetch-event-source'
+import { message } from 'ant-design-vue'
+import { StorageKey, storageManager } from '@/utils'
 
 // export function fetchChat(message: string, messageHistory: string[]) {
 //   return axios.post('/api/chat', { message, messageHistory })
@@ -26,15 +28,22 @@ export function fetchChat(config: ChatOptions) {
   const controller = new AbortController()
 
   const handleOpen = async (response: Response) => {
-    if (response.ok && response.headers.get('content-type') === EventStreamContentType)
-      // store.toggleLoading(true)
+    if (response.ok && response.headers.get('content-type') === EventStreamContentType) {
       config.openHandler && config.openHandler(response)
+    }
 
-    else if (response.status >= 400 && response.status < 500 && response.status !== 429)
+    else if (response.status >= 400 && response.status < 500 && response.status !== 429) {
+      const reader = await response.body?.getReader().read()
+      if (reader?.value) {
+        const errorMessage = new TextDecoder().decode(reader.value)
+        message.error(errorMessage)
+      }
       throw new FatalError()
+    }
 
-    else
-      throw new RetriableError()
+    else {
+      throw new FatalError()
+    }
   }
 
   const handleMessage = (ev: EventSourceMessage) => {
@@ -68,6 +77,8 @@ export function fetchChat(config: ChatOptions) {
     body: JSON.stringify(config.data),
     headers: {
       'Content-Type': 'application/json',
+      'Authorization': `Bearer ${storageManager.get(StorageKey.OPENAI_KEY)}` || '',
+      'OpenAI-proxy': `${storageManager.get(StorageKey.OPENAI_PROXY)}` || '',
     },
     signal: controller.signal,
     onopen: handleOpen,

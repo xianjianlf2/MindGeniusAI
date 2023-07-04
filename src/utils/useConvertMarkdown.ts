@@ -25,6 +25,7 @@ export function buildTree(markdown: string) {
         depth,
         ...measureText(token.text),
       }
+
       while (headingStack.length > depth)
         headingStack.pop()
 
@@ -46,6 +47,7 @@ export function buildTree(markdown: string) {
       }))
     }
   }
+
   return root.children
 }
 function removeDepth(nodes: any[]): any {

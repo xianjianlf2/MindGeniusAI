@@ -1,9 +1,13 @@
-import { nextTick, ref } from 'vue'
+import { computed, nextTick, ref } from 'vue'
 import type { Node } from '@antv/x6'
+import { useNodeStore } from '@/stores'
 
 export function useEditing() {
+  const nodeStore = useNodeStore()
   const isEditing = ref(false)
   const inputValue = ref('')
+
+  const currentEdit = computed(() => nodeStore.currentEditNode)
   function handleKeydown(e: any, node: Node<Node.Properties>) {
     if (e.key === 'Enter' && e.altKey) {
       inputValue.value = `${inputValue.value}\n`
@@ -18,14 +22,28 @@ export function useEditing() {
   }
   function handleDoubleClick(node: Node<Node.Properties>) {
     isEditing.value = true
+    nodeStore.setCurrentEditingNode(node.id)
     const { data } = node.getData()
     inputValue.value = data
+  }
+  function handleBlur(node: Node<Node.Properties>) {
+    isEditing.value = false
+    nodeStore.setCurrentEditingNode('')
+    nextTick(() => {
+      node.setData({ data: inputValue.value.trim() })
+    })
+  }
+
+  function isCanEditNode(node: Node<Node.Properties>) {
+    return isEditing.value && currentEdit.value === node.id
   }
 
   return {
     isEditing,
     inputValue,
     handleDoubleClick,
+    handleBlur,
     handleKeydown,
+    isCanEditNode,
   }
 }

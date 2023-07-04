@@ -9,10 +9,11 @@ const nodeRef = ref<Node>()
 const dataRef = ref()
 const { containerRef, updateContainerSize, listenDataChange } = useContainer()
 const {
-  isEditing,
+  isCanEditNode,
   inputValue,
   handleDoubleClick,
   handleKeydown,
+  handleBlur,
 } = useEditing()
 
 function initData(node: Node) {
@@ -41,18 +42,18 @@ onMounted(() => {
 
 <template>
   <div
-    ref="containerRef" class="rounded-lg p-3 box-border flex justify-center items-center bg-gradient-to-tl from-green-300 via-blue-500 to-purple-600
-  p-3 text-white
-  h-auto w-auto
-  min-h-[50px] min-w-[200px] max-w-[500px]
-  overflow-hidden
-  relative" @dblclick.prevent="() => handleDoubleClick(nodeRef!)"
+    ref="containerRef" class="bg-gradient-to-br from-indigo-400 to-blue-300
+rounded-lg p-3 box-border flex justify-center items-center
+h-auto w-auto
+min-h-[50px] min-w-[200px] max-w-[500px]
+overflow-hidden
+relative  node-text" @dblclick.prevent="() => handleDoubleClick(nodeRef!)"
   >
-    <span class="text-shadow-md text-lg whitespace-pre-wrap w-full" :class="isEditing ? 'block-hidden' : 'block-visible'">
+    <span class="text-shadow-md text-lg whitespace-pre-wrap w-full" :class="isCanEditNode(nodeRef!) ? 'block-hidden' : 'block-visible'">
       {{ dataRef }}
     </span>
-    <div class="w-full flex" :class="isEditing ? 'block-visible' : 'block-hidden'">
-      <textarea v-model="inputValue" class="bg-black" :rows="4" @keydown="(e: KeyboardEvent) => handleKeydown(e, nodeRef!, dataRef)" />
+    <div class="w-full flex" :class="isCanEditNode(nodeRef!) ? 'block-visible' : 'block-hidden'">
+      <a-textarea v-model:value="inputValue" :rows="4" @press-enter="(e: KeyboardEvent) => handleKeydown(e, nodeRef!)" @blur="handleBlur(nodeRef!)" />
     </div>
   </div>
 </template>
