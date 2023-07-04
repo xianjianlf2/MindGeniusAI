@@ -3,14 +3,31 @@ import { ref } from 'vue'
 import { Icon } from '@iconify/vue'
 import ChatBox from './ChatBox.vue'
 import ShareCard from './ShareCard.vue'
+import Setting from './Setting.vue'
 
 const showChatBox = ref(false)
 const showShareCard = ref(false)
+const showSetting = ref(false)
 
 const GITHUB_URL = 'https://github.com/xianjianlf2/MindGeniusAI'
-function handleOpenGitHub() {
-  window.open(GITHUB_URL, '_blank')
+function handleOpenGitHub(url: string) {
+  window.open(url, '_blank')
 }
+
+const buttonList = ref([
+  {
+    icon: 'uil:setting',
+    handler: () => showSetting.value = true,
+  },
+  {
+    icon: 'material-symbols:share',
+    handler: () => showShareCard.value = true,
+  },
+  {
+    icon: 'mdi:github',
+    handler: () => handleOpenGitHub(GITHUB_URL),
+  },
+])
 </script>
 
 <template>
@@ -21,17 +38,10 @@ function handleOpenGitHub() {
       </span>
     </div>
     <div class="items-center flex justify-center gap-2 bg-gradient-to-r ">
-      <a-button type="text" @click="showShareCard = true">
+      <a-button v-for="item in buttonList" :key="item.icon" type="text" @click="item.handler">
         <template #icon>
           <span class="button-icon">
-            <Icon icon="material-symbols:share" width="24" color="white" />
-          </span>
-        </template>
-      </a-button>
-      <a-button type="text" @click="handleOpenGitHub">
-        <template #icon>
-          <span class="button-icon">
-            <Icon icon="mdi:github" width="24" color="white" />
+            <Icon :icon="item.icon" width="24" color="white" />
           </span>
         </template>
       </a-button>
@@ -44,6 +54,8 @@ function handleOpenGitHub() {
   <a-modal v-model:open="showShareCard" :footer="null">
     <ShareCard />
   </a-modal>
+
+  <Setting v-model="showSetting" />
 </template>
 
 <style scoped>

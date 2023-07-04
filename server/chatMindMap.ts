@@ -1,11 +1,18 @@
 import { ChatOpenAI } from 'langchain/chat_models/openai'
-
 import { CallbackManager } from 'langchain/callbacks'
 import type { HumanChatMessage } from 'langchain/schema'
-import { useOpenAIProxy } from './utils/useOpenAIProxy.ts'
 
 // function generatePrompt
-export async function chatMindMap(prompt: HumanChatMessage, messageSend: Function, messageDone: Function) {
+export interface OpenAIProxyConfig {
+  basePath: string
+  apiKey: string
+}
+export interface MessageHandler {
+  messageSend: Function
+  messageDone: Function
+  messageError: Function
+}
+export async function chatMindMap(prompt: HumanChatMessage, messageHandler: MessageHandler, proxyConfig: OpenAIProxyConfig) {
   let result = ''
   const chat = new ChatOpenAI({
     maxTokens: 1024,
@@ -14,16 +21,18 @@ export async function chatMindMap(prompt: HumanChatMessage, messageSend: Functio
     callbackManager: CallbackManager.fromHandlers({
       async handleLLMNewToken(token: string) {
         result += token
-        messageSend(token)
+        messageHandler.messageSend(token)
       },
       async handleLLMEnd(output) {
         // eslint-disable-next-line no-console
-        console.log('End of stream.', result)
-        messageDone()
+        console.log('End of stream.\n', result)
+        messageHandler.messageDone()
       },
     }),
   },
-  useOpenAIProxy())
+  proxyConfig)
 
-  return chat.call([prompt])
+  chat.call([prompt]).catch((e) => {
+    messageHandler.messageError(e.response.data)
+  })
 }

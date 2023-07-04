@@ -18,10 +18,21 @@ export const useChatStore = defineStore('chatStore', () => {
       content: 'Hello! Please write your topic you want to generate a mindmap',
       time: useLocalTimeString(),
     },
-
   ])
+  const isContinuousDialog = ref(true)
   const isLoading = ref(false)
   const controller = ref<AbortController | null>(null)
+
+  function initMessage(): Message[] {
+    return [
+      {
+        id: uuidv4(),
+        role: 'assistant',
+        content: 'Hello! Please write your topic you want to generate a mindmap',
+        time: useLocalTimeString(),
+      },
+    ]
+  }
 
   function toggleLoading(val: boolean) {
     isLoading.value = val
@@ -41,10 +52,6 @@ export const useChatStore = defineStore('chatStore', () => {
     controller.value?.abort()
     toggleLoading(false)
   }
-  // todo: fetchMessage
-  // function fetchMessage() {
-  //   return fetchChatStream(messages.value.slice(-3))
-  // }
 
   function chatWithMindMap(topic: string) {
     return chatWithMindMapRequest(topic)
@@ -69,17 +76,27 @@ export const useChatStore = defineStore('chatStore', () => {
     messages.value = messages.value.filter((item: Message) => item.id !== id)
   }
 
+  function clearAllMessage() {
+    messages.value = initMessage()
+  }
+
+  function toggleContinuousDialog() {
+    isContinuousDialog.value = !isContinuousDialog.value
+  }
+
   return {
     messages,
     isLoading,
+    isContinuousDialog,
     toggleLoading,
     addMessage,
     removeMessage,
     appendMessage,
-    // fetchMessage,
     chatWithMindMap,
     stopGenerate,
     setAbortController,
+    clearAllMessage,
+    toggleContinuousDialog,
   }
 },
 )
