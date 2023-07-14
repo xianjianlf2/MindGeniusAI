@@ -1,6 +1,6 @@
 import type { EventSourceMessage } from '@microsoft/fetch-event-source'
 import { EventStreamContentType, fetchEventSource } from '@microsoft/fetch-event-source'
-import { message } from 'ant-design-vue'
+import { useMessage } from 'naive-ui'
 import { StorageKey, storageManager } from '@/utils'
 
 // export function fetchChat(message: string, messageHistory: string[]) {
@@ -14,6 +14,7 @@ enum MessageStatus {
 }
 class RetriableError extends Error { }
 class FatalError extends Error { }
+const message = useMessage()
 
 export interface ChatOptions {
   url: string
@@ -76,7 +77,7 @@ export function fetchChat(config: ChatOptions) {
     method: 'POST',
     body: JSON.stringify(config.data),
     headers: {
-      'Content-Type': 'application/json',
+      'Content-Type': 'application/json; charset=utf-8',
       'Authorization': `Bearer ${storageManager.get(StorageKey.OPENAI_KEY)}` || '',
       'OpenAI-proxy': `${storageManager.get(StorageKey.OPENAI_PROXY)}` || '',
     },

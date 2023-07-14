@@ -1,46 +1,38 @@
 /* eslint-disable no-console */
 import { PassThrough } from 'node:stream'
+import path from 'node:path'
+import { fileURLToPath } from 'node:url'
 import Koa from 'koa'
 import { koaBody } from 'koa-body'
 import Router from 'koa-router'
-import multer from '@koa/multer'
 import { HumanChatMessage } from 'langchain/schema'
-import { validateFileFormat } from './utils/validateFileFormat.ts'
+import type formidable from 'formidable'
+import Server from 'koa-static'
 import { chatStream } from './chatStream.ts'
 import { chatMindMap } from './chatMindMap.ts'
 import { configureProxyEnvironment, isEmptyKey } from './utils/useOpenAIProxy.ts'
 
+const __filename = fileURLToPath(import.meta.url)
+const __dirname = path.dirname(__filename)
 enum MessageStatus {
   PENDING = 'pending',
   DONE = 'done',
   FAILED = 'failed',
 }
-
-const storage = multer.diskStorage({
-  destination(req, file, cb) {
-    cb(null, 'uploads/')
-  },
-  filename(req, file, cb) {
-    cb(null, `${file.fieldname}-${Date.now()}-${file.originalname}`)
-  },
-})
-
 const app = new Koa()
 const router = new Router()
-const upload = multer({ storage })
 const PORT = 3000
 
-app.use(koaBody())
-app.use(async (ctx, next) => {
-  try {
-    await next()
-  }
-  catch (err: any) {
-    console.log(err)
-    // ctx.status = err.status || 500
-    // ctx.body = err.message
-  }
-})
+app.use(koaBody({
+  encoding: 'utf-8',
+  multipart: true,
+  formidable: {
+    uploadDir: path.join(__dirname, '/uploads/'),
+    keepExtensions: true,
+  },
+}))
+app.use(Server(path.join(__dirname, '/uploads/')))
+
 app.use(router.routes())
 app.use(router.allowedMethods())
 
@@ -188,13 +180,20 @@ router.post('/chatNode', async (ctx) => {
   chatMindMap(generatePrompt(content), useChatSteam(ctx), configureProxyEnvironment(ctx))
 })
 
-router.post('/upload', upload.single('file'), async (ctx) => {
-  const file = ctx.file
-  if (!file)
-    ctx.throw(400, 'No file uploaded')
+router.post('/uploadFile', async (ctx) => {
+  const file = ctx.request.files
+  if (!file || Object.keys(file).length === 0) {
+    ctx.status = 400
+    ctx.body = {
+      success: false,
+      message: 'No file',
+    }
+  }
+  const fileName = ((ctx.request.files!).files as formidable.File).newFilename
 
-  if (!validateFileFormat(file))
-    ctx.throw(400, 'Invalid file format')
-
-  ctx.body = { message: 'Upload success!' }
-})
+  ctx.body = {
+    success: true,
+    fileName,
+  }
+},
+)

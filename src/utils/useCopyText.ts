@@ -1,6 +1,7 @@
-import { message } from 'ant-design-vue'
+import { useMessage } from 'naive-ui'
 
 export function useCopyText(text: string) {
+  const message = useMessage()
   if (navigator.clipboard) {
     navigator.clipboard.writeText(text)
   }

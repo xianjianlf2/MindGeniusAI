@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import type { PropType } from 'vue'
 import { computed, ref } from 'vue'
+import { NButton, NPopconfirm } from 'naive-ui'
 import type { Message } from '@/stores'
 import { useChatStore, useNodeStore } from '@/stores'
 import { useCopyText } from '@/utils'
@@ -48,24 +49,25 @@ function handleBubbleStyle() {
         {{ props.message.role.toUpperCase() }}
       </div>
       <div v-show="showButtonGroup" class="flex justify-end items-center gap-2">
-        <a-button
-          v-if="props.message.role === 'assistant'" type="primary" size="small"
+        <NButton
+          v-if="props.message.role === 'assistant'" strong secondary type="primary" size="small"
           @click="nodeStore.generateNode(props.message.content)"
         >
           generate
-        </a-button>
-        <a-button type="primary" size="small" @click="useCopyText(props.message.content)">
+        </NButton>
+        <NButton strong secondary type="primary" size="small" @click="useCopyText(props.message.content)">
           copy
-        </a-button>
-        <a-popconfirm
-          title="Are you sure delete this message?" ok-text="Yes" cancel-text="No"
-          @confirm="confirm(props.message.id)"
+        </NButton>
+        <NPopconfirm
+          @positive-click="confirm(props.message.id)"
         >
-          <a href="#">
-            <a-button danger size="small" type="primary">
+          <template #trigger>
+            <NButton size="small" strong secondary type="error">
               delete
-            </a-button></a>
-        </a-popconfirm>
+            </NButton>
+          </template>
+          Are you sure delete this message?
+        </NPopconfirm>
       </div>
     </div>
     <div class="mt-1 text-sm inline-block break-words pl-2" v-html="robotContent" />

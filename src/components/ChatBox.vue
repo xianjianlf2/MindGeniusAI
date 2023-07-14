@@ -1,12 +1,21 @@
 <script setup lang="ts">
 import { computed, nextTick, ref, watch } from 'vue'
 import { Icon } from '@iconify/vue'
-import { message } from 'ant-design-vue'
 import { throttle } from 'lodash'
+import { NButton, useMessage } from 'naive-ui'
 import { useChatStore } from '../stores'
 import { useLocalTimeString } from '../utils'
 import RobotMessage from './RobotMessage.vue'
 import InputBox from './InputBox.vue'
+
+const props = defineProps({
+  id: {
+    type: String,
+    required: true,
+  },
+})
+
+const message = useMessage()
 
 // message control
 const chatStore = useChatStore()
@@ -22,20 +31,20 @@ const { isContinuous, handleContinuous } = useContinuousDialog()
 
 function useChat() {
   const newMessage = ref('')
-  const isLoading = computed(() => chatStore.isLoading)
+  const isLoading = computed(() => chatStore.chatWindows[props.id].isLoading)
   function sendMessage(message: string) {
-    chatStore.addMessage({
+    chatStore.addMessage(props.id, {
       role: 'user',
       content: message,
       time: useLocalTimeString(),
     })
-    chatStore.chatWithMindMap(message)
+    chatStore.chatWithMindMap(props.id, message)
   }
   function handleStopGenerate() {
-    chatStore.stopGenerate()
+    chatStore.stopGenerate(props.id)
   }
   function handleReset() {
-    chatStore.clearAllMessage()
+    chatStore.clearAllMessage(props.id)
     message.success('Chat box reset!')
   }
   return {
@@ -48,15 +57,15 @@ function useChat() {
 }
 
 function useContinuousDialog() {
-  const isContinuous = computed(() => chatStore.isContinuousDialog)
-  watch(() => chatStore.isContinuousDialog, () => {
-    if (chatStore.isContinuousDialog)
+  const isContinuous = computed(() => chatStore.chatWindows[props.id].isContinuousDialog)
+  watch(() => chatStore.chatWindows[props.id].isContinuousDialog, () => {
+    if (chatStore.chatWindows[props.id].isContinuousDialog)
       message.info('Continuous dialogue open!')
     else
       message.info('Continuous dialogue close!')
   })
   function handleContinuous() {
-    chatStore.toggleContinuousDialog()
+    chatStore.toggleContinuousDialog(props.id)
   }
   return { isContinuous, handleContinuous }
 }
@@ -64,7 +73,7 @@ function useContinuousDialog() {
 function useScrollChatBox() {
   const chatBoxRef = ref<HTMLDivElement>()
   watch(
-    () => chatStore.messages,
+    () => chatStore.chatWindows[props.id].messages,
     () => {
       throttle(scrollToBottom, 300)()
     },
@@ -85,10 +94,10 @@ function useScrollChatBox() {
 
 <template>
   <div class="border h-[500px] mt-2 shadow-box glass relative">
-    <div class="flex flex-col h-full p-3">
-      <div v-if="chatStore.messages" ref="chatBoxRef" class="flex-1 overflow-y-auto">
-        <div v-for="(_message, index) in chatStore.messages" :key="_message.id" class="flex items-start mb-4">
-          <RobotMessage :message="_message" :is-loading="isLoading && index === chatStore.messages.length - 1" />
+    <div class="flex flex-col h-full p-3 box-border">
+      <div v-if="chatStore.chatWindows[id].messages" ref="chatBoxRef" class="overflow-y-scroll overflow-x-hidden pr-2 flex-1">
+        <div v-for="(_message, index) in chatStore.chatWindows[id].messages" :key="_message.id" class="flex items-start mb-4">
+          <RobotMessage :message="_message" :is-loading="isLoading && index === chatStore.chatWindows[id].messages.length - 1" />
         </div>
       </div>
       <div v-else class="flex justify-center items-center h-full">
@@ -100,30 +109,26 @@ function useScrollChatBox() {
       <div class="flex-none">
         <div class="flex items-center">
           <div class="flex-[30%] gap-2 flex">
-            <a-button size="small" @click="handleReset">
+            <NButton size="small" @click="handleReset">
               <template #icon>
                 <span class="button-icon">
                   <Icon icon="carbon:reset" width="18" color="white" />
                 </span>
               </template>
-            </a-button>
-            <a-button size="small" :type="isContinuous ? 'primary' : ''" @click="handleContinuous">
+            </NButton>
+            <NButton size="small" :type="isContinuous ? 'primary' : 'default'" @click="handleContinuous">
               <template #icon>
-                <span class="button-icon">
-                  <Icon icon="mdi:head-snowflake-outline" width="18" color="white" />
-                </span>
+                <Icon icon="mdi:head-snowflake-outline" width="18" color="white" />
               </template>
-            </a-button>
+            </NButton>
           </div>
           <div class="flex-[60%]">
-            <a-button v-show="isLoading" size="small" type="primary" @click="handleStopGenerate">
+            <NButton v-show="isLoading" size="small" type="primary" @click="handleStopGenerate">
               <template #icon>
-                <span class="button-icon">
-                  <Icon icon="mdi:stop" width="18" color="white" />
-                </span>
+                <Icon icon="mdi:stop" width="18" color="white" />
               </template>
               Stop generating
-            </a-button>
+            </NButton>
           </div>
         </div>
 
@@ -133,4 +138,21 @@ function useScrollChatBox() {
   </div>
 </template>
 
-<style scoped></style>
+<style scoped>
+::-webkit-scrollbar {
+    width: 8px;
+}
+
+::-webkit-scrollbar-track {
+    border-radius: 8px;
+}
+
+::-webkit-scrollbar-thumb {
+    background: #888;
+    border-radius: 8px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: #555;
+}
+</style>

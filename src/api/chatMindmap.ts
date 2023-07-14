@@ -2,25 +2,25 @@ import type { ChatOptions } from '.'
 import { fetchChat } from '.'
 import { useChatStore } from '@/stores'
 
-function useChatStoreConfig(data: any) {
+function useChatStoreConfig(chatWindowId: string, data: any) {
   const chatStore = useChatStore()
   const config: ChatOptions = {
     url: '/api/chatMindMap',
     data,
     openHandler: () => {
-      chatStore.toggleLoading(true)
+      chatStore.toggleLoading(chatWindowId, true)
     },
     messageSendHandler: (data) => {
-      chatStore.appendMessage(`${data}`)
+      chatStore.appendMessage(chatWindowId, `${data}`)
     },
     messageDoneHandler: () => {
-      chatStore.toggleLoading(false)
+      chatStore.toggleLoading(chatWindowId, false)
     },
     messageCloseHandler: () => {
-      chatStore.toggleLoading(false)
+      chatStore.toggleLoading(chatWindowId, false)
     },
     errorHandler: () => {
-      chatStore.toggleLoading(false)
+      chatStore.toggleLoading(chatWindowId, false)
     },
   }
   return config
@@ -31,7 +31,7 @@ function useChatStoreConfig(data: any) {
 //   fetchChat (config)
 // }
 
-export function chatWithMindMapRequest(topic: string) {
-  const config = useChatStoreConfig({ topic })
-  fetchChat (config)
+export function chatWithMindMapRequest(chatWindowId: string, topic: string) {
+  const config = useChatStoreConfig(chatWindowId, { topic })
+  return fetchChat (config)
 }

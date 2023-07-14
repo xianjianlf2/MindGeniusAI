@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import type { Node } from '@antv/x6'
 import { inject, nextTick, onMounted, ref } from 'vue'
+import { NInput } from 'naive-ui'
 import { useContainer } from './useContainer'
 import { useEditing } from '@/hooks/useNodeEdit'
 
@@ -53,7 +54,11 @@ relative  node-text" @dblclick.prevent="() => handleDoubleClick(nodeRef!)"
       {{ dataRef }}
     </span>
     <div class="w-full flex" :class="isCanEditNode(nodeRef!) ? 'block-visible' : 'block-hidden'">
-      <a-textarea v-model:value="inputValue" :rows="4" @press-enter="(e: KeyboardEvent) => handleKeydown(e, nodeRef!)" @blur="handleBlur(nodeRef!)" />
+      <NInput
+        v-model:value="inputValue"
+        type="textarea"
+        @press-enter="(e: KeyboardEvent) => handleKeydown(e, nodeRef!)" @blur="handleBlur(nodeRef!)"
+      />
     </div>
   </div>
 </template>

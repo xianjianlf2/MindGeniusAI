@@ -8,17 +8,22 @@ import { cloneDeep } from 'lodash'
 import { register } from '@antv/x6-vue-shape'
 import { History } from '@antv/x6-plugin-history'
 import { Export } from '@antv/x6-plugin-export'
+import { Icon } from '@iconify/vue'
+import { NButton } from 'naive-ui'
 import { useNodeStore } from '../stores'
 import GraphToolbar from './GraphToolBar.vue'
 import NoteNode from '@/components/Nodes/NoteNode.vue'
 import TopicChildNode from '@/components/Nodes/TopicChildNode.vue'
 import TopicNode from '@/components/Nodes/TopicNode.vue'
 import { useNodeOperate } from '@/hooks/useNodeOperate'
+import Help from '@/components/Help.vue'
 
 const containerRef = ref()
 const nodeStore = useNodeStore()
 const historyStateRef = ref()
 const { render, removeNode, addChildNode, dataRef, graphRef } = useNodeOperate()
+
+const { showGuideLine, openGuideLine } = useHelpButton()
 
 watch(
   () => nodeStore.nodes,
@@ -132,6 +137,7 @@ function useInitMindMap() {
       color: '#0F1729',
     },
   })
+
   useRegisterPlugins(graph)
   return { graph }
 }
@@ -193,14 +199,34 @@ onMounted(() => {
   useRegister()
   graphRef.value = graph
 })
+
+function useHelpButton() {
+  const showGuideLine = ref(false)
+  function openGuideLine() {
+    showGuideLine.value = true
+  }
+  return {
+    showGuideLine,
+    openGuideLine,
+  }
+}
 </script>
 
 <template>
-  <div class="h-full w-full flex flex-col">
-    <div class="flex  items-center bg-#1e293b">
+  <div class="w-full flex flex-col h-full relative">
+    <div class="flex  items-center bg-#1e293b px-3">
       <GraphToolbar v-if="graphRef" :graph="graphRef!" :history-state="historyStateRef" />
     </div>
     <div ref="containerRef" />
+    <div class="absolute right-8 bottom-8">
+      <NButton size="large" @click="openGuideLine">
+        <template #icon>
+          <Icon icon="material-symbols:question-mark-rounded" width="20" color="white" />
+        </template>
+      </NButton>
+    </div>
+
+    <Help v-model="showGuideLine" />
   </div>
 </template>
 

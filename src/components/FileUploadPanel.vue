@@ -1,59 +1,100 @@
-<!-- eslint-disable no-console -->
 <script setup lang="ts">
+import { computed, ref } from 'vue'
 import { Icon } from '@iconify/vue'
-import type { UploadChangeParam } from 'ant-design-vue'
-import { message } from 'ant-design-vue'
-import { ref } from 'vue'
+import type { UploadFileInfo, UploadInst } from 'naive-ui'
+import { NButton, NModal, NP, NText, NUpload, NUploadDragger, useMessage } from 'naive-ui'
+import { useFileStore, useLayoutStore } from '@/stores'
 
-const modelValue = defineModel<boolean>()
+const props = defineProps({
+  modelValue: { type: Boolean, required: true },
+},
+)
+const emit = defineEmits(['update:modelValue'])
 
-const fileList = ref([])
+const show = computed({
+  get: () => props.modelValue,
+  set: value => emit('update:modelValue', value),
+})
 
-function handleChange(info: UploadChangeParam) {
-  if (info.file.status !== 'uploading')
-    console.log(info.file, info.fileList)
+const message = useMessage()
+const fileList = ref()
+const isUploading = ref(false)
+const fileListLengthRef = ref(0)
+const uploadRef = ref<UploadInst | null>(null)
+const fileStore = useFileStore()
 
-  if (info.file.status === 'done')
-    message.success(`${info.file.name} file uploaded successfully`)
-  else if (info.file.status === 'error')
-    message.error(`${info.file.name} file upload failed.`)
+function beforeUpload(data: {
+  file: UploadFileInfo
+  fileList: UploadFileInfo[]
+}) {
+  const { file } = data
+  const allowedExtensions = /\.(pdf)$/i
+  if (!allowedExtensions.test(file.name)) {
+    message.error('You can only upload PDF files!')
+    return false
+  }
+  fileList.value = [file.file]
+  return true
 }
 
-function handleDrop(e: DragEvent) {
-  console.log('Dropped files', e.dataTransfer?.files)
+async function handleUpload() {
+  if (fileList.value.length === 0)
+    return message.error('Please upload a PDF file!')
+
+  isUploading.value = true
+
+  const formData = new FormData()
+  formData.append('files', fileList.value[0])
+  const res = await fileStore.uploadPdf(formData)
+  if (res) {
+    message.success('Upload success!')
+    show.value = false
+    const layoutStore = useLayoutStore()
+    layoutStore.setCurrentTab('Paper')
+  }
+  else {
+    message.error('Upload failed!')
+  }
+}
+
+function handleChange(data: { fileList: UploadFileInfo[] }) {
+  fileListLengthRef.value = data.fileList.length
+}
+
+function handlePreview() {
+  const url = URL.createObjectURL(fileList.value[0])
+  window.open(url)
 }
 </script>
 
 <template>
-  <div
-    v-show="modelValue"
-    class="border rounded-lg h-max shadow-box glass mt-2 p-3"
-  >
-    <div class="flex justify-center items-start h-full w-full inline-block">
-      <a-upload-dragger
-        v-model:fileList="fileList"
-        name="file"
-        action="/api/upload"
-        @change="handleChange"
-        @drop="handleDrop"
-      >
-        <div class="flex flex-col items-center justify-center">
-          <Icon icon="iconamoon:file" width="40" />
-          <p class="ant-upload-text">
-            Click or drag file to this area to upload
-          </p>
-          <p class="ant-upload-hint">
-            Support for a single or bulk upload. Strictly prohibit from
-            uploading company data or other band files
-          </p>
+  <NModal v-model:show="show" preset="card" style="width: 600px;" title="Upload" :bordered="false" size="huge">
+    <NUpload
+      ref="uploadRef" :default-upload="false" directory-dnd :max="1" @before-upload="beforeUpload"
+      @change="handleChange"
+    >
+      <NUploadDragger>
+        <div style="margin-bottom: 12px">
+          <Icon icon="material-symbols:upload-file-outline-rounded" width="48" color="white" />
         </div>
-      </a-upload-dragger>
+        <NText style="font-size: 16px">
+          Click or drag a file to this area to upload
+        </NText>
+        <NP depth="3" style="margin: 8px 0 0 0">
+          Strictly prohibit from uploading sensitive information. For example,
+          your bank card PIN or your credit card expiry date.
+        </NP>
+      </NUploadDragger>
+    </NUpload>
+    <div class="w-full flex items-center justify-center mt-3 gap-5">
+      <NButton :disabled="!fileListLengthRef" @click="handlePreview">
+        Preview
+      </NButton>
+      <NButton type="primary" :loading="isUploading" :disabled="!fileListLengthRef" @click="handleUpload">
+        Generate
+      </NButton>
     </div>
-  </div>
+  </NModal>
 </template>
 
-<style scoped>
-/* ::v-deep(.ant-upload-wrapper) {
-  height: 100%;
-} */
-</style>
+<style scoped></style>
