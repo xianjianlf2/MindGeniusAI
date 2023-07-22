@@ -3,12 +3,13 @@ import { defineStore } from 'pinia'
 import { ref } from 'vue'
 import type { AxiosProgressEvent } from 'axios'
 import { v4 as uuidv4 } from 'uuid'
-import { uploadFile } from '@/api/uploadFile'
+import { getFileListRequest, uploadFileRequest } from '@/api/file'
 
 export const useFileStore = defineStore('fileStore', () => {
   const currentFileName = ref()
   const currentChatId = ref(uuidv4())
   const uploadProgress = ref(0)
+  const fileList = ref([])
 
   function handleProgress(event: AxiosProgressEvent) {
     if (!event.total)
@@ -22,21 +23,30 @@ export const useFileStore = defineStore('fileStore', () => {
   async function uploadPdf(formData: FormData) {
     resetUploadProgress()
 
-    const [err, res] = await to(uploadFile(formData, handleProgress))
+    const [err, res] = await to(uploadFileRequest(formData, handleProgress))
     if (err)
       return false
-    const { success, fileName } = res.data
+    const { success } = res.data
     if (!success)
       return false
 
-    currentFileName.value = fileName
-    currentChatId.value = uuidv4()
     return true
+  }
+
+  async function getFileList() {
+    const [err, res] = await to(getFileListRequest())
+    if (err)
+      return err
+
+    const { files } = res.data
+    fileList.value = files
   }
 
   return {
     currentFileName,
     currentChatId,
+    fileList,
     uploadPdf,
+    getFileList,
   }
 })

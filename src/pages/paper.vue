@@ -1,6 +1,7 @@
 <script setup lang="ts">
-import { NButton, NCollapse, NCollapseItem, NDivider, NLayout, NLayoutContent, NLayoutSider, useMessage } from 'naive-ui'
+import { NButton, NCollapse, NCollapseItem, NDivider, NEmpty, NLayout, NLayoutContent, NLayoutSider, useMessage } from 'naive-ui'
 import { computed, onMounted, ref } from 'vue'
+import { Icon } from '@iconify/vue'
 import { useChatStore, useFileStore } from '@/stores'
 import InputBox from '@/components/InputBox.vue'
 import { useLocalTimeString } from '@/utils'
@@ -9,6 +10,7 @@ import PDFViewer from '@/components/PDFViewer.vue'
 const fileStore = useFileStore()
 const chatStore = useChatStore()
 const message = useMessage()
+const currentFileName = ref('')
 const {
   newMessage,
   isLoading,
@@ -16,14 +18,11 @@ const {
   // handleStopGenerate,
   // handleReset,
 } = useChat()
-const headerRef = ref()
 const headerRefHeight = ref(0)
 
 onMounted(() => {
   if (!chatStore.findChatWindow(fileStore.currentChatId))
     chatStore.addChatWindow(fileStore.currentChatId)
-
-  headerRefHeight.value = headerRef.value.offsetHeight
 })
 
 function useChat() {
@@ -58,21 +57,26 @@ function useChat() {
     handleReset,
   }
 }
+
+function handleRefreshList() {
+  fileStore.getFileList()
+}
+
+function handleClickFile(fileName: string) {
+  currentFileName.value = fileName
+}
+
+onMounted(() => {
+  fileStore.getFileList()
+})
 </script>
 
 <template>
   <div class="flex h-full w-full flex-col">
-    <div
-      ref="headerRef"
-      class="w-full justify-start items-center p-3 bg-#1E293B font-bold text-shadow-lg"
-      :class="fileStore.currentFileName ? '' : 'text-amber'"
-    >
-      {{ fileStore.currentFileName ?? 'No file selected' }}
-    </div>
     <div class="flex-1 flex h-[calc(100%-1100px)]" :style="{ height: `calc(100% - ${headerRefHeight}px)` }">
       <NLayout has-sider sider-placement="right">
         <NLayoutContent content-style="padding: 24px;" :native-scrollbar="false">
-          <PDFViewer />
+          <PDFViewer :file-name="currentFileName" />
         </NLayoutContent>
         <NLayoutSider
           collapse-mode="transform" :native-scrollbar="false" :collapsed-width="120" width="30%"
@@ -80,8 +84,26 @@ function useChat() {
         >
           <div class="flex flex-col h-full w-full">
             <div class="flex justify-between items-center w-full">
-              <NCollapse>
-                <NCollapseItem title="Summary" name="1">
+              <NCollapse default-expanded-names="FileList">
+                <NCollapseItem title="FileList" name="FileList">
+                  <template #header-extra>
+                    <NButton strong secondary type="primary" @click.stop="handleRefreshList">
+                      <template #icon>
+                        <Icon icon="material-symbols:refresh" />
+                      </template>
+                      Refresh
+                    </NButton>
+                  </template>
+                  <NEmpty v-if="!fileStore.fileList.length" description="Please upload file first" />
+                  <div
+                    v-for="file in fileStore.fileList" :key="file" class="p-2 m-2 hover:bg-#1E293B rounded-md cursor-pointer select-none flex items-center justify-between" :class="currentFileName === file ? 'bg-#1E293B' : ''"
+                    @click="handleClickFile(file)"
+                  >
+                    <span>{{ file }}</span>
+                    <NButton>Create Index</NButton>
+                  </div>
+                </NCollapseItem>
+                <NCollapseItem title="Summary" name="Summary">
                   Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the
                   industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and
                   scrambled it to make a type specimen book. It has survived not only five centuries, but also the leap
@@ -89,7 +111,7 @@ function useChat() {
                   release of Letraset sheets containing Lorem Ipsum passages, and more recently with desktop publishing
                   software like Aldus PageMaker including versions of Lorem Ipsum
                   <template #header-extra>
-                    <NButton strong secondary type="primary">
+                    <NButton strong secondary type="primary" @click.stop="">
                       Generate Mind map
                     </NButton>
                   </template>

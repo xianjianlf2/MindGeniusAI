@@ -2,6 +2,7 @@
 import { PassThrough } from 'node:stream'
 import path from 'node:path'
 import { fileURLToPath } from 'node:url'
+import * as fs from 'node:fs'
 import Koa from 'koa'
 import { koaBody } from 'koa-body'
 import Router from 'koa-router'
@@ -11,6 +12,7 @@ import Server from 'koa-static'
 import { chatStream } from './chatStream.ts'
 import { chatMindMap } from './chatMindMap.ts'
 import { configureProxyEnvironment, isEmptyKey } from './utils/useOpenAIProxy.ts'
+import { initialDocument } from './initialDocument.ts'
 
 const __filename = fileURLToPath(import.meta.url)
 const __dirname = path.dirname(__filename)
@@ -197,3 +199,26 @@ router.post('/uploadFile', async (ctx) => {
   }
 },
 )
+
+router.get('/getFileList', async (ctx) => {
+  const directoryPath = path.join(__dirname, 'uploads')
+  try {
+    const files = await fs.promises.readdir(directoryPath)
+    ctx.body = {
+      success: true,
+      files,
+    }
+  }
+  catch (err: any) {
+    console.log(`Unable to scan directory: ${err}`)
+    ctx.body = {
+      success: false,
+      error: err.message,
+    }
+  }
+})
+
+router.post('/initialDocument', async (ctx) => {
+  const { fileName } = ctx.request.body
+  await initialDocument(fileName)
+})
