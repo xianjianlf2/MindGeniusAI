@@ -1,16 +1,19 @@
 <script setup lang="ts">
-import { NButton, NCollapse, NCollapseItem, NDivider, NEmpty, NLayout, NLayoutContent, NLayoutSider, useMessage } from 'naive-ui'
+import { NButton, NCollapse, NCollapseItem, NDivider, NEmpty, NLayout, NLayoutContent, NLayoutSider, NSpin, useMessage } from 'naive-ui'
 import { computed, onMounted, ref } from 'vue'
 import { Icon } from '@iconify/vue'
+import type { DocumentResult, SourceDocument } from './types'
 import { useChatStore, useFileStore } from '@/stores'
 import InputBox from '@/components/InputBox.vue'
 import { useLocalTimeString } from '@/utils'
 import PDFViewer from '@/components/PDFViewer.vue'
+import { useGenerateMarkdown } from '@/hooks/useGenerateMarkdown'
 
 const fileStore = useFileStore()
 const chatStore = useChatStore()
 const message = useMessage()
 const currentFileName = ref('')
+const sourceDocument = ref<{ text: string; sourceList: any[] }>()
 const {
   newMessage,
   isLoading,
@@ -19,6 +22,9 @@ const {
   // handleReset,
 } = useChat()
 const headerRefHeight = ref(0)
+
+const indexButtonLoading = ref(false)
+const summaryLoading = ref(false)
 
 onMounted(() => {
   if (!chatStore.findChatWindow(fileStore.currentChatId))
@@ -69,6 +75,43 @@ function handleClickFile(fileName: string) {
 onMounted(() => {
   fileStore.getFileList()
 })
+
+async function handleIndexClick(fileName: string) {
+  indexButtonLoading.value = true
+  const res = await fileStore.initDocumentIndex(fileName)
+
+  if (res) {
+    message.success('Index created!')
+    summaryDocument()
+    indexButtonLoading.value = false
+  }
+
+  else { message.error('Index creation failed!') }
+}
+
+async function summaryDocument() {
+  summaryLoading.value = true
+  const query = [
+    'Please summarize this document in one paragraph, keeping the language as concise as possible.Required: use markdown format',
+  ]
+  const res = await fileStore.queryDocument(query, currentFileName.value)
+  summaryLoading.value = false
+  if (typeof res === 'string') {
+    message.error(res)
+  }
+  else {
+    message.success('Summary generated!')
+    const { sourceDocuments: docs } = res as DocumentResult
+    const sourceList = docs.map((doc: SourceDocument) => {
+      const { metadata: { loc: { pageNumber } } } = doc
+      return pageNumber
+    })
+    sourceDocument.value = {
+      text: useGenerateMarkdown(res.text),
+      sourceList,
+    }
+  }
+}
 </script>
 
 <template>
@@ -84,7 +127,7 @@ onMounted(() => {
         >
           <div class="flex flex-col h-full w-full">
             <div class="flex justify-between items-center w-full">
-              <NCollapse default-expanded-names="FileList">
+              <NCollapse :default-expanded-names="['FileList', 'Summary']">
                 <NCollapseItem title="FileList" name="FileList">
                   <template #header-extra>
                     <NButton strong secondary type="primary" @click.stop="handleRefreshList">
@@ -100,18 +143,28 @@ onMounted(() => {
                     @click="handleClickFile(file)"
                   >
                     <span>{{ file }}</span>
-                    <NButton>Create Index</NButton>
+                    <NButton :loading="indexButtonLoading && currentFileName === file" @click.prevent="handleIndexClick(file)">
+                      Create Index
+                    </NButton>
                   </div>
                 </NCollapseItem>
                 <NCollapseItem title="Summary" name="Summary">
-                  Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the
-                  industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and
-                  scrambled it to make a type specimen book. It has survived not only five centuries, but also the leap
-                  into electronic typesetting, remaining essentially unchanged. It was popularised in the 1960s with the
-                  release of Letraset sheets containing Lorem Ipsum passages, and more recently with desktop publishing
-                  software like Aldus PageMaker including versions of Lorem Ipsum
+                  <NSpin v-if="summaryLoading" size="medium" />
+                  <template v-else>
+                    <div class="font-semibold  text-shadow-md" v-html="sourceDocument?.text" />
+                    <div v-for="(item, index) in sourceDocument?.sourceList" :key="index">
+                      <div class="gap-2 items-center justify-start flex mt-4">
+                        <div class="font-semibold text-shadow-md">
+                          source:
+                        </div>
+                        <NButton class="border rounded-md p-2">
+                          pageNumber: {{ item }}
+                        </NButton>
+                      </div>
+                    </div>
+                  </template>
                   <template #header-extra>
-                    <NButton strong secondary type="primary" @click.stop="">
+                    <NButton strong secondary type="primary" @click.stop="summaryDocument">
                       Generate Mind map
                     </NButton>
                   </template>
@@ -121,7 +174,8 @@ onMounted(() => {
             <NDivider />
             <div class="flex-1 flex flex-col">
               <div class="flex flex-col flex-1">
-                chat with document
+                <span class="border-b border-dashed p-2">Ask a question about the document</span>
+                <div class="flex-1 flex flex-col" />
               </div>
               <InputBox :message="newMessage" :is-loading="isLoading" @send-message="sendMessage" />
             </div>

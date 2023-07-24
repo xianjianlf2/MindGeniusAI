@@ -3,7 +3,7 @@ import { defineStore } from 'pinia'
 import { ref } from 'vue'
 import type { AxiosProgressEvent } from 'axios'
 import { v4 as uuidv4 } from 'uuid'
-import { getFileListRequest, uploadFileRequest } from '@/api/file'
+import { getFileListRequest, initDocumentRequest, queryDocumentRequest, uploadFileRequest } from '@/api/file'
 
 export const useFileStore = defineStore('fileStore', () => {
   const currentFileName = ref()
@@ -41,6 +41,24 @@ export const useFileStore = defineStore('fileStore', () => {
     const { files } = res.data
     fileList.value = files
   }
+  async function initDocumentIndex(fileName: string) {
+    const [err, res] = await to(initDocumentRequest(fileName))
+    if (err)
+      return err
+
+    const { success } = res.data
+    return success
+  }
+  async function queryDocument(query: string[], fileName: string) {
+    const [err, res] = await to(queryDocumentRequest(query, fileName))
+    if (err)
+      return err
+
+    const { success, result, message } = res.data
+    if (!success)
+      return message
+    return result
+  }
 
   return {
     currentFileName,
@@ -48,5 +66,7 @@ export const useFileStore = defineStore('fileStore', () => {
     fileList,
     uploadPdf,
     getFileList,
+    initDocumentIndex,
+    queryDocument,
   }
 })

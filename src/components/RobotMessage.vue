@@ -16,6 +16,10 @@ const props = defineProps({
     type: Boolean,
     default: false,
   },
+  messageId: {
+    type: String,
+    required: true,
+  },
 })
 
 const showButtonGroup = ref(false)
@@ -23,7 +27,7 @@ const nodeStore = useNodeStore()
 const chatStore = useChatStore()
 
 function confirm(id: Message['id']) {
-  chatStore.removeMessage(id)
+  chatStore.removeMessage(id, props.messageId)
 }
 
 const robotContent = computed(() => useGenerateMarkdown(props.message.content))

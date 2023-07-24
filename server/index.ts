@@ -12,7 +12,7 @@ import Server from 'koa-static'
 import { chatStream } from './chatStream.ts'
 import { chatMindMap } from './chatMindMap.ts'
 import { configureProxyEnvironment, isEmptyKey } from './utils/useOpenAIProxy.ts'
-import { initialDocument } from './initialDocument.ts'
+import { initialDocument, queryDocument } from './initialDocument.ts'
 
 const __filename = fileURLToPath(import.meta.url)
 const __dirname = path.dirname(__filename)
@@ -46,7 +46,7 @@ router.get('/', (ctx) => {
   ctx.body = 'hello server'
 })
 
-function useChatSteam(ctx: Koa.ParameterizedContext<any, Router.IRouterParamContext<any, {}>, any>) {
+function useChatSteam(ctx: Koa.ParameterizedContext<any, Router.IRouterParamContext<any, object>, any>) {
   const headers = {
     'Content-Type': 'text/event-stream',
     'Cache-Control': 'no-cache',
@@ -200,7 +200,7 @@ router.post('/uploadFile', async (ctx) => {
 },
 )
 
-router.get('/getFileList', async (ctx) => {
+router.get('/document/fileList', async (ctx) => {
   const directoryPath = path.join(__dirname, 'uploads')
   try {
     const files = await fs.promises.readdir(directoryPath)
@@ -218,7 +218,26 @@ router.get('/getFileList', async (ctx) => {
   }
 })
 
-router.post('/initialDocument', async (ctx) => {
+router.post('/document/init', async (ctx) => {
   const { fileName } = ctx.request.body
-  await initialDocument(fileName)
+  const vectorStore = await initialDocument(fileName)
+  ctx.body = {
+    success: !!vectorStore,
+  }
+})
+
+router.post('/document/query', async (ctx) => {
+  const { query, fileName } = ctx.request.body
+  const result = await queryDocument(query[0], fileName)
+  if (!result) {
+    ctx.body = {
+      success: false,
+      message: 'Please create index first',
+    }
+    return
+  }
+  ctx.body = {
+    success: true,
+    result,
+  }
 })

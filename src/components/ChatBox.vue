@@ -97,7 +97,7 @@ function useScrollChatBox() {
     <div class="flex flex-col h-full p-3 box-border">
       <div v-if="chatStore.chatWindows[id].messages" ref="chatBoxRef" class="overflow-y-scroll overflow-x-hidden pr-2 flex-1">
         <div v-for="(_message, index) in chatStore.chatWindows[id].messages" :key="_message.id" class="flex items-start mb-4">
-          <RobotMessage :message="_message" :is-loading="isLoading && index === chatStore.chatWindows[id].messages.length - 1" />
+          <RobotMessage :message="_message" :is-loading="isLoading && index === chatStore.chatWindows[id].messages.length - 1" :message-id="id" />
         </div>
       </div>
       <div v-else class="flex justify-center items-center h-full">
