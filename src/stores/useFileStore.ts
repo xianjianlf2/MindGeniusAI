@@ -2,12 +2,9 @@ import { to } from 'await-to-js'
 import { defineStore } from 'pinia'
 import { ref } from 'vue'
 import type { AxiosProgressEvent } from 'axios'
-import { v4 as uuidv4 } from 'uuid'
 import { getFileListRequest, initDocumentRequest, queryDocumentRequest, uploadFileRequest } from '@/api/file'
 
 export const useFileStore = defineStore('fileStore', () => {
-  const currentFileName = ref()
-  const currentChatId = ref(uuidv4())
   const uploadProgress = ref(0)
   const fileList = ref([])
 
@@ -61,8 +58,6 @@ export const useFileStore = defineStore('fileStore', () => {
   }
 
   return {
-    currentFileName,
-    currentChatId,
     fileList,
     uploadPdf,
     getFileList,

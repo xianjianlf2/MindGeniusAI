@@ -37,7 +37,7 @@ export function fetchChat(config: ChatOptions) {
       const reader = await response.body?.getReader().read()
       if (reader?.value) {
         const errorMessage = new TextDecoder().decode(reader.value)
-        message.error(errorMessage)
+        throw new FatalError(errorMessage)
       }
       throw new FatalError()
     }

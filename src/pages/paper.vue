@@ -1,68 +1,25 @@
 <script setup lang="ts">
-import { NButton, NCollapse, NCollapseItem, NDivider, NEmpty, NLayout, NLayoutContent, NLayoutSider, NSpin, useMessage } from 'naive-ui'
-import { computed, onMounted, ref } from 'vue'
+import { NButton, NCollapse, NCollapseItem, NDivider, NEmpty, NLayout, NLayoutContent, NLayoutSider, NSpin, NTag, useMessage } from 'naive-ui'
+import { defineAsyncComponent, onMounted, ref } from 'vue'
 import { Icon } from '@iconify/vue'
+import { useRouter } from 'vue-router'
+import { v4 as uuidv4 } from 'uuid'
 import type { DocumentResult, SourceDocument } from './types'
 import { useChatStore, useFileStore } from '@/stores'
-import InputBox from '@/components/InputBox.vue'
-import { useLocalTimeString } from '@/utils'
 import PDFViewer from '@/components/PDFViewer.vue'
-import { useGenerateMarkdown } from '@/hooks/useGenerateMarkdown'
+import { useGenerateMarkdown, useRandomColorTag } from '@/hooks'
 
+const router = useRouter()
 const fileStore = useFileStore()
-const chatStore = useChatStore()
 const message = useMessage()
 const currentFileName = ref('')
 const sourceDocument = ref<{ text: string; sourceList: any[] }>()
-const {
-  newMessage,
-  isLoading,
-  sendMessage,
-  // handleStopGenerate,
-  // handleReset,
-} = useChat()
+const chatWindowId = uuidv4()
 const headerRefHeight = ref(0)
+const chatStore = useChatStore()
 
 const indexButtonLoading = ref(false)
 const summaryLoading = ref(false)
-
-onMounted(() => {
-  if (!chatStore.findChatWindow(fileStore.currentChatId))
-    chatStore.addChatWindow(fileStore.currentChatId)
-})
-
-function useChat() {
-  const newMessage = ref('')
-  const isLoading = computed(() => {
-    if (chatStore.chatWindows[fileStore.currentChatId])
-      return chatStore.chatWindows[fileStore.currentChatId].isLoading
-    else
-      return false
-  },
-  )
-  function sendMessage(message: string) {
-    chatStore.addMessage(fileStore.currentChatId, {
-      role: 'user',
-      content: message,
-      time: useLocalTimeString(),
-    })
-    chatStore.chatWithMindMap(fileStore.currentChatId, message)
-  }
-  function handleStopGenerate() {
-    chatStore.stopGenerate(fileStore.currentChatId)
-  }
-  function handleReset() {
-    chatStore.clearAllMessage(fileStore.currentChatId)
-    message.success('Chat box reset!')
-  }
-  return {
-    newMessage,
-    isLoading,
-    sendMessage,
-    handleStopGenerate,
-    handleReset,
-  }
-}
 
 function handleRefreshList() {
   fileStore.getFileList()
@@ -92,7 +49,10 @@ async function handleIndexClick(fileName: string) {
 async function summaryDocument() {
   summaryLoading.value = true
   const query = [
-    'Please summarize this document in one paragraph, keeping the language as concise as possible.Required: use markdown format',
+    `
+    Please summarize this document in one paragraph, keeping the language as concise as possible.
+    Required: 1. Markdown format  2.Keep the language short and to the point. 3. limit of 200 words 
+    `,
   ]
   const res = await fileStore.queryDocument(query, currentFileName.value)
   summaryLoading.value = false
@@ -102,15 +62,26 @@ async function summaryDocument() {
   else {
     message.success('Summary generated!')
     const { sourceDocuments: docs } = res as DocumentResult
-    const sourceList = docs.map((doc: SourceDocument) => {
+    const sourceList = docs?.map((doc: SourceDocument) => {
       const { metadata: { loc: { pageNumber } } } = doc
       return pageNumber
-    })
+    }) ?? []
     sourceDocument.value = {
       text: useGenerateMarkdown(res.text),
       sourceList,
     }
   }
+}
+
+const ChatBoxAsync = defineAsyncComponent(() => {
+  if (!chatStore.findChatWindow(chatWindowId))
+    chatStore.addChatWindow(chatWindowId, false)
+
+  return import('@/components/ChatBox.vue')
+})
+
+function handleGenerateMap() {
+  router.push('/home')
 }
 </script>
 
@@ -157,16 +128,11 @@ async function summaryDocument() {
                         <div class="font-semibold text-shadow-md">
                           source:
                         </div>
-                        <NButton class="border rounded-md p-2">
+                        <NTag :type="useRandomColorTag(index)">
                           pageNumber: {{ item }}
-                        </NButton>
+                        </NTag>
                       </div>
                     </div>
-                  </template>
-                  <template #header-extra>
-                    <NButton strong secondary type="primary" @click.stop="summaryDocument">
-                      Generate Mind map
-                    </NButton>
                   </template>
                 </NCollapseItem>
               </NCollapse>
@@ -174,10 +140,14 @@ async function summaryDocument() {
             <NDivider />
             <div class="flex-1 flex flex-col">
               <div class="flex flex-col flex-1">
-                <span class="border-b border-dashed p-2">Ask a question about the document</span>
-                <div class="flex-1 flex flex-col" />
+                <div class="flex items-center justify-between">
+                  <span>Ask a question about the document</span>
+                  <NButton strong secondary type="primary" @click.stop="handleGenerateMap">
+                    Generate Mind map
+                  </NButton>
+                </div>
               </div>
-              <InputBox :message="newMessage" :is-loading="isLoading" @send-message="sendMessage" />
+              <ChatBoxAsync :id="chatWindowId" :file-name="currentFileName" chat-type="document" :border="false" />
             </div>
           </div>
         </NLayoutSider>

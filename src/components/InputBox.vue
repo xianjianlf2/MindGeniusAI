@@ -1,7 +1,8 @@
 <script setup lang="ts">
 import { computed, ref, watch } from 'vue'
 import { Icon } from '@iconify/vue'
-import { NButton, NInput, NSpin } from 'naive-ui'
+import { NButton, NConfigProvider, NInput, NSpin } from 'naive-ui'
+import { useGlobalStore } from '../stores'
 
 const props = defineProps({
   isLoading: {
@@ -15,6 +16,7 @@ const props = defineProps({
 })
 const emit = defineEmits(['sendMessage', 'update:message'])
 
+const globalStore = useGlobalStore()
 const newMessage = ref(props.message)
 const inputWrapper = ref<HTMLElement | null>(null)
 
@@ -59,12 +61,14 @@ function handleEnter(e: any) {
         />
       </NSpin>
     </div>
-    <NButton type="primary" :disabled="!isCanClick" @click="sendMessage">
-      <template #icon>
-        <Icon icon="bi:send-fill" width="14" />
-      </template>
-      Send
-    </NButton>
+    <NConfigProvider :theme="globalStore.theme?.Button">
+      <NButton type="primary" :disabled="!isCanClick" @click="sendMessage">
+        <template #icon>
+          <Icon icon="bi:send-fill" width="14" />
+        </template>
+        Send
+      </NButton>
+    </NConfigProvider>
   </div>
 </template>
 

@@ -3,6 +3,7 @@ import { ref } from 'vue'
 import { v4 as uuidv4 } from 'uuid'
 import { useLocalTimeString } from '../utils'
 import { chatWithMindMapRequest } from '@/api/chatMindmap'
+import { chatWithDocumentRequest } from '@/api/file'
 
 export interface Message {
   id: string
@@ -36,9 +37,9 @@ export const useChatStore = defineStore('chatStore', () => {
     ]
   }
 
-  function addChatWindow(id: string) {
+  function addChatWindow(id: string, defaultMessage = true) {
     chatWindows.value[id] = {
-      messages: initMessage(),
+      messages: defaultMessage ? initMessage() : [],
       isContinuousDialog: true,
       isLoading: false,
       controller: null,
@@ -71,6 +72,10 @@ export const useChatStore = defineStore('chatStore', () => {
 
   function chatWithMindMap(id: string, topic: string) {
     chatWindows.value[id].controller = chatWithMindMapRequest(id, topic)
+  }
+
+  function chatWithDocument(id: string, query: string[], fileName: string) {
+    chatWindows.value[id].controller = chatWithDocumentRequest(id, query, fileName)
   }
 
   function appendMessage(id: string, message: string) {
@@ -114,5 +119,6 @@ export const useChatStore = defineStore('chatStore', () => {
     clearAllMessage,
     toggleContinuousDialog,
     findChatWindow,
+    chatWithDocument,
   }
 })

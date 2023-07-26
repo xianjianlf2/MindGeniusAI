@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { onMounted, ref } from 'vue'
+import { nextTick, onMounted, ref } from 'vue'
 import { NButton, NForm, NFormItem, NInput, NSpace, useMessage } from 'naive-ui'
 import { StorageKey, storageManager } from '@/utils'
 
@@ -13,8 +13,8 @@ const formState = ref({
 const formRef = ref<InstanceType<typeof NForm>>()
 
 function setLocalStorage() {
-  storageManager.remove('openAIKey')
-  storageManager.remove('openAIProxy')
+  storageManager.remove(StorageKey.OPENAI_KEY)
+  storageManager.remove(StorageKey.OPENAI_PROXY)
   storageManager.set(StorageKey.OPENAI_KEY, formState.value.openAIKey.trim())
   storageManager.set(StorageKey.OPENAI_PROXY, formState.value.openAIProxy.trim())
 }
@@ -37,7 +37,9 @@ function handleReset() {
     openAIProxy: '',
   }
   message.info('Setting reset!')
-  initKey()
+  nextTick(() => {
+    setLocalStorage()
+  })
 }
 
 onMounted(() => {

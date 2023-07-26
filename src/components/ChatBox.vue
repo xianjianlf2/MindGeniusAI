@@ -1,22 +1,35 @@
 <script setup lang="ts">
+import type { PropType } from 'vue'
 import { computed, nextTick, ref, watch } from 'vue'
 import { Icon } from '@iconify/vue'
 import { throttle } from 'lodash'
 import { NButton, useMessage } from 'naive-ui'
 import { useChatStore } from '../stores'
-import { useLocalTimeString } from '../utils'
 import RobotMessage from './RobotMessage.vue'
 import InputBox from './InputBox.vue'
+import type { ChatType } from '@/hooks'
+import { useChat } from '@/hooks'
 
 const props = defineProps({
   id: {
     type: String,
     required: true,
   },
+  fileName: {
+    type: String,
+  },
+  chatType: {
+    type: String as PropType<ChatType>,
+    default: 'mindmap',
+  },
+  border: {
+    type: Boolean,
+    default: true,
+  },
 })
 
+const fileNameRef = computed(() => props.fileName)
 const message = useMessage()
-
 // message control
 const chatStore = useChatStore()
 const {
@@ -25,36 +38,9 @@ const {
   sendMessage,
   handleStopGenerate,
   handleReset,
-} = useChat()
+} = useChat(props.id, props.chatType)
 const { chatBoxRef } = useScrollChatBox()
 const { isContinuous, handleContinuous } = useContinuousDialog()
-
-function useChat() {
-  const newMessage = ref('')
-  const isLoading = computed(() => chatStore.chatWindows[props.id].isLoading)
-  function sendMessage(message: string) {
-    chatStore.addMessage(props.id, {
-      role: 'user',
-      content: message,
-      time: useLocalTimeString(),
-    })
-    chatStore.chatWithMindMap(props.id, message)
-  }
-  function handleStopGenerate() {
-    chatStore.stopGenerate(props.id)
-  }
-  function handleReset() {
-    chatStore.clearAllMessage(props.id)
-    message.success('Chat box reset!')
-  }
-  return {
-    newMessage,
-    isLoading,
-    sendMessage,
-    handleStopGenerate,
-    handleReset,
-  }
-}
 
 function useContinuousDialog() {
   const isContinuous = computed(() => chatStore.chatWindows[props.id].isContinuousDialog)
@@ -90,14 +76,32 @@ function useScrollChatBox() {
   }
   return { chatBoxRef }
 }
+function switchSend(msg: string) {
+  if (props.chatType === 'document') {
+    if (!fileNameRef.value)
+      return message.error('Please select a file first!')
+    sendMessage(msg, undefined, fileNameRef.value)
+  }
+
+  else { sendMessage(msg) }
+}
 </script>
 
 <template>
-  <div class="border h-[500px] mt-2 shadow-box glass relative">
+  <div class=" h-[500px] mt-2  glass relative" :class="border ? 'shadow-box border' : ''">
     <div class="flex flex-col h-full p-3 box-border">
-      <div v-if="chatStore.chatWindows[id].messages" ref="chatBoxRef" class="overflow-y-scroll overflow-x-hidden pr-2 flex-1">
-        <div v-for="(_message, index) in chatStore.chatWindows[id].messages" :key="_message.id" class="flex items-start mb-4">
-          <RobotMessage :message="_message" :is-loading="isLoading && index === chatStore.chatWindows[id].messages.length - 1" :message-id="id" />
+      <div
+        v-if="chatStore.chatWindows[id].messages" ref="chatBoxRef"
+        class="overflow-y-scroll overflow-x-hidden pr-2 flex-1"
+      >
+        <div
+          v-for="(_message, index) in chatStore.chatWindows[id].messages" :key="_message.id"
+          class="flex items-start mb-4"
+        >
+          <RobotMessage
+            :message="_message"
+            :is-loading="isLoading && index === chatStore.chatWindows[id].messages.length - 1" :message-id="id"
+          />
         </div>
       </div>
       <div v-else class="flex justify-center items-center h-full">
@@ -132,7 +136,7 @@ function useScrollChatBox() {
           </div>
         </div>
 
-        <InputBox :message="newMessage" :is-loading="isLoading" @send-message="sendMessage" />
+        <InputBox :message="newMessage" :is-loading="isLoading" @send-message="switchSend" />
       </div>
     </div>
   </div>
@@ -140,19 +144,19 @@ function useScrollChatBox() {
 
 <style scoped>
 ::-webkit-scrollbar {
-    width: 8px;
+  width: 8px;
 }
 
 ::-webkit-scrollbar-track {
-    border-radius: 8px;
+  border-radius: 8px;
 }
 
 ::-webkit-scrollbar-thumb {
-    background: #888;
-    border-radius: 8px;
+  background: #888;
+  border-radius: 8px;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-    background: #555;
+  background: #555;
 }
 </style>

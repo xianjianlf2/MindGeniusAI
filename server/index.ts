@@ -12,7 +12,7 @@ import Server from 'koa-static'
 import { chatStream } from './chatStream.ts'
 import { chatMindMap } from './chatMindMap.ts'
 import { configureProxyEnvironment, isEmptyKey } from './utils/useOpenAIProxy.ts'
-import { initialDocument, queryDocument } from './initialDocument.ts'
+import { initialDocument, queryDocument, queryDocumentStream } from './document.ts'
 
 const __filename = fileURLToPath(import.meta.url)
 const __dirname = path.dirname(__filename)
@@ -74,9 +74,13 @@ function useChatSteam(ctx: Koa.ParameterizedContext<any, Router.IRouterParamCont
     sendData(JSON.stringify(message))
     sseStream.end()
   }
-  function messageError(e: string) {
+  function messageError(e: any) {
     ctx.status = 400
-    sseStream.write(e)
+    if (typeof e === 'object' && e.error && e.error.code)
+      sseStream.write(e.error.code)
+    else
+      sseStream.write(e)
+
     sseStream.end()
   }
 
@@ -99,14 +103,8 @@ router.post('/chat', async (ctx) => {
   chatStream(messages, messageSend, messageDone)
 })
 
-router.post('/chatWithFile', async (ctx) => {
-  let { messages } = ctx.request.body
-  if (!messages)
-    ctx.throw(400, 'No message')
-
-  if (!Array.isArray(messages) && typeof messages === 'string')
-    messages = [messages]
-
+router.post('/chatMindMap', async (ctx) => {
+  const { topic } = ctx.request.body
   const headers = {
     'Content-Type': 'text/event-stream',
     'Cache-Control': 'no-cache',
@@ -115,21 +113,20 @@ router.post('/chatWithFile', async (ctx) => {
   ctx.set(headers)
   const sseStream = new PassThrough()
   ctx.body = sseStream
-})
-
-router.post('/chatMindMap', async (ctx) => {
-  const { topic } = ctx.request.body
-  if (!topic)
-    ctx.throw(400, 'No topic')
-  if (isEmptyKey(ctx))
-    ctx.throw(400, 'Please set openai key')
-
+  if (!topic) {
+    sseStream.write('Please set topic')
+    sseStream.end()
+  }
+  if (isEmptyKey(ctx)) {
+    sseStream.write('Please set openai key')
+    sseStream.end()
+  }
   function generatePrompt(topic: string) {
     let prompt: HumanChatMessage
     const pattern = /[\u4E00-\u9FA5]+/
     if (pattern.test(topic)) {
       prompt = new HumanChatMessage(
-      `为主题${topic}创建一个思维导图/指南
+        `为主题${topic}创建一个思维导图/指南
         要求：
         1.使用markdown
         2.语言简洁
@@ -138,7 +135,7 @@ router.post('/chatMindMap', async (ctx) => {
     }
     else {
       prompt = new HumanChatMessage(
-      `create a road map / guide line for the topic ${topic}
+        `create a road map / guide line for the topic ${topic}
         requirement:
         1.use markdown
         2.short language is preferred
@@ -148,8 +145,11 @@ router.post('/chatMindMap', async (ctx) => {
     return prompt
   }
 
-  chatMindMap(generatePrompt(topic), useChatSteam(ctx),
-    configureProxyEnvironment(ctx))
+  const prompt = generatePrompt(topic)
+  const chatStream = useChatSteam(ctx)
+  const proxyEnvironment = configureProxyEnvironment(ctx)
+
+  chatMindMap(prompt, chatStream, proxyEnvironment)
 })
 
 router.post('/chatNode', async (ctx) => {
@@ -227,17 +227,23 @@ router.post('/document/init', async (ctx) => {
 })
 
 router.post('/document/query', async (ctx) => {
-  const { query, fileName } = ctx.request.body
-  const result = await queryDocument(query[0], fileName)
-  if (!result) {
+  const { query, fileName, isStream } = ctx.request.body
+  if (!fileName) {
+    ctx.status = 400
     ctx.body = {
       success: false,
       message: 'Please create index first',
     }
     return
   }
-  ctx.body = {
-    success: true,
-    result,
+  if (isStream) {
+    queryDocumentStream(query[0], fileName, useChatSteam(ctx), configureProxyEnvironment(ctx))
+  }
+  else {
+    const result = await queryDocument(query[0], fileName)
+    ctx.body = {
+      success: true,
+      result,
+    }
   }
 })

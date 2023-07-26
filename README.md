@@ -15,8 +15,8 @@
 - [x] Edit Node
 - [ ] node support add picture
 - [ ] Automatically summarize web-linked articles
-- [ ] support chat
-- [ ] Support for importing files
+- [x] support chat
+- [x] Support for importing files
 - [ ] dark mode
 - [ ] change node style
 
@@ -25,6 +25,11 @@
 ![mindmap](https://github.com/xianjianlf2/MindGeniusAI/blob/main/markdownImg/brainStorm.gif?raw=true)
 ![mindmap](https://github.com/xianjianlf2/MindGeniusAI/blob/main/markdownImg/editNode.gif?raw=true)
 
+---
+
+Now you can upload a pdf file and ask questions
+
+![image-20230726104555490](https://github.com/xianjianlf2/MindGeniusAI/blob/main/markdownImg/uploadFile?raw=true)
 
 ## Motivation
 

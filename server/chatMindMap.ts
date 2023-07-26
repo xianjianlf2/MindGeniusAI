@@ -1,17 +1,9 @@
 import { ChatOpenAI } from 'langchain/chat_models/openai'
 import { CallbackManager } from 'langchain/callbacks'
 import type { HumanChatMessage } from 'langchain/schema'
+import type { MessageHandler, OpenAIProxyConfig } from './types.ts'
 
 // function generatePrompt
-export interface OpenAIProxyConfig {
-  basePath: string
-  apiKey: string
-}
-export interface MessageHandler {
-  messageSend: Function
-  messageDone: Function
-  messageError: Function
-}
 export async function chatMindMap(prompt: HumanChatMessage, messageHandler: MessageHandler, proxyConfig: OpenAIProxyConfig) {
   let result = ''
   const chat = new ChatOpenAI({
@@ -33,6 +25,9 @@ export async function chatMindMap(prompt: HumanChatMessage, messageHandler: Mess
   proxyConfig)
 
   chat.call([prompt]).catch((e) => {
-    messageHandler.messageError(e.response.data)
+    if (!e.response)
+      messageHandler.messageError('Please check your key')
+    else
+      messageHandler.messageError(e.response.data)
   })
 }
