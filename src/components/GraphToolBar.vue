@@ -4,6 +4,7 @@ import { DataUri } from '@antv/x6'
 import type { PropType } from 'vue'
 import { ref, watch } from 'vue'
 import { Icon } from '@iconify/vue'
+import { NButton, NTooltip } from 'naive-ui'
 import type { HistoryState } from './types'
 
 const props = defineProps({
@@ -73,24 +74,6 @@ const buttonList = ref([
       props.graph.redo()
     },
   },
-  // {
-  //   icon: 'ic:baseline-zoom-in',
-  //   text: 'zoom in',
-  //   tooltip: 'zoom in',
-  //   handler: () => {
-  //     props.graph.zoom(0.1)
-  //     useShowCurrentZoomMessage(props.graph)
-  //   },
-  // },
-  // {
-  //   icon: 'ic:baseline-zoom-out',
-  //   text: 'zoom out',
-  //   tooltip: 'zoom out',
-  //   handler: () => {
-  //     props.graph.zoom(-0.1)
-  //     useShowCurrentZoomMessage(props.graph)
-  //   },
-  // },
   {
     icon: 'ic:baseline-fit-screen',
     text: 'fit screen',
@@ -99,14 +82,6 @@ const buttonList = ref([
       props.graph.zoomToFit({ padding: 20 })
     },
   },
-  // {
-  //   icon: 'carbon:star-review',
-  //   text: 'AI generate',
-  //   tooltip: 'AI generate',
-  //   handler: () => {
-  //     message.info('coming soon')
-  //   },
-  // },
   {
     icon: 'material-symbols:output-rounded',
     rotate: 3,
@@ -122,14 +97,6 @@ const buttonList = ref([
       })
     },
   },
-  // {
-  //   icon: 'material-symbols:live-help-outline-rounded',
-  //   text: 'guide line',
-  //   tooltip: 'guide line',
-  //   handler: () => {
-  //     showGuideLine.value = true
-  //   },
-  // },
 ])
 watch(
   () => props.historyState,
@@ -144,18 +111,15 @@ watch(
 </script>
 
 <template>
-  <div class="w-full flex">
-    <a-tooltip v-for="item in buttonList" :key="item.text" placement="bottom">
-      <template #title>
-        <span>{{ item.tooltip }}</span>
-      </template>
-      <a-button type="text" style="height: fit-content;" :disabled="item.enabled" @click="item.handler">
-        <div class="flex flex-col justify-center items-center">
+  <div class="w-full flex gap-2">
+    <NTooltip v-for="item in buttonList" :key="item.text" trigger="hover" placement="bottom">
+      <template #trigger>
+        <NButton :disabled="item.enabled" quaternary circle type="success" @click="item.handler">
           <Icon :icon="item.icon" width="24" :rotate="item.rotate" />
-          <span>{{ item.text }}</span>
-        </div>
-      </a-button>
-    </a-tooltip>
+        </NButton>
+      </template>
+      {{ item.tooltip }}
+    </NTooltip>
   </div>
 </template>
 

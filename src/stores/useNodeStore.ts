@@ -1,8 +1,8 @@
 import { defineStore } from 'pinia'
 import { ref } from 'vue'
-import { message } from 'ant-design-vue'
 import { v4 as uuidv4 } from 'uuid'
 import type { marked } from 'marked'
+import { useMessage } from 'naive-ui'
 import { getNodes, getSingleNode } from '../utils/useConvertMarkdown'
 import { fetchChatNode } from '@/api/chatNode'
 import { measureText } from '@/utils'
@@ -18,6 +18,7 @@ export interface MindMapData {
 }
 
 export const useNodeStore = defineStore('nodeStore', () => {
+  const message = useMessage()
   const nodes = ref<MindMapData>()
   const noteContent = ref<string>()
   const nodeList = ref<any>([])
@@ -63,6 +64,10 @@ export const useNodeStore = defineStore('nodeStore', () => {
     currentNodeContent.value = ''
   }
 
+  function clearNodeList() {
+    nodeList.value = []
+  }
+
   function getCurrentNodeContent(content: string) {
     return fetchChatNode(content)
   }
@@ -101,5 +106,6 @@ export const useNodeStore = defineStore('nodeStore', () => {
     getCurrentNodeContent,
     splitTextToNodes,
     setCurrentEditingNode,
+    clearNodeList,
   }
 })

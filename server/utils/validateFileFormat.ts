@@ -8,22 +8,6 @@ export function validateFileFormat(file: File) {
     case 'application/pdf':
       flag = true
       break
-
-    case 'application/epub+zip':
-      flag = true
-      break
-
-    case 'application/vnd.openxmlformats-officedocument.wordprocessingml.document':
-      flag = true
-      break
-
-    case 'text/plain':
-      flag = true
-      break
-
-    case 'text/markdown':
-      flag = true
-      break
   }
   return flag
 }

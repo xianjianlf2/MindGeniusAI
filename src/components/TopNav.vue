@@ -1,61 +1,102 @@
 <script setup lang="ts">
-import { ref } from 'vue'
+import { onMounted, ref } from 'vue'
 import { Icon } from '@iconify/vue'
+import { NButton } from 'naive-ui'
+import { v4 as uuidv4 } from 'uuid'
 import ChatBox from './ChatBox.vue'
 import ShareCard from './ShareCard.vue'
 import Setting from './Setting.vue'
+import FileUploadPanel from './FileUploadPanel.vue'
+import CardModal from './CardModal.vue'
+import { useChatStore } from '@/stores'
 
 const showChatBox = ref(false)
 const showShareCard = ref(false)
 const showSetting = ref(false)
+const showFileUploadPanel = ref(false)
 
-const GITHUB_URL = 'https://github.com/xianjianlf2/MindGeniusAI'
-function handleOpenGitHub(url: string) {
-  window.open(url, '_blank')
+const { buttonList } = useButton()
+
+function useButton() {
+  const GITHUB_URL = 'https://github.com/xianjianlf2/MindGeniusAI'
+  function handleOpenGitHub(url: string) {
+    window.open(url, '_blank')
+  }
+
+  const buttonList = ref([
+    {
+      icon: 'uil:setting',
+      handler: () => showSetting.value = true,
+    },
+    {
+      icon: 'material-symbols:share',
+      handler: () => showShareCard.value = true,
+    },
+    {
+      icon: 'mdi:github',
+      handler: () => handleOpenGitHub(GITHUB_URL),
+    },
+  ])
+
+  return {
+    buttonList,
+
+  }
 }
 
-const buttonList = ref([
-  {
-    icon: 'uil:setting',
-    handler: () => showSetting.value = true,
-  },
-  {
-    icon: 'material-symbols:share',
-    handler: () => showShareCard.value = true,
-  },
-  {
-    icon: 'mdi:github',
-    handler: () => handleOpenGitHub(GITHUB_URL),
-  },
-])
+function openChatBox() {
+  showChatBox.value = true
+}
+
+function openFileUploadPanel() {
+  showFileUploadPanel.value = true
+}
+
+const chatStore = useChatStore()
+const chatWindowId = ref(uuidv4())
+
+onMounted(() => {
+  chatStore.addChatWindow(chatWindowId.value)
+})
 </script>
 
 <template>
   <div class="bg-#1e293b flex justify-between items-center p-3">
-    <div class="button" @click="showChatBox = true">
-      <span class="bg-via-gray-900 ">
-        Get Start
-      </span>
+    <div class="flex items-center gap-3">
+      <div class="button" @click="openChatBox">
+        <span class="bg-via-gray-900 ">
+          Get Start
+        </span>
+      </div>
+      <div class="button" @click="openFileUploadPanel">
+        <span class="bg-via-gray-900 ">
+          Get Start With PDF
+        </span>
+      </div>
     </div>
+
     <div class="items-center flex justify-center gap-2 bg-gradient-to-r ">
-      <a-button v-for="item in buttonList" :key="item.icon" type="text" @click="item.handler">
+      <NButton v-for="item in buttonList" :key="item.icon" quaternary circle @click="item.handler">
         <template #icon>
-          <span class="button-icon">
-            <Icon :icon="item.icon" width="24" color="white" />
-          </span>
+          <Icon :icon="item.icon" width="36" color="white" />
         </template>
-      </a-button>
+      </NButton>
     </div>
   </div>
 
-  <a-modal v-model:open="showChatBox" title="Talking with AI" :footer="null" :mask-closable="false">
-    <ChatBox />
-  </a-modal>
-  <a-modal v-model:open="showShareCard" :footer="null">
-    <ShareCard />
-  </a-modal>
+  <CardModal v-model="showChatBox">
+    <ChatBox :id="chatWindowId" />
+  </CardModal>
 
-  <Setting v-model="showSetting" />
+  <CardModal v-model="showShareCard">
+    <ShareCard />
+  </CardModal>
+
+  <CardModal v-model="showSetting">
+    <Setting />
+  </CardModal>
+
+  <FileUploadPanel v-model="showFileUploadPanel" />
 </template>
 
 <style scoped>
@@ -73,8 +114,7 @@ const buttonList = ref([
   --border-width: 2px;
   --border-radius: 0.35rem;
   --background-spread: 200px;
-  font-weight: bold;
-  font-size: 16px;
+  font-size: 14px;
   letter-spacing: -0.02rem;
   position: relative;
   color: #fff;
@@ -103,7 +143,7 @@ const buttonList = ref([
 .button span {
   display: block;
   background-color: #000;
-  padding: 10px 20px;
+  padding: 8px 16px;
   border-radius: calc(var(--border-radius) - var(--border-width) / 2);
 }
 </style>

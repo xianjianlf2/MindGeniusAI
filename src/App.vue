@@ -1,16 +1,17 @@
 <script setup lang="ts">
 import { RouterView } from 'vue-router'
-import { theme } from 'ant-design-vue'
+import { NConfigProvider, NMessageProvider } from 'naive-ui'
+import { useGlobalStore } from './stores'
+
+const globalStore = useGlobalStore()
 </script>
 
 <template>
-  <a-config-provider
-    :theme="{
-      algorithm: theme.darkAlgorithm,
-    }"
-  >
-    <RouterView />
-  </a-config-provider>
+  <NConfigProvider :theme="globalStore.theme">
+    <NMessageProvider>
+      <RouterView />
+    </NMessageProvider>
+  </NConfigProvider>
 </template>
 
 <style scoped></style>

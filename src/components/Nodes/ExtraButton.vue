@@ -1,6 +1,9 @@
 <script setup lang="ts">
 import type { PropType } from 'vue'
 import { Icon } from '@iconify/vue'
+import { NButton, NDropdown } from 'naive-ui'
+import type { DropdownMixedOption } from 'naive-ui/es/dropdown/src/interface'
+import { useGlobalStore } from '@/stores'
 
 export interface MenuItem {
   key: string
@@ -8,41 +11,29 @@ export interface MenuItem {
   icon: string
   handler: () => void
 }
-
-defineProps({
-  menuItems: {
-    type: Array as PropType<MenuItem[]>,
+const props = defineProps({
+  options: {
+    type: Array as PropType<OptionType[]>,
     required: true,
   },
 })
+const globalStore = useGlobalStore()
+type OptionType = DropdownMixedOption & { handler: Function }
+function handleSelect(key: string) {
+  const item = props.options.find(item => item.key === key)
+  if (item)
+    item.handler()
+}
 </script>
 
 <template>
-  <a-dropdown :trigger="['click']">
-    <a-button type="primary" shape="circle" class="hover:scale-110 hover:font-bold">
+  <NDropdown trigger="click" :options="options.filter(item => item.handler)" :theme="globalStore.theme?.Dropdown" @select="handleSelect">
+    <NButton type="primary" strong circle class="hover:scale-110 hover:font-bold">
       <template #icon>
-        <span class="button-icon">
-          <Icon icon="material-symbols:add" width="24" color="white" />
-        </span>
+        <Icon icon="material-symbols:add" width="24" color="white" />
       </template>
-    </a-button>
-    <template #overlay>
-      <a-menu>
-        <a-menu-item v-for="item in menuItems" :key="item.key">
-          <a-button type="text" size="small" @click.prevent="item.handler">
-            <template #icon>
-              <span class="button-icon">
-                <Icon :icon="item.icon" width="18" color="white" />
-              </span>
-            </template>
-            {{ item.label }}
-          </a-button>>
-        </a-menu-item>
-      </a-menu>
-    </template>
-  </a-dropdown>
+    </NButton>
+  </NDropdown>
 </template>
 
-<style scoped>
-
-</style>
+<style scoped></style>

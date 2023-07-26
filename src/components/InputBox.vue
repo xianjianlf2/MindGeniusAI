@@ -1,6 +1,8 @@
 <script setup lang="ts">
 import { computed, ref, watch } from 'vue'
 import { Icon } from '@iconify/vue'
+import { NButton, NConfigProvider, NInput, NSpin } from 'naive-ui'
+import { useGlobalStore } from '../stores'
 
 const props = defineProps({
   isLoading: {
@@ -14,6 +16,7 @@ const props = defineProps({
 })
 const emit = defineEmits(['sendMessage', 'update:message'])
 
+const globalStore = useGlobalStore()
 const newMessage = ref(props.message)
 const inputWrapper = ref<HTMLElement | null>(null)
 
@@ -49,21 +52,23 @@ function handleEnter(e: any) {
 <template>
   <div ref="inputWrapper" class="flex items-center px-4 py-2 rounded-md relative">
     <div class="flex-1 mr-2">
-      <a-spin :spinning="isLoadingRef">
-        <a-textarea
-          v-model:value="newMessage" type="text" class="w-full px-4 py-2 border border-gray-300 rounded-md"
-          placeholder="Type your message..." auto-size @keydown="handleEnter"
+      <NSpin :show="isLoadingRef" size="small">
+        <NInput
+          v-model:value="newMessage"
+          type="text"
+          placeholder="Type your message..."
+          @keydown.enter="handleEnter"
         />
-      </a-spin>
+      </NSpin>
     </div>
-    <a-button type="primary" :disabled="!isCanClick" @click="sendMessage">
-      <template #icon>
-        <span class="button-icon mr-1">
+    <NConfigProvider :theme="globalStore.theme?.Button">
+      <NButton type="primary" :disabled="!isCanClick" @click="sendMessage">
+        <template #icon>
           <Icon icon="bi:send-fill" width="14" />
-        </span>
-      </template>
-      Send
-    </a-button>
+        </template>
+        Send
+      </NButton>
+    </NConfigProvider>
   </div>
 </template>
 

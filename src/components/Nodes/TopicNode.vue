@@ -1,16 +1,18 @@
 <script setup lang="ts">
 import type { Node } from '@antv/x6'
 import type { ComputedRef } from 'vue'
-import { computed, inject, nextTick, onMounted, ref } from 'vue'
-import { message } from 'ant-design-vue'
+import { computed, h, inject, nextTick, onMounted, ref } from 'vue'
+import { NButton, NConfigProvider, NInput, NList, NListItem, NModal, NThing, useMessage } from 'naive-ui'
+import { Icon } from '@iconify/vue'
 import InputBox from '../InputBox.vue'
 import { useContainer } from './useContainer'
 import ExtraButton from './ExtraButton.vue'
-import { useNodeStore } from '@/stores'
+import { useGlobalStore, useNodeStore } from '@/stores'
 import { useGenerateMarkdown } from '@/hooks/useGenerateMarkdown'
 import { useEditing } from '@/hooks/useNodeEdit'
 
 const getNode: (() => Node | undefined) | undefined = inject('getNode')
+const globalStore = useGlobalStore()
 const nodeRef = ref<Node>()
 const dataRef = ref()
 const { containerRef, updateContainerSize, listenDataChange } = useContainer()
@@ -67,11 +69,17 @@ function useNodeMenu() {
   const nodeContent = computed(() => useGenerateMarkdown(nodeStore.currentNodeContent))
   const nodeList: ComputedRef<Array<any>> = computed(() => nodeStore.nodeList)
   // menu list
+  const renderIcon = (icon: string) => {
+    return () => h(Icon, {
+      icon,
+      width: '20',
+    })
+  }
   const menuItems = ref([
     {
       key: 'Add child',
       label: 'Add child',
-      icon: 'material-symbols:add',
+      icon: renderIcon('material-symbols:add'),
       handler: () => {
         handleAddChild()
       },
@@ -79,7 +87,7 @@ function useNodeMenu() {
     {
       key: 'Brain storm',
       label: 'Brain storm',
-      icon: 'carbon:star-review',
+      icon: renderIcon('carbon:star-review'),
       handler: () => {
         initModal()
         isShowModal.value = true
@@ -88,9 +96,11 @@ function useNodeMenu() {
   ])
   const lastMessage = ref('')
 
-  function sendMessage(message: string) {
+  function sendMessage(message?: string) {
     if (message)
       lastMessage.value = message
+    nodeStore.clearMessage()
+    nodeStore.clearNodeList()
     nodeStore.getCurrentNodeContent(lastMessage.value)
   }
   function initModal() {
@@ -101,6 +111,7 @@ function useNodeMenu() {
   function handleAddChild() {
     if (!nodeRef.value)
       return
+    const message = useMessage()
     const {
       addChildNode, render,
     } = nodeRef.value.getData()
@@ -112,6 +123,7 @@ function useNodeMenu() {
     }
   }
   function handleNodeClick(data: any) {
+    const message = useMessage()
     if (!data || !nodeRef.value)
       return
     const node = nodeList.value.find(item => item.id === data.id)
@@ -162,40 +174,53 @@ function useNodeMenu() {
         {{ dataRef }}
       </span>
       <div class="w-full flex" :class="isCanEditNode(nodeRef!) ? 'block-visible' : 'block-hidden'">
-        <a-textarea v-model:value="inputValue" :rows="4" @press-enter="(e: KeyboardEvent) => handleKeydown(e, nodeRef!)" @blur="handleBlur(nodeRef!)" />
+        <NInput
+          v-model:value="inputValue" type="textarea" @press-enter="(e: KeyboardEvent) => handleKeydown(e, nodeRef!)"
+          @blur="handleBlur(nodeRef!)"
+        />
       </div>
     </div>
     <div class="flex extra-button ml-2">
-      <ExtraButton :menu-items="menuItems" />
+      <ExtraButton :options="menuItems" />
     </div>
   </div>
-  <a-modal v-model:open="isShowModal" title="Brain Storm" :footer="null">
-    <div
-      v-if="!nodeList.length" class="robot-bubble" :class="isLoading ? 'bubble-transition' : ''"
-      v-html="nodeContent"
-    />
-    <div v-else>
-      <a-list item-layout="horizontal" :data-source="nodeList">
-        <template #loadMore>
-          <div v-if="!isLoading" :style="{ textAlign: 'center', marginTop: '12px', height: '32px', lineHeight: '32px' }">
-            <a-button @click="() => sendMessage">
-              Regenerate
-            </a-button>
-          </div>
-        </template>
-        <template #renderItem="{ item }">
-          <a-list-item>
-            <template #actions>
-              <a key="list-loadmore-edit" @click="handleNodeClick(item)">append</a>
+  <NConfigProvider :theme="globalStore.theme">
+    <NModal
+      v-model:show="isShowModal" title="Brain Storm" preset="card" style="width: 600px;" :bordered="false"
+      size="huge" :theme="globalStore.theme?.Modal"
+    >
+      <div
+        v-if="!nodeList.length" class="robot-bubble" :class="isLoading ? 'bubble-transition' : ''"
+        v-html="nodeContent"
+      />
+      <div v-else>
+        <NList>
+          <NListItem v-for="item in nodeList" :key="item.key">
+            <template #suffix>
+              <NButton @click="handleNodeClick(item)">
+                <template #icon>
+                  <Icon icon="carbon:data-enrichment-add" />
+                </template>
+                Append
+              </NButton>
             </template>
-            <a-list-item-meta :description="item.label" />
-          </a-list-item>
-        </template>
-      </a-list>
-    </div>
-
-    <InputBox v-model:message="aiInputBoxContent" :is-loading="isLoading" @send-message="sendMessage" />
-  </a-modal>
+            <NThing>
+              {{ item.label }}
+            </NThing>
+          </NListItem>
+        </NList>
+      </div>
+      <div v-if="!isLoading" :style="{ textAlign: 'center', marginTop: '12px', height: '32px', lineHeight: '32px' }">
+        <NButton @click="() => sendMessage()">
+          <template #icon>
+            <Icon icon="carbon:reset" />
+          </template>
+          Regenerate
+        </NButton>
+      </div>
+      <InputBox v-model:message="aiInputBoxContent" :is-loading="isLoading" @send-message="sendMessage" />
+    </NModal>
+  </NConfigProvider>
 </template>
 
 <style scoped>
