@@ -29,7 +29,7 @@
 
 Now you can upload a pdf file and ask questions
 
-![image-20230726104555490](https://github.com/xianjianlf2/MindGeniusAI/blob/main/markdownImg/uploadFile?raw=true)
+![mindmap](https://github.com/xianjianlf2/MindGeniusAI/blob/main/markdownImg/uploadFile.png?raw=true)
 
 ## Motivation
 
