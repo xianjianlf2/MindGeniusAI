@@ -13,6 +13,8 @@ import { chatStream } from './chatStream.ts'
 import { chatMindMap } from './chatMindMap.ts'
 import { configureProxyEnvironment, isEmptyKey } from './utils/useOpenAIProxy.ts'
 import { initialDocument, queryDocument, queryDocumentStream } from './document.ts'
+import { Language, validateWord } from './utils/useValidateLanguage.ts'
+import { compressContent } from './compressContent.ts'
 
 const __filename = fileURLToPath(import.meta.url)
 const __dirname = path.dirname(__filename)
@@ -160,8 +162,7 @@ router.post('/chatNode', async (ctx) => {
     ctx.throw(400, 'Please set openai key')
   function generatePrompt(content: string) {
     let prompt: HumanChatMessage
-    const pattern = /[\u4E00-\u9FA5]+/
-    if (pattern.test(content)) {
+    if (validateWord(content) === Language.Chinese) {
       prompt = new HumanChatMessage(
       `为${content}创建三点
         要求：
@@ -197,8 +198,7 @@ router.post('/uploadFile', async (ctx) => {
     success: true,
     fileName,
   }
-},
-)
+})
 
 router.get('/document/fileList', async (ctx) => {
   const directoryPath = path.join(__dirname, 'uploads')
@@ -245,5 +245,16 @@ router.post('/document/query', async (ctx) => {
       success: true,
       result,
     }
+  }
+})
+
+router.post('/compressContent', async (ctx) => {
+  const { content } = ctx.request.body
+  if (!content)
+    ctx.throw(400, 'No content')
+  const result = await compressContent(content)
+  ctx.body = {
+    success: true,
+    result,
   }
 })

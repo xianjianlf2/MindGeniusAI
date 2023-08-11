@@ -1,11 +1,11 @@
 import type { EventSourceMessage } from '@microsoft/fetch-event-source'
 import { EventStreamContentType, fetchEventSource } from '@microsoft/fetch-event-source'
-import { useMessage } from 'naive-ui'
+import axios from 'axios'
 import { StorageKey, storageManager } from '@/utils'
 
-// export function fetchChat(message: string, messageHistory: string[]) {
-//   return axios.post('/api/chat', { message, messageHistory })
-// }
+export function compressContentRequest(content: string) {
+  return axios.post('/api/compressContent', { content })
+}
 
 enum MessageStatus {
   PENDING = 'pending',
@@ -14,7 +14,6 @@ enum MessageStatus {
 }
 class RetriableError extends Error { }
 class FatalError extends Error { }
-const message = useMessage()
 
 export interface ChatOptions {
   url: string

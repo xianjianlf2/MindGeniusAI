@@ -13,10 +13,11 @@
 - [x] Export result to picture, json
 - [x] Single node support ai generate
 - [x] Edit Node
-- [ ] node support add picture
-- [ ] Automatically summarize web-linked articles
 - [x] support chat
 - [x] Support for importing files
+- [x] add notes feature,summary content and generate mindMap
+- [ ] node support add picture
+- [ ] Automatically summarize web-linked articles
 - [ ] dark mode
 - [ ] change node style
 

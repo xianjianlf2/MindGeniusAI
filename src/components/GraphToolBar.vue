@@ -111,7 +111,7 @@ watch(
 </script>
 
 <template>
-  <div class="w-full flex gap-2">
+  <div class="flex gap-2 bg-[#1e293b] rounded-lg border p-2">
     <NTooltip v-for="item in buttonList" :key="item.text" trigger="hover" placement="bottom">
       <template #trigger>
         <NButton :disabled="item.enabled" quaternary circle type="success" @click="item.handler">

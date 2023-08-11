@@ -10,8 +10,8 @@ import { History } from '@antv/x6-plugin-history'
 import { Export } from '@antv/x6-plugin-export'
 import { Icon } from '@iconify/vue'
 import { NButton } from 'naive-ui'
-import { useNodeStore } from '../stores'
-import GraphToolbar from './GraphToolBar.vue'
+import GraphToolbar from '@/components/GraphToolBar.vue'
+import { useNodeStore } from '@/stores'
 import NoteNode from '@/components/Nodes/NoteNode.vue'
 import TopicChildNode from '@/components/Nodes/TopicChildNode.vue'
 import TopicNode from '@/components/Nodes/TopicNode.vue'
@@ -213,8 +213,8 @@ function useHelpButton() {
 </script>
 
 <template>
-  <div class="w-full flex flex-col h-full relative">
-    <div class="flex  items-center bg-#1e293b px-3">
+  <div class="w-full flex flex-col h-full relative bg-[#0F1729]">
+    <div class="flex  items-center  justify-center mt-2">
       <GraphToolbar v-if="graphRef" :graph="graphRef!" :history-state="historyStateRef" />
     </div>
     <div ref="containerRef" />
