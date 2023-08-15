@@ -1,7 +1,7 @@
 import { defineStore } from 'pinia'
 import { ref } from 'vue'
 import { v4 as uuidv4 } from 'uuid'
-import type { marked } from 'marked'
+import type { Token } from 'marked'
 import { useMessage } from 'naive-ui'
 import { getNodes, getSingleNode } from '../utils/useConvertMarkdown'
 import { fetchChatNode } from '@/api/chatNode'
@@ -77,7 +77,7 @@ export const useNodeStore = defineStore('nodeStore', () => {
     if (!content)
       return
     const tokens = getSingleNode(content)
-    const nodes = tokens.reduce((acc: any, token: marked.Token) => {
+    const nodes = tokens.reduce((acc: any, token: Token) => {
       if (token.type === 'list') {
         const items = token.items.map(item => ({
           id: uuidv4(),

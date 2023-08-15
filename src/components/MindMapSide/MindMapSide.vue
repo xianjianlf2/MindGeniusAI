@@ -1,10 +1,12 @@
 <script setup lang="ts">
 import { NButton, NLayoutSider, NScrollbar } from 'naive-ui'
 import { Icon } from '@iconify/vue'
+import { useCommandModal } from '../command/commandModal'
 import NoteCard from './NoteCard.vue'
 import { useNoteStore } from '@/stores'
 
 const notesStore = useNoteStore()
+const { openCommandModal } = useCommandModal()
 
 function handleNewClick() {
   const item = notesStore.addNote('')
@@ -22,13 +24,13 @@ function handleNewClick() {
           </template>
           New
         </NButton>
-        <NButton type="primary" ghost>
+        <NButton type="primary" ghost @click="openCommandModal()">
           <template #icon>
             <Icon icon="material-symbols:search" />
           </template>
         </NButton>
       </div>
-      <NScrollbar style="max-height: 100%">
+      <NScrollbar style="max-height: calc(100% - 25px);">
         <div class="p-2 flex flex-col gap-2">
           <NoteCard v-for="note in notesStore.reverseNoteList" :key="note.id" :data="note" />
         </div>

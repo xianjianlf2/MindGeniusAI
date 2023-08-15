@@ -30,7 +30,7 @@ watch(
   (nodes) => {
     dataRef.value = cloneDeep(nodes)
     if (nodes && graphRef.value) {
-      useBindingKeyBoard(
+      registerKeyboard(
         graphRef.value,
         render,
       )
@@ -186,7 +186,7 @@ function handleTabKey(graph: Graph, render: any) {
   })
 }
 
-function useBindingKeyBoard(graph: Graph, render: any) {
+function registerKeyboard(graph: Graph, render: any) {
   // handleAddTopic(graph, render)
   handleHideNode(graph)
   handleHistoryChange(graph)
@@ -213,7 +213,7 @@ function useHelpButton() {
 </script>
 
 <template>
-  <div class="w-full flex flex-col h-full relative bg-[#0F1729]">
+  <div class="w-full flex flex-col h-full relative bg-[#0F1729] flex-1">
     <div class="flex  items-center  justify-center mt-2">
       <GraphToolbar v-if="graphRef" :graph="graphRef!" :history-state="historyStateRef" />
     </div>

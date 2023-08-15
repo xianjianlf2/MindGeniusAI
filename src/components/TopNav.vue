@@ -9,13 +9,19 @@ import Setting from './Setting.vue'
 import FileUploadPanel from './FileUploadPanel.vue'
 import CardModal from './CardModal.vue'
 import { useChatStore } from '@/stores'
+import { useIsMac } from '@/utils'
+import CommandModal from '@/components/command/commandModal.vue'
+import { useCommandModal } from '@/components/command/commandModal'
 
 const showChatBox = ref(false)
 const showShareCard = ref(false)
 const showSetting = ref(false)
 const showFileUploadPanel = ref(false)
+const isMac = useIsMac()
 
 const { buttonList } = useButton()
+
+const { openCommandModal } = useCommandModal()
 
 function useButton() {
   const GITHUB_URL = 'https://github.com/xianjianlf2/MindGeniusAI'
@@ -40,7 +46,6 @@ function useButton() {
 
   return {
     buttonList,
-
   }
 }
 
@@ -76,6 +81,12 @@ onMounted(() => {
     </div>
 
     <div class="items-center flex justify-center gap-2 bg-gradient-to-r ">
+      <NButton @click="openCommandModal()">
+        <template #icon>
+          <Icon icon="material-symbols:keyboard-alt-outline" color="white" />
+        </template>
+        {{ isMac ? 'Command + k' : 'Ctrl + k' }}
+      </NButton>
       <NButton v-for="item in buttonList" :key="item.icon" quaternary circle @click="item.handler">
         <template #icon>
           <Icon :icon="item.icon" width="36" color="white" />
@@ -97,6 +108,8 @@ onMounted(() => {
   </CardModal>
 
   <FileUploadPanel v-model="showFileUploadPanel" />
+
+  <CommandModal />
 </template>
 
 <style scoped>

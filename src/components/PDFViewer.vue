@@ -2,7 +2,6 @@
 import { ref, watch } from 'vue'
 import { NButton, NInput, NInputGroup, NSkeleton } from 'naive-ui'
 import { PdfViewer } from '@xianjianlf2/vue-pdf-viewer'
-import '@xianjianlf2/vue-pdf-viewer/dist/style.css'
 
 type PdfViewerType = InstanceType<typeof PdfViewer>
 
@@ -75,4 +74,6 @@ function handleJumpPage() {
   </div>
 </template>
 
-<style scoped></style>
+<style scoped>
+@import '@xianjianlf2/vue-pdf-viewer/dist/style.css'
+</style>

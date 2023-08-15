@@ -24,6 +24,7 @@ const {
 
 watch(() => noteStore.currentEditId, (val) => {
   if (props.data.id === val) {
+    editBuffer.value = props.data.content
     nextTick(() => {
       inputElement.value?.focus()
     })
@@ -89,7 +90,7 @@ function useExtraButton() {
     if (isEditing(id))
       return
 
-    noteStore.setCurrentEditId(id)
+    noteStore.setCurrentLoadingId(id)
     const res = await chatStore.compressContent(content)
     const { content: data } = res.data
     noteStore.updateNote({
@@ -97,7 +98,7 @@ function useExtraButton() {
       content: data,
     })
     message.success('Compress success!')
-    noteStore.setCurrentEditId(undefined)
+    noteStore.setCurrentLoadingId(undefined)
   }
 
   function handleSelect(value: string, item: CardType) {

@@ -1,15 +1,15 @@
 <script setup lang="ts">
-import { NLayout } from 'naive-ui'
+import { NLayout, NLayoutContent } from 'naive-ui'
 import MindMap from '@/components/MindMap'
 import MindMapSide from '@/components/MindMapSide'
 </script>
 
 <template>
   <NLayout style="height: 100%;" has-sider>
-    <div class="w-full h-full relative flex">
-      <MindMapSide />
+    <MindMapSide />
+    <NLayoutContent>
       <MindMap />
-    </div>
+    </NLayoutContent>
   </NLayout>
 </template>
 
