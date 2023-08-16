@@ -1,25 +1,24 @@
 <script setup lang="ts">
 import { onMounted, ref } from 'vue'
-import { NButton, NForm, NFormItem, NInput, NSpace, useMessage } from 'naive-ui'
-import { useStorage } from './useStorage'
+import { NButton, NForm, NFormItem, NInput, NSpace } from 'naive-ui'
+import { useKeyConfig } from './useKeyConfig'
+import { messageInfo, messageSuccess } from '@/hooks/message'
 
-const message = useMessage()
 const formRef = ref<InstanceType<typeof NForm>>()
-
-const { initConfig, resetConfig, keyConfig, setConfig } = useStorage()
+const { initConfig, resetConfig, keyConfig, setConfig } = useKeyConfig()
 
 function handleSubmit() {
   formRef.value?.validate((err) => {
     if (!err) {
       setConfig()
-      message.success('Setting saved!')
+      messageSuccess('Setting saved!')
     }
   })
 }
 
 function handleReset() {
   resetConfig()
-  message.info('Setting reset!')
+  messageInfo('Setting reset!')
 }
 
 onMounted(() => {

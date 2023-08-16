@@ -6,7 +6,7 @@ const keyConfig = ref({
   openAIProxy: '',
 })
 
-export function useStorage() {
+export function useKeyConfig() {
   function setConfig() {
     const { openAIKey, openAIProxy } = keyConfig.value
     storageManager.set(StorageKey.OPENAI_KEY, openAIKey.trim())

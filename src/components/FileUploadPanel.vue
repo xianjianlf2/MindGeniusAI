@@ -2,8 +2,9 @@
 import { computed, ref } from 'vue'
 import { Icon } from '@iconify/vue'
 import type { UploadFileInfo, UploadInst } from 'naive-ui'
-import { NButton, NModal, NP, NText, NUpload, NUploadDragger, useMessage } from 'naive-ui'
+import { NButton, NModal, NP, NText, NUpload, NUploadDragger } from 'naive-ui'
 import { useFileStore, useLayoutStore } from '@/stores'
+import { messageError, messageSuccess } from '@/hooks/message'
 
 const props = defineProps({
   modelValue: { type: Boolean, required: true },
@@ -16,7 +17,6 @@ const show = computed({
   set: value => emit('update:modelValue', value),
 })
 
-const message = useMessage()
 const fileList = ref()
 const isUploading = ref(false)
 const fileListLengthRef = ref(0)
@@ -30,7 +30,7 @@ function beforeUpload(data: {
   const { file } = data
   const allowedExtensions = /\.(pdf)$/i
   if (!allowedExtensions.test(file.name)) {
-    message.error('You can only upload PDF files!')
+    messageError('You can only upload PDF files!')
     return false
   }
   fileList.value = [file.file]
@@ -39,7 +39,7 @@ function beforeUpload(data: {
 
 async function handleUpload() {
   if (fileList.value.length === 0)
-    return message.error('Please upload a PDF file!')
+    return messageError('Please upload a PDF file!')
 
   isUploading.value = true
 
@@ -47,13 +47,13 @@ async function handleUpload() {
   formData.append('files', fileList.value[0])
   const res = await fileStore.uploadPdf(formData)
   if (res) {
-    message.success('Upload success!')
+    messageSuccess('Upload success!')
     show.value = false
     const layoutStore = useLayoutStore()
     layoutStore.setCurrentTab('Paper')
   }
   else {
-    message.error('Upload failed!')
+    messageError('Upload failed!')
   }
 }
 

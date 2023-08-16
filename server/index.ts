@@ -206,7 +206,7 @@ router.get('/document/fileList', async (ctx) => {
     const files = await fs.promises.readdir(directoryPath)
     ctx.body = {
       success: true,
-      files,
+      data: { files },
     }
   }
   catch (err: any) {
@@ -243,7 +243,7 @@ router.post('/document/query', async (ctx) => {
     const result = await queryDocument(query[0], fileName)
     ctx.body = {
       success: true,
-      result,
+      data: { result },
     }
   }
 })

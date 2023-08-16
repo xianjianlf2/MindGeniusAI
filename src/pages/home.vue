@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { NLayout, NLayoutContent } from 'naive-ui'
-import MindMap from '@/components/MindMap'
+import { MindMap } from '@/components/MindMap'
 import MindMapSide from '@/components/MindMapSide'
 </script>
 
@@ -12,5 +12,3 @@ import MindMapSide from '@/components/MindMapSide'
     </NLayoutContent>
   </NLayout>
 </template>
-
-<style scoped></style>

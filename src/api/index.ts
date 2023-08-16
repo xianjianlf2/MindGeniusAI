@@ -1,10 +1,10 @@
 import type { EventSourceMessage } from '@microsoft/fetch-event-source'
 import { EventStreamContentType, fetchEventSource } from '@microsoft/fetch-event-source'
-import axios from 'axios'
+import { http } from './http'
 import { StorageKey, storageManager } from '@/utils'
 
 export function compressContentRequest(content: string) {
-  return axios.post('/api/compressContent', { content })
+  return http.post('/compressContent', { content })
 }
 
 enum MessageStatus {

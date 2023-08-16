@@ -2,7 +2,7 @@
 import type { Node } from '@antv/x6'
 import type { ComputedRef } from 'vue'
 import { computed, h, inject, nextTick, onMounted, ref } from 'vue'
-import { NButton, NConfigProvider, NInput, NList, NListItem, NModal, NThing, useMessage } from 'naive-ui'
+import { NButton, NConfigProvider, NInput, NList, NListItem, NModal, NThing } from 'naive-ui'
 import { Icon } from '@iconify/vue'
 import { useContainer } from './useContainer'
 import ExtraButton from './ExtraButton.vue'
@@ -10,6 +10,7 @@ import { InputBox } from '@/components/Chat'
 import { useGlobalStore, useNodeStore } from '@/stores'
 import { useGenerateMarkdown } from '@/hooks/useGenerateMarkdown'
 import { useEditing } from '@/hooks/useNodeEdit'
+import { messageSuccess } from '@/hooks/message'
 
 const getNode: (() => Node | undefined) | undefined = inject('getNode')
 const globalStore = useGlobalStore()
@@ -111,19 +112,17 @@ function useNodeMenu() {
   function handleAddChild() {
     if (!nodeRef.value)
       return
-    const message = useMessage()
     const {
       addChildNode, render,
     } = nodeRef.value.getData()
     const { id } = nodeRef.value
     const type = nodeRef.value.prop('type')
     if (addChildNode(id, type)) {
-      message.success('Add child node success!')
+      messageSuccess('Add child node success!')
       render()
     }
   }
   function handleNodeClick(data: any) {
-    const message = useMessage()
     if (!data || !nodeRef.value)
       return
     const node = nodeList.value.find(item => item.id === data.id)
@@ -134,7 +133,7 @@ function useNodeMenu() {
     const newNode = addChildNode(id, node?.type, data.label)
     if (newNode) {
       render()
-      message.success('Add child node success!')
+      messageSuccess('Add child node success!')
     }
   }
 

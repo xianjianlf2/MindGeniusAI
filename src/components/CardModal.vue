@@ -4,6 +4,7 @@ import { NModal } from 'naive-ui'
 
 const props = defineProps({
   modelValue: { type: Boolean, required: true },
+  modalTitle: { type: String, required: true },
 },
 )
 
@@ -17,7 +18,7 @@ const show = computed({
 
 <template>
   <NModal
-    v-model:show="show" class="custom-card" preset="card" style="width: 600px;" title="Modal" :bordered="false"
+    v-model:show="show" class="custom-card" preset="card" style="width: 600px;" :title="modalTitle" :bordered="false"
     size="huge"
   >
     <slot />

@@ -93,15 +93,15 @@ onMounted(() => {
     </div>
   </div>
 
-  <CardModal v-model="showChatBox">
+  <CardModal v-model="showChatBox" modal-title="ChatBox">
     <ChatBox :id="chatWindowId" />
   </CardModal>
 
-  <CardModal v-model="showShareCard">
+  <CardModal v-model="showShareCard" modal-title="Share">
     <ShareCard />
   </CardModal>
 
-  <CardModal v-model="showSetting">
+  <CardModal v-model="showSetting" modal-title="Setting">
     <Setting />
   </CardModal>
 

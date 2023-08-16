@@ -1,11 +1,12 @@
 <script setup lang="ts">
-import { NButton, NCard, NCollapseTransition, NInput, NPopselect, NSpin, useMessage } from 'naive-ui'
+import { NButton, NCard, NCollapseTransition, NInput, NPopselect, NSpin } from 'naive-ui'
 import type { PropType } from 'vue'
 import { nextTick, ref, watch } from 'vue'
 import { Icon } from '@iconify/vue'
 import type { CardType } from './type'
 import { useChatStore, useNodeStore, useNoteStore } from '@/stores'
 import { useGenerateMarkdown } from '@/hooks'
+import { messageInfo, messageSuccess } from '@/hooks/message'
 
 const props = defineProps({
   data: { type: Object as PropType<CardType>, required: true },
@@ -14,7 +15,6 @@ const props = defineProps({
 const chatStore = useChatStore()
 const editBuffer = ref('')
 const inputElement = ref<HTMLInputElement>()
-const message = useMessage()
 const nodeStore = useNodeStore()
 const noteStore = useNoteStore()
 const {
@@ -84,7 +84,7 @@ function useExtraButton() {
 
   async function handleCompress(item: CardType) {
     if (item.content.trim() === '')
-      return message.info('Content is empty!')
+      return messageInfo('Content is empty!')
 
     const { id, content } = item
     if (isEditing(id))
@@ -97,7 +97,7 @@ function useExtraButton() {
       id,
       content: data,
     })
-    message.success('Compress success!')
+    messageSuccess('Compress success!')
     noteStore.setCurrentLoadingId(undefined)
   }
 

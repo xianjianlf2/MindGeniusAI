@@ -1,28 +1,28 @@
 import type { AxiosProgressEvent } from 'axios'
-import axios from 'axios'
+import { http } from './http'
 import type { ChatOptions } from '.'
 import { fetchChat } from '.'
 import { useChatStore } from '@/stores'
 
 export function uploadFileRequest(formData: FormData, handleUploadProgress: (progressEvent: AxiosProgressEvent) => void) {
-  return axios.post('/api/uploadFile', formData, {
+  return http.post('/uploadFile', formData, {
     headers: { 'Content-Type': 'multipart/form-data' },
     onUploadProgress: handleUploadProgress,
   })
 }
 export function getFileListRequest() {
-  return axios.get('/api/document/fileList')
+  return http.get('/document/fileList')
 }
 
 export function initDocumentRequest(fileName: string) {
-  return axios.post('/api/document/init',
+  return http.post('/document/init',
     {
       fileName,
     })
 }
 
 export function queryDocumentRequest(query: string[], fileName: string) {
-  return axios.post('/api/document/query', {
+  return http.post('/document/query', {
     fileName,
     query,
   })
