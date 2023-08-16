@@ -1,6 +1,6 @@
 import Fuse from 'fuse.js'
 import { ref } from 'vue'
-import type { CardType } from './../MindMapSide/type'
+import type { CardType } from '../MindMapSide/type'
 import { useNoteStore } from '@/stores'
 
 const fuse = new Fuse([] as CardType[], {

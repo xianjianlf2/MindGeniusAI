@@ -40,3 +40,4 @@ function handleNewClick() {
 </template>
 
 <style scoped></style>
+../Command/commandModal

@@ -17,18 +17,11 @@ const show = computed({
 
 <template>
   <NModal
-    v-model:show="show"
-    class="custom-card"
-    preset="card"
-    style="width: 600px;"
-    title="Modal"
-    :bordered="false"
+    v-model:show="show" class="custom-card" preset="card" style="width: 600px;" title="Modal" :bordered="false"
     size="huge"
   >
     <slot />
   </NModal>
 </template>
 
-<style scoped>
-
-</style>
+<style scoped></style>

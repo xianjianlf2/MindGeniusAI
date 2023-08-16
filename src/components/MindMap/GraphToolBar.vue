@@ -98,16 +98,21 @@ const buttonList = ref([
     },
   },
 ])
-watch(
-  () => props.historyState,
-  (val) => {
-    if (val) {
-      buttonList.value[0].enabled = !val.canUndo
-      buttonList.value[1].enabled = !val.canRedo
-    }
-  },
-  { deep: true },
-)
+
+function watchHistoryState() {
+  watch(
+    () => props.historyState,
+    (val) => {
+      if (val) {
+        buttonList.value[0].enabled = !val.canUndo
+        buttonList.value[1].enabled = !val.canRedo
+      }
+    },
+    { deep: true },
+  )
+}
+
+watchHistoryState()
 </script>
 
 <template>

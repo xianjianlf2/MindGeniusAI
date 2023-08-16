@@ -1,3 +1,4 @@
 import MindMap from './MindMap.vue'
+import GraphToolBar from './GraphToolBar.vue'
 
-export default MindMap
+export { MindMap, GraphToolBar }

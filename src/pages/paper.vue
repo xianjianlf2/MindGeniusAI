@@ -77,7 +77,7 @@ const ChatBoxAsync = defineAsyncComponent(() => {
   if (!chatStore.findChatWindow(chatWindowId))
     chatStore.addChatWindow(chatWindowId, false)
 
-  return import('@/components/ChatBox.vue')
+  return import('@/components/Chat/ChatBox.vue')
 })
 
 function handleGenerateMap() {

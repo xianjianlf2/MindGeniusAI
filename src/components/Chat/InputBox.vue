@@ -2,7 +2,7 @@
 import { computed, ref, watch } from 'vue'
 import { Icon } from '@iconify/vue'
 import { NButton, NConfigProvider, NInput, NSpin } from 'naive-ui'
-import { useGlobalStore } from '../stores'
+import { useGlobalStore } from '@/stores'
 
 const props = defineProps({
   isLoading: {

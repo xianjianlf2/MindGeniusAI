@@ -3,15 +3,15 @@ import { onMounted, ref } from 'vue'
 import { Icon } from '@iconify/vue'
 import { NButton } from 'naive-ui'
 import { v4 as uuidv4 } from 'uuid'
-import ChatBox from './ChatBox.vue'
-import ShareCard from './ShareCard.vue'
-import Setting from './Setting.vue'
 import FileUploadPanel from './FileUploadPanel.vue'
-import CardModal from './CardModal.vue'
+import Setting from '@/components/Setting'
+import ShareCard from '@/components/ShareCard.vue'
+import CardModal from '@/components/CardModal.vue'
+import { ChatBox } from '@/components/Chat'
 import { useChatStore } from '@/stores'
 import { useIsMac } from '@/utils'
-import CommandModal from '@/components/command/commandModal.vue'
-import { useCommandModal } from '@/components/command/commandModal'
+import CommandModal from '@/components/Command/CommandModal.vue'
+import { useCommandModal } from '@/components/Command/commandModal'
 
 const showChatBox = ref(false)
 const showShareCard = ref(false)
@@ -19,7 +19,7 @@ const showSetting = ref(false)
 const showFileUploadPanel = ref(false)
 const isMac = useIsMac()
 
-const { buttonList } = useButton()
+const buttonList = useButton()
 
 const { openCommandModal } = useCommandModal()
 
@@ -44,9 +44,7 @@ function useButton() {
     },
   ])
 
-  return {
-    buttonList,
-  }
+  return buttonList
 }
 
 function openChatBox() {
