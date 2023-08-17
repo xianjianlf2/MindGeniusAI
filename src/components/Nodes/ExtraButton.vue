@@ -18,7 +18,7 @@ const props = defineProps({
   },
 })
 const globalStore = useGlobalStore()
-type OptionType = DropdownMixedOption & { handler: Function }
+type OptionType = DropdownMixedOption & { handler: any }
 function handleSelect(key: string) {
   const item = props.options.find(item => item.key === key)
   if (item)

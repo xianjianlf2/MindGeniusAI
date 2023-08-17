@@ -12,7 +12,7 @@ export interface Message {
   content: string
   time: string
 }
-function chat(messageSend: Function, messageDone: Function) {
+function chat(messageSend: (token: string) => void, messageDone: () => void) {
   let result = ''
   return new ChatOpenAI({
     maxTokens: 1024,
@@ -34,7 +34,7 @@ function chat(messageSend: Function, messageDone: Function) {
   useOpenAIProxy())
 }
 
-export async function chatStream(messages: Message[], messageSend: Function, messageDone: Function) {
+export async function chatStream(messages: Message[], messageSend: (token: string) => void, messageDone: () => void) {
   const messageList = useGenerateMessage(messages)
   function useGenerateMessage(messages: Message[]) {
     return messages.map((message) => {
