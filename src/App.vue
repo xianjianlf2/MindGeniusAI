@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { RouterView } from 'vue-router'
-import { NConfigProvider, NMessageProvider } from 'naive-ui'
+import 'vfonts/Lato.css'
+import { NConfigProvider } from 'naive-ui'
 import { useGlobalStore } from './stores'
 
 const globalStore = useGlobalStore()
@@ -8,9 +9,7 @@ const globalStore = useGlobalStore()
 
 <template>
   <NConfigProvider :theme="globalStore.theme">
-    <NMessageProvider>
-      <RouterView />
-    </NMessageProvider>
+    <RouterView />
   </NConfigProvider>
 </template>
 

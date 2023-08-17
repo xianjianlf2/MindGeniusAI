@@ -13,8 +13,8 @@
   },
   "dependencies": {
     "@koa/multer": "^3.0.2",
-    "@types/formidable": "^3.4.0",
-    "@types/node": "^20.3.3",
+    "@types/formidable": "^3.4.1",
+    "@types/node": "^20.5.0",
     "koa": "^2.14.2",
     "koa-body": "^6.0.1",
     "koa-router": "^12.0.0",
@@ -24,15 +24,15 @@
   },
   "devDependencies": {
     "@pinecone-database/pinecone": "^0.1.6",
-    "@types/koa": "^2.13.6",
+    "@types/koa": "^2.13.8",
     "@types/koa-router": "^7.4.4",
     "@types/koa-static": "^4.0.2",
     "@types/koa__multer": "^2.0.4",
     "@types/mime-types": "^2.1.1",
     "dotenv": "^16.3.1",
-    "langchain": "^0.0.102",
+    "langchain": "^0.0.129",
     "mime-types": "^2.1.35",
-    "nodemon": "^2.0.22",
+    "nodemon": "^3.0.1",
     "ts-node": "^10.9.1"
   }
 }

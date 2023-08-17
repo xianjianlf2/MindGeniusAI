@@ -1,7 +1,6 @@
-import { useMessage } from 'naive-ui'
+import { messageSuccess } from '@/hooks/message'
 
 export function useCopyText(text: string) {
-  const message = useMessage()
   if (navigator.clipboard) {
     navigator.clipboard.writeText(text)
   }
@@ -13,5 +12,5 @@ export function useCopyText(text: string) {
     document.execCommand('copy')
     document.body.removeChild(textarea)
   }
-  message.success('Copied to clipboard')
+  messageSuccess('Copied to clipboard')
 }

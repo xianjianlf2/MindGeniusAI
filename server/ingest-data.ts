@@ -1,3 +1,4 @@
+/* eslint-disable n/prefer-global/process */
 import { PineconeClient } from '@pinecone-database/pinecone'
 import dotenv from 'dotenv'
 import { UnstructuredLoader } from 'langchain/document_loaders/fs/unstructured'

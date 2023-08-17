@@ -3,10 +3,11 @@ import { defineStore } from 'pinia'
 import { ref } from 'vue'
 import type { AxiosProgressEvent } from 'axios'
 import { getFileListRequest, initDocumentRequest, queryDocumentRequest, uploadFileRequest } from '@/api/file'
+import { messageError } from '@/hooks/message'
 
 export const useFileStore = defineStore('fileStore', () => {
   const uploadProgress = ref(0)
-  const fileList = ref([])
+  const fileList = ref<string[]>([])
 
   function handleProgress(event: AxiosProgressEvent) {
     if (!event.total)
@@ -31,11 +32,8 @@ export const useFileStore = defineStore('fileStore', () => {
   }
 
   async function getFileList() {
-    const [err, res] = await to(getFileListRequest())
-    if (err)
-      return err
-
-    const { files } = res.data
+    const res = await getFileListRequest()
+    const { files } = res as any
     fileList.value = files
   }
   async function initDocumentIndex(fileName: string) {
@@ -47,13 +45,12 @@ export const useFileStore = defineStore('fileStore', () => {
     return success
   }
   async function queryDocument(query: string[], fileName: string) {
-    const [err, res] = await to(queryDocumentRequest(query, fileName))
-    if (err)
-      return err
-
-    const { success, result, message } = res.data
-    if (!success)
-      return message
+    const res = await queryDocumentRequest(query, fileName)
+    if (!res) {
+      messageError('something went wrong')
+      return false
+    }
+    const { result } = res as any
     return result
   }
 

@@ -9,7 +9,7 @@ import { Icon } from '@iconify/vue'
       <span>AI Mind Map</span>
     </h2>
     <div>
-      Learn more
+      Unleash Minds, Spark Ideas
       <Icon icon="material-symbols:arrow-right-alt-rounded" width="50" color="white" />
     </div>
   </div>
@@ -17,8 +17,8 @@ import { Icon } from '@iconify/vue'
 
 <style scoped>
 .card {
-    width: 400px;
-    height: 400px;
+    width: 450px;
+    height: 450px;
     position: relative;
     border-radius: 40px;
     padding: 40px;

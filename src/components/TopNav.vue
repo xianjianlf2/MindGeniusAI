@@ -3,19 +3,25 @@ import { onMounted, ref } from 'vue'
 import { Icon } from '@iconify/vue'
 import { NButton } from 'naive-ui'
 import { v4 as uuidv4 } from 'uuid'
-import ChatBox from './ChatBox.vue'
-import ShareCard from './ShareCard.vue'
-import Setting from './Setting.vue'
 import FileUploadPanel from './FileUploadPanel.vue'
-import CardModal from './CardModal.vue'
+import Setting from '@/components/Setting'
+import ShareCard from '@/components/ShareCard.vue'
+import CardModal from '@/components/CardModal.vue'
+import { ChatBox } from '@/components/Chat'
 import { useChatStore } from '@/stores'
+import { useIsMac } from '@/utils'
+import CommandModal from '@/components/Command/CommandModal.vue'
+import { useCommandModal } from '@/components/Command/commandModal'
 
 const showChatBox = ref(false)
 const showShareCard = ref(false)
 const showSetting = ref(false)
 const showFileUploadPanel = ref(false)
+const isMac = useIsMac()
 
-const { buttonList } = useButton()
+const buttonList = useButton()
+
+const { openCommandModal } = useCommandModal()
 
 function useButton() {
   const GITHUB_URL = 'https://github.com/xianjianlf2/MindGeniusAI'
@@ -38,10 +44,7 @@ function useButton() {
     },
   ])
 
-  return {
-    buttonList,
-
-  }
+  return buttonList
 }
 
 function openChatBox() {
@@ -76,6 +79,12 @@ onMounted(() => {
     </div>
 
     <div class="items-center flex justify-center gap-2 bg-gradient-to-r ">
+      <NButton @click="openCommandModal()">
+        <template #icon>
+          <Icon icon="material-symbols:keyboard-alt-outline" color="white" />
+        </template>
+        {{ isMac ? 'Command + k' : 'Ctrl + k' }}
+      </NButton>
       <NButton v-for="item in buttonList" :key="item.icon" quaternary circle @click="item.handler">
         <template #icon>
           <Icon :icon="item.icon" width="36" color="white" />
@@ -84,19 +93,21 @@ onMounted(() => {
     </div>
   </div>
 
-  <CardModal v-model="showChatBox">
+  <CardModal v-model="showChatBox" modal-title="ChatBox">
     <ChatBox :id="chatWindowId" />
   </CardModal>
 
-  <CardModal v-model="showShareCard">
+  <CardModal v-model="showShareCard" modal-title="Share">
     <ShareCard />
   </CardModal>
 
-  <CardModal v-model="showSetting">
+  <CardModal v-model="showSetting" modal-title="Setting">
     <Setting />
   </CardModal>
 
   <FileUploadPanel v-model="showFileUploadPanel" />
+
+  <CommandModal />
 </template>
 
 <style scoped>

@@ -2,10 +2,12 @@
 import type { PropType } from 'vue'
 import { computed, ref } from 'vue'
 import { NButton, NPopconfirm } from 'naive-ui'
+import { Icon } from '@iconify/vue'
 import type { Message } from '@/stores'
-import { useChatStore, useNodeStore } from '@/stores'
+import { useChatStore, useNodeStore, useNoteStore } from '@/stores'
 import { useCopyText } from '@/utils'
 import { useGenerateMarkdown } from '@/hooks/useGenerateMarkdown'
+import { messageSuccess } from '@/hooks/message'
 
 const props = defineProps({
   message: {
@@ -25,6 +27,8 @@ const props = defineProps({
 const showButtonGroup = ref(false)
 const nodeStore = useNodeStore()
 const chatStore = useChatStore()
+const isAssistant = computed(() => props.message.role === 'assistant')
+const noteStore = useNoteStore()
 
 function confirm(id: Message['id']) {
   chatStore.removeMessage(id, props.messageId)
@@ -41,6 +45,15 @@ function handleBubbleStyle() {
   else
     return 'robot-bubble'
 }
+
+function handleAddToNote(content: string) {
+  messageSuccess('Add to note success!')
+  noteStore.addNote(content)
+}
+
+function handleGenerateNode(content: string) {
+  nodeStore.generateNode(content)
+}
 </script>
 
 <template>
@@ -54,20 +67,36 @@ function handleBubbleStyle() {
       </div>
       <div v-show="showButtonGroup" class="flex justify-end items-center gap-2">
         <NButton
-          v-if="props.message.role === 'assistant'" strong secondary type="primary" size="small"
-          @click="nodeStore.generateNode(props.message.content)"
+          v-if="isAssistant" strong secondary type="primary" size="small"
+          @click="handleAddToNote(props.message.content)"
         >
-          generate
+          <template #icon>
+            <Icon icon="material-symbols:note-alt-outline" />
+          </template>
+          Note
+        </NButton>
+        <NButton
+          v-if="isAssistant" strong secondary type="primary" size="small"
+          @click="handleGenerateNode(props.message.content)"
+        >
+          <template #icon>
+            <Icon icon="material-symbols:map-outline-rounded" />
+          </template>
+          MindMap
         </NButton>
         <NButton strong secondary type="primary" size="small" @click="useCopyText(props.message.content)">
-          copy
+          <template #icon>
+            <Icon icon="material-symbols:content-copy-outline-rounded" />
+          </template>
         </NButton>
         <NPopconfirm
           @positive-click="confirm(props.message.id)"
         >
           <template #trigger>
             <NButton size="small" strong secondary type="error">
-              delete
+              <template #icon>
+                <Icon icon="material-symbols:delete-forever" />
+              </template>
             </NButton>
           </template>
           Are you sure delete this message?

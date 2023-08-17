@@ -1,12 +1,11 @@
 import { computed, ref } from 'vue'
-import { useMessage } from 'naive-ui'
+import { messageSuccess } from './message'
 import { useChatStore } from '@/stores'
 import { useLocalTimeString } from '@/utils'
 
 export type ChatType = 'mindmap' | 'document'
 
 export function useChat(id: string, chatType: ChatType) {
-  const message = useMessage()
   const chatStore = useChatStore()
   const newMessage = ref('')
   const isLoading = computed(() => chatStore.chatWindows[id].isLoading)
@@ -33,7 +32,7 @@ export function useChat(id: string, chatType: ChatType) {
 
   function handleReset() {
     chatStore.clearAllMessage(id)
-    message.success('Chat box reset!')
+    messageSuccess('Chat box reset!')
   }
 
   return {

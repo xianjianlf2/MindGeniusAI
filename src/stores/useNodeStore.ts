@@ -1,11 +1,11 @@
 import { defineStore } from 'pinia'
 import { ref } from 'vue'
 import { v4 as uuidv4 } from 'uuid'
-import type { marked } from 'marked'
-import { useMessage } from 'naive-ui'
+import type { Token } from 'marked'
 import { getNodes, getSingleNode } from '../utils/useConvertMarkdown'
 import { fetchChatNode } from '@/api/chatNode'
 import { measureText } from '@/utils'
+import { messageInfo, messageSuccess } from '@/hooks/message'
 
 export interface MindMapData {
   id: string
@@ -18,7 +18,6 @@ export interface MindMapData {
 }
 
 export const useNodeStore = defineStore('nodeStore', () => {
-  const message = useMessage()
   const nodes = ref<MindMapData>()
   const noteContent = ref<string>()
   const nodeList = ref<any>([])
@@ -37,16 +36,16 @@ export const useNodeStore = defineStore('nodeStore', () => {
   function generateNode(markdown: string) {
     resetSingleNode()
     if (!markdown) {
-      message.info('There is no content')
+      messageInfo('There is no content')
       return
     }
     const result = getNodes(markdown)
     if (result === undefined || result.length === 0) {
-      message.info('There is no mind map generated.')
+      messageInfo('There is no mind map generated.')
       return
     }
     if (Array.isArray(result) && result.length > 0) {
-      message.success('Mind map generated.')
+      messageSuccess('Mind map generated.')
       nodes.value = result[0]
       noteContent.value = markdown
     }
@@ -77,7 +76,7 @@ export const useNodeStore = defineStore('nodeStore', () => {
     if (!content)
       return
     const tokens = getSingleNode(content)
-    const nodes = tokens.reduce((acc: any, token: marked.Token) => {
+    const nodes = tokens.reduce((acc: any, token: Token) => {
       if (token.type === 'list') {
         const items = token.items.map(item => ({
           id: uuidv4(),

@@ -3,12 +3,14 @@ import type { PropType } from 'vue'
 import { computed, nextTick, ref, watch } from 'vue'
 import { Icon } from '@iconify/vue'
 import { throttle } from 'lodash'
-import { NButton, useMessage } from 'naive-ui'
-import { useChatStore } from '../stores'
+import { NEmpty, NScrollbar } from 'naive-ui'
 import RobotMessage from './RobotMessage.vue'
-import InputBox from './InputBox.vue'
+import ChatBoxFooter from './ChatBoxFooter.vue'
+import { InputBox } from '@/components/Chat'
+import { useChatStore } from '@/stores'
 import type { ChatType } from '@/hooks'
 import { useChat } from '@/hooks'
+import { messageError, messageInfo } from '@/hooks/message'
 
 const props = defineProps({
   id: {
@@ -29,7 +31,7 @@ const props = defineProps({
 })
 
 const fileNameRef = computed(() => props.fileName)
-const message = useMessage()
+
 // message control
 const chatStore = useChatStore()
 const {
@@ -39,16 +41,16 @@ const {
   handleStopGenerate,
   handleReset,
 } = useChat(props.id, props.chatType)
-const { chatBoxRef } = useScrollChatBox()
+const chatBoxRef = useScrollChatBox()
 const { isContinuous, handleContinuous } = useContinuousDialog()
 
 function useContinuousDialog() {
   const isContinuous = computed(() => chatStore.chatWindows[props.id].isContinuousDialog)
   watch(() => chatStore.chatWindows[props.id].isContinuousDialog, () => {
     if (chatStore.chatWindows[props.id].isContinuousDialog)
-      message.info('Continuous dialogue open!')
+      messageInfo('Continuous dialogue open!')
     else
-      message.info('Continuous dialogue close!')
+      messageInfo('Continuous dialogue close!')
   })
   function handleContinuous() {
     chatStore.toggleContinuousDialog(props.id)
@@ -57,11 +59,11 @@ function useContinuousDialog() {
 }
 
 function useScrollChatBox() {
-  const chatBoxRef = ref<HTMLDivElement>()
+  const chatBoxRef = ref()
   watch(
     () => chatStore.chatWindows[props.id].messages,
     () => {
-      throttle(scrollToBottom, 300)()
+      throttle(scrollToBottom, 500)()
     },
     { immediate: true, deep: true },
   )
@@ -69,17 +71,17 @@ function useScrollChatBox() {
   function scrollToBottom() {
     nextTick(() => {
       chatBoxRef.value?.scrollTo({
-        top: chatBoxRef.value?.scrollHeight,
+        position: 'bottom',
         behavior: 'smooth',
       })
     })
   }
-  return { chatBoxRef }
+  return chatBoxRef
 }
 function switchSend(msg: string) {
   if (props.chatType === 'document') {
     if (!fileNameRef.value)
-      return message.error('Please select a file first!')
+      return messageError('Please select a file first!')
     sendMessage(msg, undefined, fileNameRef.value)
   }
 
@@ -90,10 +92,7 @@ function switchSend(msg: string) {
 <template>
   <div class=" h-[500px] mt-2  glass relative" :class="border ? 'shadow-box border' : ''">
     <div class="flex flex-col h-full p-3 box-border">
-      <div
-        v-if="chatStore.chatWindows[id].messages" ref="chatBoxRef"
-        class="overflow-y-scroll overflow-x-hidden pr-2 flex-1"
-      >
+      <NScrollbar v-if="chatStore.chatWindows[id].messages" ref="chatBoxRef">
         <div
           v-for="(_message, index) in chatStore.chatWindows[id].messages" :key="_message.id"
           class="flex items-start mb-4"
@@ -103,60 +102,20 @@ function switchSend(msg: string) {
             :is-loading="isLoading && index === chatStore.chatWindows[id].messages.length - 1" :message-id="id"
           />
         </div>
-      </div>
+      </NScrollbar>
+
       <div v-else class="flex justify-center items-center h-full">
-        <div class="flex flex-col items-center">
-          <Icon icon="teenyicons:box-outline" width="40" />
-          <span class="text-gray-400 mt-2">Chat Box</span>
-        </div>
+        <NEmpty description="Chat Box">
+          <template #icon>
+            <Icon icon="teenyicons:box-outline" width="40" />
+          </template>
+        </NEmpty>
       </div>
       <div class="flex-none">
-        <div class="flex items-center">
-          <div class="flex-[30%] gap-2 flex">
-            <NButton size="small" @click="handleReset">
-              <template #icon>
-                <span class="button-icon">
-                  <Icon icon="carbon:reset" width="18" color="white" />
-                </span>
-              </template>
-            </NButton>
-            <NButton size="small" :type="isContinuous ? 'primary' : 'default'" @click="handleContinuous">
-              <template #icon>
-                <Icon icon="mdi:head-snowflake-outline" width="18" color="white" />
-              </template>
-            </NButton>
-          </div>
-          <div class="flex-[60%]">
-            <NButton v-show="isLoading" size="small" type="primary" @click="handleStopGenerate">
-              <template #icon>
-                <Icon icon="mdi:stop" width="18" color="white" />
-              </template>
-              Stop generating
-            </NButton>
-          </div>
-        </div>
+        <ChatBoxFooter :is-continuous="isContinuous" :is-loading="isLoading" @continuous="handleContinuous" @reset="handleReset" @stop-generate="handleStopGenerate" />
 
         <InputBox :message="newMessage" :is-loading="isLoading" @send-message="switchSend" />
       </div>
     </div>
   </div>
 </template>
-
-<style scoped>
-::-webkit-scrollbar {
-  width: 8px;
-}
-
-::-webkit-scrollbar-track {
-  border-radius: 8px;
-}
-
-::-webkit-scrollbar-thumb {
-  background: #888;
-  border-radius: 8px;
-}
-
-::-webkit-scrollbar-thumb:hover {
-  background: #555;
-}
-</style>

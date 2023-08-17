@@ -1,11 +1,14 @@
 <script setup lang="ts">
-import MindMap from '../components/MindMap.vue'
+import { NLayout, NLayoutContent } from 'naive-ui'
+import { MindMap } from '@/components/MindMap'
+import MindMapSide from '@/components/MindMapSide'
 </script>
 
 <template>
-  <div class="w-full h-full relative">
-    <MindMap />
-  </div>
+  <NLayout style="height: 100%;" has-sider>
+    <MindMapSide />
+    <NLayoutContent>
+      <MindMap />
+    </NLayoutContent>
+  </NLayout>
 </template>
-
-<style scoped></style>

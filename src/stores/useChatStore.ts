@@ -4,6 +4,7 @@ import { v4 as uuidv4 } from 'uuid'
 import { useLocalTimeString } from '../utils'
 import { chatWithMindMapRequest } from '@/api/chatMindmap'
 import { chatWithDocumentRequest } from '@/api/file'
+import { compressContentRequest } from '@/api'
 
 export interface Message {
   id: string
@@ -105,6 +106,13 @@ export const useChatStore = defineStore('chatStore', () => {
     chatWindows.value[id].isContinuousDialog = !chatWindows.value[id].isContinuousDialog
   }
 
+  async function compressContent(content: string) {
+    const res = await compressContentRequest(content)
+    const { success, result } = res.data
+    if (success)
+      return result
+  }
+
   return {
     chatWindows,
     addChatWindow,
@@ -120,5 +128,6 @@ export const useChatStore = defineStore('chatStore', () => {
     toggleContinuousDialog,
     findChatWindow,
     chatWithDocument,
+    compressContent,
   }
 })
