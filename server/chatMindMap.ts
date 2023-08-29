@@ -1,10 +1,10 @@
 import { ChatOpenAI } from 'langchain/chat_models/openai'
 import { CallbackManager } from 'langchain/callbacks'
-import type { HumanChatMessage } from 'langchain/schema'
+import type { HumanMessage } from 'langchain/schema'
 import type { MessageHandler, OpenAIProxyConfig } from './types.ts'
 
 // function generatePrompt
-export async function chatMindMap(prompt: HumanChatMessage, messageHandler: MessageHandler, proxyConfig: OpenAIProxyConfig) {
+export async function chatMindMap(prompt: HumanMessage, messageHandler: MessageHandler, proxyConfig: OpenAIProxyConfig) {
   let result = ''
   const chat = new ChatOpenAI({
     maxTokens: 1024,

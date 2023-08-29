@@ -23,7 +23,11 @@ const {
   handleDoubleClick,
   handleKeydown,
   handleBlur,
-} = useEditing()
+} = useEditing(() => {
+  nextTick(() => {
+    updateContainerSize(nodeRef.value!)
+  })
+})
 
 const {
   aiInputBoxContent,

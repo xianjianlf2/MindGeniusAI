@@ -15,7 +15,11 @@ const {
   handleDoubleClick,
   handleKeydown,
   handleBlur,
-} = useEditing()
+} = useEditing(() => {
+  nextTick(() => {
+    updateContainerSize(nodeRef.value!)
+  })
+})
 
 function initData(node: Node) {
   nodeRef.value = node
