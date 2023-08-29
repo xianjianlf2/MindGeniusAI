@@ -50,7 +50,6 @@ onMounted(() => {
         <div class="bg-#1e293b p-3">
           <NTabs v-model:value="activeKey" type="line" animated :on-update-value="handleTabsChange">
             <NTab name="MindMap" />
-            <NTab name="Paper" />
           </NTabs>
         </div>
       </NLayoutHeader>

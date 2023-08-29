@@ -51,9 +51,9 @@ function openChatBox() {
   showChatBox.value = true
 }
 
-function openFileUploadPanel() {
-  showFileUploadPanel.value = true
-}
+// function openFileUploadPanel() {
+//   showFileUploadPanel.value = true
+// }
 
 const chatStore = useChatStore()
 const chatWindowId = ref(uuidv4())
@@ -71,11 +71,11 @@ onMounted(() => {
           Get Start
         </span>
       </div>
-      <div class="button" @click="openFileUploadPanel">
+      <!-- <div class="button" @click="openFileUploadPanel">
         <span class="bg-via-gray-900 ">
           Get Start With PDF
         </span>
-      </div>
+      </div> -->
     </div>
 
     <div class="items-center flex justify-center gap-2 bg-gradient-to-r ">
