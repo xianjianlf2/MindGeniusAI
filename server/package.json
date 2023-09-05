@@ -9,7 +9,8 @@
   "main": "index.ts",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "dev": "npx nodemon --exec ts-node --esm index.ts"
+    "dev": "npx nodemon --exec ts-node --esm index.ts",
+    "docker": "if [ -z $(docker images -q mind-genius-server) ]; then docker build -t mind-genius-server . && docker run -p 3000:3000 mind-genius-server; else docker run -p 3000:3000 mind-genius-server; fi"
   },
   "dependencies": {
     "@koa/multer": "^3.0.2",
