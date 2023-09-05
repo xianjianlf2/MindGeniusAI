@@ -38,7 +38,7 @@ export function buildTree(markdown: string) {
     }
     else if (token.type === 'list') {
       const currentHeading = headingStack[headingStack.length - 1]
-      currentHeading.children = token.items.map(item => ({
+      currentHeading.children = token.items.map((item: { text: string }) => ({
         id: uuidv4(),
         type: 'topic-child',
         label: item.text,

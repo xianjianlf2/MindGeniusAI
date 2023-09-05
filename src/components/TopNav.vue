@@ -10,8 +10,8 @@ import CardModal from '@/components/CardModal.vue'
 import { ChatBox } from '@/components/Chat'
 import { useChatStore } from '@/stores'
 import { useIsMac } from '@/utils'
-import CommandModal from '@/components/Command/CommandModal.vue'
-import { useCommandModal } from '@/components/Command/commandModal'
+import CommandModal from '@/components/command/CommandModal.vue'
+import { useCommandModal } from '@/components/command/commandModal'
 
 const showChatBox = ref(false)
 const showShareCard = ref(false)
