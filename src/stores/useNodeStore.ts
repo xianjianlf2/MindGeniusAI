@@ -78,7 +78,7 @@ export const useNodeStore = defineStore('nodeStore', () => {
     const tokens = getSingleNode(content)
     const nodes = tokens.reduce((acc: any, token: Token) => {
       if (token.type === 'list') {
-        const items = token.items.map(item => ({
+        const items = token.items.map((item: { text: string }) => ({
           id: uuidv4(),
           type: 'topic-branch',
           label: item.text,

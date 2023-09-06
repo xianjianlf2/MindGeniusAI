@@ -10,8 +10,8 @@ import CardModal from '@/components/CardModal.vue'
 import { ChatBox } from '@/components/Chat'
 import { useChatStore } from '@/stores'
 import { useIsMac } from '@/utils'
-import CommandModal from '@/components/Command/CommandModal.vue'
-import { useCommandModal } from '@/components/Command/commandModal'
+import CommandModal from '@/components/command/CommandModal.vue'
+import { useCommandModal } from '@/components/command/commandModal'
 
 const showChatBox = ref(false)
 const showShareCard = ref(false)
@@ -51,9 +51,9 @@ function openChatBox() {
   showChatBox.value = true
 }
 
-function openFileUploadPanel() {
-  showFileUploadPanel.value = true
-}
+// function openFileUploadPanel() {
+//   showFileUploadPanel.value = true
+// }
 
 const chatStore = useChatStore()
 const chatWindowId = ref(uuidv4())
@@ -71,11 +71,11 @@ onMounted(() => {
           Get Start
         </span>
       </div>
-      <div class="button" @click="openFileUploadPanel">
+      <!-- <div class="button" @click="openFileUploadPanel">
         <span class="bg-via-gray-900 ">
           Get Start With PDF
         </span>
-      </div>
+      </div> -->
     </div>
 
     <div class="items-center flex justify-center gap-2 bg-gradient-to-r ">

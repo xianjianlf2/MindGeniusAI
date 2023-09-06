@@ -1,7 +1,7 @@
 /* eslint-disable n/prefer-global/process */
 import dotenv from 'dotenv'
 import type Router from 'koa-router'
-import type Koa from 'Koa'
+import type Koa from 'koa'
 import type { OpenAIProxyConfig } from '../types.ts'
 
 dotenv.config()

@@ -1,8 +1,8 @@
 <script setup lang="ts">
 import { NButton, NLayoutSider, NScrollbar } from 'naive-ui'
 import { Icon } from '@iconify/vue'
-import { useCommandModal } from '../command/commandModal'
 import NoteCard from './NoteCard.vue'
+import { useCommandModal } from '@/components/command/commandModal'
 import { useNoteStore } from '@/stores'
 
 const notesStore = useNoteStore()
@@ -40,4 +40,3 @@ function handleNewClick() {
 </template>
 
 <style scoped></style>
-../Command/commandModal

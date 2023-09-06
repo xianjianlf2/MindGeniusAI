@@ -2,7 +2,7 @@ import { computed, nextTick, ref } from 'vue'
 import type { Node } from '@antv/x6'
 import { useNodeStore } from '@/stores'
 
-export function useEditing() {
+export function useEditing(statusCallback?: () => void) {
   const nodeStore = useNodeStore()
   const isEditing = ref(false)
   const inputValue = ref('')
@@ -25,6 +25,7 @@ export function useEditing() {
     nodeStore.setCurrentEditingNode(node.id)
     const { data } = node.getData()
     inputValue.value = data
+    statusCallback && statusCallback()
   }
   function handleBlur(node: Node<Node.Properties>) {
     isEditing.value = false
@@ -32,6 +33,7 @@ export function useEditing() {
     nextTick(() => {
       node.setData({ data: inputValue.value.trim() })
     })
+    statusCallback && statusCallback()
   }
 
   function isCanEditNode(node: Node<Node.Properties>) {

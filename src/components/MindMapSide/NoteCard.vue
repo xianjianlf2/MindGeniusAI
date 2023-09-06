@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { NButton, NCard, NCollapseTransition, NInput, NPopselect, NSpin } from 'naive-ui'
+import { NButton, NCard, NCollapseTransition, NEllipsis, NInput, NPopselect, NSpin } from 'naive-ui'
 import type { PropType } from 'vue'
 import { nextTick, ref, watch } from 'vue'
 import { Icon } from '@iconify/vue'
@@ -145,7 +145,9 @@ function useExtraButton() {
     </NCollapseTransition>
     <NCollapseTransition :show="!isEditing(data.id)">
       <NSpin :show="isLoading(data.id)">
-        <div v-html="useGenerateMarkdown(data.content)" />
+        <NEllipsis :line-clamp="5" :tooltip="false" expand-trigger="click">
+          <div v-html="useGenerateMarkdown(data.content)" />
+        </NEllipsis>
       </NSpin>
     </NCollapseTransition>
   </NCard>

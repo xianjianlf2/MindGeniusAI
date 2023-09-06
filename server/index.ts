@@ -6,7 +6,7 @@ import * as fs from 'node:fs'
 import Koa from 'koa'
 import { koaBody } from 'koa-body'
 import Router from 'koa-router'
-import { HumanChatMessage } from 'langchain/schema'
+import { HumanChatMessage, HumanMessage } from 'langchain/schema'
 import type formidable from 'formidable'
 import Server from 'koa-static'
 import { chatStream } from './chatStream.ts'
@@ -124,10 +124,10 @@ router.post('/chatMindMap', async (ctx) => {
     sseStream.end()
   }
   function generatePrompt(topic: string) {
-    let prompt: HumanChatMessage
+    let prompt: HumanMessage
     const pattern = /[\u4E00-\u9FA5]+/
     if (pattern.test(topic)) {
-      prompt = new HumanChatMessage(
+      prompt = new HumanMessage(
         `为主题${topic}创建一个思维导图/指南
         要求：
         1.使用markdown
@@ -136,7 +136,7 @@ router.post('/chatMindMap', async (ctx) => {
       `)
     }
     else {
-      prompt = new HumanChatMessage(
+      prompt = new HumanMessage(
         `create a road map / guide line for the topic ${topic}
         requirement:
         1.use markdown
@@ -161,9 +161,9 @@ router.post('/chatNode', async (ctx) => {
   if (isEmptyKey(ctx))
     ctx.throw(400, 'Please set openai key')
   function generatePrompt(content: string) {
-    let prompt: HumanChatMessage
+    let prompt: HumanMessage
     if (validateWord(content) === Language.Chinese) {
-      prompt = new HumanChatMessage(
+      prompt = new HumanMessage(
       `为${content}创建三点
         要求：
         1.使用markdown
@@ -171,7 +171,7 @@ router.post('/chatNode', async (ctx) => {
       `)
     }
     else {
-      prompt = new HumanChatMessage(
+      prompt = new HumanMessage(
       `create three points for ${content}
         requirement:
         1.use markdown
