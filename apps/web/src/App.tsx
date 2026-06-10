@@ -14,7 +14,7 @@ import { extractMarkdownBlock } from '@/utils/convertMarkdown'
 const NARROW = 1280
 
 /**
- * Hermas 工作台：单一入口三分布局
+ * 单一入口三分布局
  * 左栏对话流（380px 可折叠）/ 中央思维导图画布 / 右侧资料源抽屉（360px）
  */
 export default function App() {
