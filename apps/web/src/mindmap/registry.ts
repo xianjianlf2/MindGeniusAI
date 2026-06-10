@@ -35,8 +35,8 @@ export function registerMindMapShapes() {
       attrs: {
         line: {
           targetMarker: '',
-          stroke: '#A2B1C3',
-          strokeWidth: 2,
+          stroke: '#2A3340',
+          strokeWidth: 1.5,
         },
       },
       zIndex: 0,

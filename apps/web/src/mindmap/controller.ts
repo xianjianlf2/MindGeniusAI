@@ -15,6 +15,8 @@ export interface NodeComponentData {
   label: string
   type: MindMapNodeType
   controller: MindMapController
+  /** 所属一级分支的序号（根的直接子节点按序编号，整条子树继承），用于彩色分层模式 */
+  branchIndex?: number
 }
 
 /**
@@ -45,7 +47,7 @@ export class MindMapController {
     })
 
     const cells: Cell[] = []
-    const traverse = (item: HierarchyResult) => {
+    const traverse = (item: HierarchyResult, branchIndex?: number) => {
       const { data, children } = item
       const node = this.graph.createNode({
         id: data.id,
@@ -55,10 +57,10 @@ export class MindMapController {
         width: data.width,
         height: data.height,
       })
-      node.setData({ label: data.label, type: data.type, controller: this } satisfies NodeComponentData)
+      node.setData({ label: data.label, type: data.type, controller: this, branchIndex } satisfies NodeComponentData)
       cells.push(node)
 
-      children?.forEach((child) => {
+      children?.forEach((child, index) => {
         cells.push(this.graph.createEdge({
           shape: 'mindmap-edge',
           source: {
@@ -69,7 +71,7 @@ export class MindMapController {
           },
           target: { cell: child.id, anchor: { name: 'left' } },
         }))
-        traverse(child)
+        traverse(child, branchIndex ?? index)
       })
     }
     traverse(result)

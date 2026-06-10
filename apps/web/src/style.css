@@ -1,21 +1,173 @@
-* {
-  margin: 0;
-  padding: 0;
-  box-sizing: border-box;
+/* =========================================================
+   MindGenius AI — Design Tokens
+   Dark, cool-neutral surfaces · coral accent · mono technical labels
+   ========================================================= */
+
+:root {
+  /* ---- Surfaces (cool-neutral dark) ---- */
+  --c-bg: #0A0E17;
+  --c-surface: #0F141F;
+  --c-surface-2: #141A27;
+  --c-elevated: #1B2230;
+  --c-overlay: #10151F;
+
+  /* ---- Borders / hairlines ---- */
+  --c-border: #1E2531;
+  --c-border-strong: #2A3340;
+  --c-border-focus: #3A4658;
+
+  /* ---- Text ---- */
+  --c-text: #E7EAF0;
+  --c-text-2: #98A2B3;
+  --c-text-3: #5C6675;
+  --c-text-disabled: #3C4452;
+
+  /* ---- Accent (coral) ---- */
+  --c-accent: #FF6F59;
+  --c-accent-hover: #FF8470;
+  --c-accent-press: #F0604A;
+  --c-accent-soft: rgba(255, 111, 89, 0.14);
+  --c-accent-softer: rgba(255, 111, 89, 0.08);
+  --c-accent-line: rgba(255, 111, 89, 0.40);
+
+  /* ---- Semantic status ---- */
+  --c-ok: #34D399;
+  --c-ok-soft: rgba(52, 211, 153, 0.13);
+  --c-warn: #F2B14C;
+  --c-warn-soft: rgba(242, 177, 76, 0.14);
+  --c-err: #F4566B;
+  --c-err-soft: rgba(244, 86, 107, 0.13);
+  --c-info: #5B8DEF;
+  --c-info-soft: rgba(91, 141, 239, 0.13);
+
+  /* ---- Typography ---- */
+  --f-sans: -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC",
+            "Hiragino Sans GB", "Microsoft YaHei", "Helvetica Neue", Arial, sans-serif;
+  --f-mono: "JetBrains Mono", "SF Mono", ui-monospace, "Cascadia Code",
+            "Roboto Mono", Menlo, Consolas, monospace;
+
+  /* ---- Radius ---- */
+  --r-xs: 5px;
+  --r-sm: 7px;
+  --r-md: 9px;
+  --r-lg: 12px;
+  --r-xl: 16px;
+
+  /* ---- Shadow ---- */
+  --sh-1: 0 1px 2px rgba(0, 0, 0, 0.30);
+  --sh-2: 0 6px 18px -6px rgba(0, 0, 0, 0.55);
+  --sh-3: 0 18px 50px -12px rgba(0, 0, 0, 0.70);
+  --sh-pop: 0 12px 34px -8px rgba(0, 0, 0, 0.62), 0 0 0 1px var(--c-border);
+
+  /* ---- Density (overridden by .density-compact) ---- */
+  --chat-gap: 18px;
+  --node-pad-y: 11px;
+  --node-pad-x: 15px;
 }
 
-html,
-body,
-#root {
-  height: 100%;
-  background: #0f172a;
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, 'PingFang SC', 'Microsoft YaHei', sans-serif;
+.density-compact {
+  --chat-gap: 12px;
+  --node-pad-y: 8px;
+  --node-pad-x: 12px;
 }
 
+/* =========================================================
+   Base
+   ========================================================= */
+* { box-sizing: border-box; margin: 0; padding: 0; }
+html, body, #root { height: 100%; }
+body {
+  font-family: var(--f-sans);
+  background: var(--c-bg);
+  color: var(--c-text);
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+  overflow: hidden;
+}
+::selection { background: var(--c-accent-soft); color: #fff; }
+
+button { font-family: inherit; background: none; border: none; cursor: pointer; }
+input, textarea { font-family: inherit; }
+
+/* Scrollbars — thin, unobtrusive */
+*::-webkit-scrollbar { width: 9px; height: 9px; }
+*::-webkit-scrollbar-thumb {
+  background: var(--c-border-strong);
+  border-radius: 99px;
+  border: 2px solid transparent;
+  background-clip: padding-box;
+}
+*::-webkit-scrollbar-thumb:hover { background: #38424f; background-clip: padding-box; }
+*::-webkit-scrollbar-track { background: transparent; }
+
+.mono { font-family: var(--f-mono); }
+.tnum { font-variant-numeric: tabular-nums; }
+.no-drag { -webkit-user-select: none; user-select: none; }
+
+/* =========================================================
+   Animations
+   ========================================================= */
+@keyframes mg-card-in {
+  from { transform: translateY(7px); }
+  to   { transform: translateY(0); }
+}
+.mg-card-in { animation: mg-card-in 0.34s cubic-bezier(.21, .9, .3, 1); }
+
+@keyframes mg-node-pop {
+  0%   { transform: scale(.82); }
+  60%  { transform: scale(1.04); }
+  100% { transform: scale(1); }
+}
+.mg-node-pop { animation: mg-node-pop 0.4s cubic-bezier(.2, .8, .25, 1); }
+
+@keyframes mg-blink { 0%, 49% { opacity: 1; } 50%, 100% { opacity: 0; } }
+.mg-caret {
+  display: inline-block; width: 7px; height: 1.05em; margin-left: 1px;
+  background: var(--c-accent); border-radius: 1px;
+  transform: translateY(2px);
+  animation: mg-blink 1s steps(1) infinite;
+}
+
+@keyframes mg-spin { to { transform: rotate(360deg); } }
+.mg-spin { animation: mg-spin 0.8s linear infinite; }
+
+@keyframes mg-shimmer {
+  0%   { background-position: -360px 0; }
+  100% { background-position: 360px 0; }
+}
+.mg-shimmer {
+  background: linear-gradient(90deg, var(--c-elevated) 0%, #232c3b 50%, var(--c-elevated) 100%);
+  background-size: 720px 100%;
+  animation: mg-shimmer 1.5s linear infinite;
+}
+
+@keyframes mg-fade-in { from { opacity: 0; } to { opacity: 1; } }
+.mg-fade-in { animation: mg-fade-in .25s ease; }
+
+@keyframes mg-drawer-in {
+  from { transform: translateX(18px); opacity: 0; }
+  to   { transform: translateX(0); opacity: 1; }
+}
+.mg-drawer-in { animation: mg-drawer-in .28s cubic-bezier(.2, .8, .25, 1); }
+
+/* Dotted canvas grid */
+.mg-grid {
+  background-image: radial-gradient(circle at center, #1a2230 1px, transparent 1px);
+  background-size: 26px 26px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { animation-duration: .001ms !important; animation-iteration-count: 1 !important; }
+}
+
+/* =========================================================
+   Markdown (assistant messages)
+   ========================================================= */
 .markdown-body {
-  font-size: 14px;
-  line-height: 1.6;
+  font-size: 13px;
+  line-height: 1.65;
   word-break: break-word;
+  color: var(--c-text);
 }
 
 .markdown-body h1,
@@ -30,13 +182,14 @@ body,
 }
 
 .markdown-body pre {
-  background: #0f172a;
-  border-radius: 6px;
+  background: var(--c-bg);
+  border: 1px solid var(--c-border);
+  border-radius: var(--r-sm);
   padding: 8px;
   overflow-x: auto;
 }
 
 .markdown-body code {
-  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
-  font-size: 13px;
+  font-family: var(--f-mono);
+  font-size: 12px;
 }

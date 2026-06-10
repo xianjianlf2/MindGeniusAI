@@ -6,14 +6,15 @@ Auto generate MindMap with AI — now powered by **Hermas**, an autonomous agent
 
 ## Features
 
-- Hermas Agent mode: multi-step planning with live tool-call visualization
+- Single Hermas workbench: chat panel + mind-map canvas + sources drawer in one screen
+- Hermas Agent: multi-step planning with live tool-call cards
   (generate mind map / expand node / search uploaded PDF, chained automatically)
-- One-shot mind map generation from a topic (classic mode)
 - Edit the canvas: add/delete/rename nodes, AI brainstorm on any branch,
-  undo/redo, fit screen, export PNG
-- Upload a PDF, build an in-memory vector index, ask questions with streaming answers (RAG)
-- Multi-provider LLM: OpenAI / Anthropic (Claude) / DeepSeek — switch in Settings,
-  bring your own key & custom gateway
+  undo/redo, zoom, fit screen, export PNG
+- Attach a PDF from the composer (📎): upload → vector index → Hermas retrieves it
+  via `rag_query` while drawing the map
+- Multi-provider LLM: OpenAI / Anthropic (Claude) / DeepSeek — switch in the top bar,
+  bring your own key & custom gateway; accent / density / node-style preferences
 
 ## Architecture
 

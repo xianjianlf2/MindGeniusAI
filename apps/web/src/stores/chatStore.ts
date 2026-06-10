@@ -19,6 +19,8 @@ export interface UiMessage {
   time: string
   steps?: AgentStep[]
   error?: string
+  /** 该条用户消息附带的文档上下文（展示用） */
+  pdf?: string
 }
 
 interface ChatState {
@@ -29,6 +31,7 @@ interface ChatState {
     url: string
     data: unknown
     userText: string
+    userPdf?: string
     agentMode?: boolean
     onDone?: (finalContent: string) => void
   }) => void
@@ -95,11 +98,11 @@ export function createChatStore(welcome?: string) {
       isLoading: false,
       controller: null,
 
-      send({ url, data, userText, agentMode, onDone }) {
+      send({ url, data, userText, userPdf, agentMode, onDone }) {
         if (get().isLoading)
           return
         set(state => ({
-          messages: [...state.messages, newMessage('user', userText), newMessage('assistant', '')],
+          messages: [...state.messages, { ...newMessage('user', userText), pdf: userPdf }, newMessage('assistant', '')],
           isLoading: true,
         }))
 
