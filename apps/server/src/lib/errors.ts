@@ -11,7 +11,7 @@ export function toUserMessage(error: unknown): string {
     return 'Please check your key'
 
   const message = error instanceof Error ? error.message : String(error)
-  const status = (error as { statusCode?: number, status?: number })?.statusCode
+  const status = (error as { statusCode?: number; status?: number })?.statusCode
     ?? (error as { status?: number })?.status
 
   if (status === 401 || /api key|unauthorized|authentication/i.test(message))

@@ -30,11 +30,11 @@ export interface ChatMessage {
 
 /** Hermas Agent 推送的结构化事件，作为 JSON 字符串放进 SseEnvelope.data */
 export type AgentEvent =
-  | { type: 'text', delta: string }
-  | { type: 'tool-call', toolName: string, toolCallId: string, input: unknown }
-  | { type: 'tool-result', toolName: string, toolCallId: string, output: unknown }
+  | { type: 'text'; delta: string }
+  | { type: 'tool-call'; toolName: string; toolCallId: string; input: unknown }
+  | { type: 'tool-result'; toolName: string; toolCallId: string; output: unknown }
   | { type: 'step-finish' }
-  | { type: 'error', message: string }
+  | { type: 'error'; message: string }
 
 export interface AgentRequest {
   messages: Pick<ChatMessage, 'role' | 'content'>[]

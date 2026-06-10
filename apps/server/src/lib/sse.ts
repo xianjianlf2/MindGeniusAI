@@ -20,7 +20,7 @@ export interface SseEmitter {
 export function legacySSE(c: Context, handler: (emit: SseEmitter) => Promise<void>) {
   return streamSSE(c, async (stream) => {
     let closed = false
-    const write = async (envelope: { status: MessageStatus, data?: string }) => {
+    const write = async (envelope: { status: MessageStatus; data?: string }) => {
       if (closed)
         return
       await stream.writeSSE({ data: JSON.stringify(envelope) })
