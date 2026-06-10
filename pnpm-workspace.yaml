@@ -1,0 +1,8 @@
+packages:
+  - apps/*
+  - packages/*
+allowBuilds:
+  canvas: false
+  esbuild: true
+  simple-git-hooks: true
+  vue-demi: true
