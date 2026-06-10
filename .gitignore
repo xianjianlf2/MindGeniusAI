@@ -24,4 +24,4 @@ dist-ssr
 *.sw?
 .env
 
-/server/uploads/*
+apps/server/uploads/

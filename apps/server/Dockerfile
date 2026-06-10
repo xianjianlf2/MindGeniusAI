@@ -1,17 +1,20 @@
-# use node 18
-FROM node:18
+# 构建上下文必须是仓库根目录：
+#   docker build -f apps/server/Dockerfile .
+FROM node:22-alpine
 
-WORKDIR /usr/src/app
+WORKDIR /app
+RUN npm install -g pnpm@11
 
-COPY package.json ./
+COPY pnpm-workspace.yaml pnpm-lock.yaml package.json ./
+COPY packages/shared/package.json packages/shared/
+COPY apps/server/package.json apps/server/
 
+RUN pnpm install --frozen-lockfile --filter @mindgenius/server... --prod
 
-RUN npm install -g pnpm@7.17.0
-RUN pnpm install --prod
+COPY packages/shared packages/shared
+COPY apps/server apps/server
 
-COPY . .
-
+ENV NODE_ENV=production
 EXPOSE 3000
-
-CMD ["pnpm", "dev"]
-
+WORKDIR /app/apps/server
+CMD ["pnpm", "start"]
