@@ -2,6 +2,11 @@
 
 Talk to **Hermas** — an autonomous agent that plans, retrieves your documents, and draws editable mind maps for you, with every tool call visible in real time.
 
+[![CI](https://github.com/xianjianlf2/MindGeniusAI/actions/workflows/ci.yml/badge.svg)](https://github.com/xianjianlf2/MindGeniusAI/actions/workflows/ci.yml)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
+[![Stars](https://img.shields.io/github/stars/xianjianlf2/MindGeniusAI?style=flat)](https://github.com/xianjianlf2/MindGeniusAI/stargazers)
+[![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg)](CONTRIBUTING.md)
+
 <!-- 💡 Live demo: deploy to Vercel / Cloudflare, then surface it here:
 [![Live Demo](https://img.shields.io/badge/Live%20Demo-online-brightgreen?style=flat-square)](https://your-demo-url) -->
 
