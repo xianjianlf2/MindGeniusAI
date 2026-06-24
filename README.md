@@ -16,11 +16,9 @@ Talk to **Hermas** — an autonomous agent that plans, retrieves your documents,
 
 ## Demo
 
-<!-- 💡 Replace the static screenshot below with a short screen-recording GIF
-     (agent picking tools → drawing the map → editing a node in place). A GIF converts far better than a still image.
-     TODO(demo): upload PDF → rag_query card → mindmap_generate → map grows → "add a node under X" → mindmap_edit patches it. Assets go in docs/assets/. -->
+![MindGenius AI — Hermas plans, then draws an editable mind map live](docs/assets/demo.gif)
 
-![mindmap](https://github.com/xianjianlf2/MindGeniusAI/blob/main/markdownImg/newSample.png?raw=true)
+> Type a goal → Hermas plans and calls its tools → the editable mind map grows on the canvas. Try it on the **[live demo](https://mindgenius.onrender.com)**.
 
 ## Why it's different
 

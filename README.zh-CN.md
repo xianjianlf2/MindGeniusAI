@@ -16,10 +16,9 @@
 
 ## 演示
 
-<!-- 💡 把下面的静态截图换成一段简短的录屏 GIF（智能体选工具 → 画出导图 → 原地编辑某个节点），GIF 的转化率远高于静态图。
-     TODO(demo)：上传 PDF → rag_query 卡片 → mindmap_generate → 导图生长 → 说一句「在 X 下加个节点」→ mindmap_edit 原地打补丁。素材放在 docs/assets/。 -->
+![MindGenius AI —— Hermas 规划后，把可编辑思维导图实时画出来](docs/assets/demo.gif)
 
-![mindmap](https://github.com/xianjianlf2/MindGeniusAI/blob/main/markdownImg/newSample.png?raw=true)
+> 输入一个目标 → Hermas 规划并调用工具 → 可编辑的思维导图在画布上生长。去 **[在线体验](https://mindgenius.onrender.com)** 试试。
 
 ## 它有什么不一样
 
