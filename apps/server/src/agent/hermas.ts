@@ -1,4 +1,4 @@
-import type { AgentEvent, AgentRequest } from '@mindgenius/shared'
+import type { AgentEvent, AgentRequest, MindMapOp } from '@mindgenius/shared'
 import { stepCountIs, streamText } from 'ai'
 import { toUserMessage } from '../lib/errors'
 import { logger } from '../lib/logger'
@@ -19,9 +19,13 @@ export async function runHermas(
   cfg: LLMRequestConfig,
   onEvent: (event: AgentEvent) => Promise<void>,
 ) {
+  logger.info(
+    { provider: cfg.provider, model: cfg.model, baseURL: cfg.baseURL ?? null, hasFile: !!request.fileName },
+    'hermas run',
+  )
   const result = streamText({
     model: chatModel(cfg),
-    system: hermasSystemPrompt(),
+    system: hermasSystemPrompt(request.mindMap),
     messages: request.messages.map(message => ({
       role: message.role,
       content: message.content,
@@ -43,6 +47,12 @@ export async function runHermas(
           toolCallId: part.toolCallId,
           input: part.input,
         })
+        // mindmap_edit 的增量指令直接推给前端应用到画布
+        if (part.toolName === 'mindmap_edit') {
+          const ops = (part.input as { ops?: MindMapOp[] }).ops ?? []
+          if (ops.length)
+            await onEvent({ type: 'mindmap-patch', ops })
+        }
         break
       case 'tool-result':
         await onEvent({
@@ -51,6 +61,9 @@ export async function runHermas(
           toolCallId: part.toolCallId,
           output: part.output,
         })
+        // 生成工具的 markdown 直接确定地推给画布，绕开「模型回显 + 前端正则」的脆链路
+        if (part.toolName === 'mindmap_generate' && typeof part.output === 'string' && part.output.trim())
+          await onEvent({ type: 'mindmap-set', markdown: part.output })
         break
       case 'finish-step':
         await onEvent({ type: 'step-finish' })
