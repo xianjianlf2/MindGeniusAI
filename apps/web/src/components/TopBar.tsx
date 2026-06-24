@@ -29,7 +29,7 @@ export function TopBar() {
         padding: '0 12px',
         flexShrink: 0,
         position: 'relative',
-        zIndex: 30,
+        zIndex: 60, // 压住画布层的浮动元素（缩放栏 z30 / 导出菜单 z40），否则顶栏下拉会被盖住
         background: 'var(--c-surface)',
         borderBottom: '1px solid var(--c-border)',
       }}
