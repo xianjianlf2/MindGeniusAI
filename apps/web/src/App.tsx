@@ -5,10 +5,12 @@ import { MindMapCanvas } from '@/components/MindMapCanvas'
 import { SourcesDrawer } from '@/components/SourcesDrawer'
 import { TopBar } from '@/components/TopBar'
 import { Icon } from '@/components/ui/Icon'
+import type { MindMapController } from '@/mindmap/controller'
 import { docDisplayName, useDocStore } from '@/stores/docStore'
 import { createChatStore } from '@/stores/chatStore'
 import { useNodeStore } from '@/stores/nodeStore'
 import { PROVIDERS, useUiStore } from '@/stores/uiStore'
+import { track } from '@/utils/analytics'
 import { extractMarkdownBlock } from '@/utils/convertMarkdown'
 
 const NARROW = 1280
@@ -28,6 +30,8 @@ export default function App() {
   const { files, attached, setAttached, refresh, upload } = useDocStore()
 
   const lastSentRef = useRef('')
+  const controllerRef = useRef<MindMapController | null>(null)
+  const mapSetThisTurnRef = useRef(false)
   const fileInputRef = useRef<HTMLInputElement>(null)
   const wasNarrow = useRef(typeof window !== 'undefined' && window.innerWidth < NARROW)
 
@@ -48,16 +52,28 @@ export default function App() {
     return () => window.removeEventListener('resize', onResize)
   }, [setLeftCollapsed])
 
+  /* 强保证出图：优先用 mindmap-set 事件直送的 markdown 渲染 */
+  const setMapFromMarkdown = (markdown: string) => {
+    if (generateFromMarkdown(markdown).ok) {
+      mapSetThisTurnRef.current = true
+      flash('思维导图已生成')
+    }
+  }
+
+  /* 兜底：本轮没有 mindmap-set 事件时，再尝试从聊天回复里抠 ```markdown 块 */
   const applyMarkdown = (content: string) => {
+    if (mapSetThisTurnRef.current)
+      return
     const markdown = extractMarkdownBlock(content)
     if (!/^#{1,6}\s/m.test(markdown))
       return
-    if (generateFromMarkdown(markdown).ok)
-      flash('思维导图已生成')
+    setMapFromMarkdown(markdown)
   }
 
   const handleSend = (text: string) => {
     lastSentRef.current = text
+    mapSetThisTurnRef.current = false
+    track('agent_run') // 仅计数「有人真正发起了一次生成」，不含任何内容
     setLeftCollapsed(false)
     const attachedDoc = files.find(file => file.name === attached)
     send({
@@ -68,11 +84,19 @@ export default function App() {
           { role: 'user', content: text },
         ],
         fileName: attached ?? undefined,
+        // 画布已有导图时随请求带上轮廓，Hermas 可据此做增量编辑而非全量重画
+        mindMap: controllerRef.current?.toOutline() ?? undefined,
       },
       userText: text,
       userPdf: attachedDoc ? docDisplayName(attachedDoc) : undefined,
       agentMode: true,
       onDone: applyMarkdown,
+      onSetMap: setMapFromMarkdown,
+      onPatch: (ops) => {
+        const applied = controllerRef.current?.applyPatch(ops) ?? 0
+        if (applied)
+          flash(`已更新画布 ${applied} 处`)
+      },
     })
   }
 
@@ -137,7 +161,10 @@ export default function App() {
           </div>
         )}
 
-        <MindMapCanvas onPickExample={handleSend} />
+        <MindMapCanvas
+          onPickExample={handleSend}
+          onController={(controller) => { controllerRef.current = controller }}
+        />
 
         {sourcesOpen && (
           <div style={{ width: 360, flexShrink: 0 }}>

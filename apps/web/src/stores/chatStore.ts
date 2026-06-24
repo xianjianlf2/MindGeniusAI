@@ -1,4 +1,4 @@
-import type { AgentEvent } from '@mindgenius/shared'
+import type { AgentEvent, MindMapOp } from '@mindgenius/shared'
 import { decodeAgentEvent } from '@mindgenius/shared'
 import { v4 as uuidv4 } from 'uuid'
 import { create } from 'zustand'
@@ -34,6 +34,10 @@ interface ChatState {
     userPdf?: string
     agentMode?: boolean
     onDone?: (finalContent: string) => void
+    /** Agent 推送的画布增量编辑指令（mindmap_edit） */
+    onPatch?: (ops: MindMapOp[]) => void
+    /** Agent 确定送达的整张导图 markdown（mindmap_generate），出图强保证 */
+    onSetMap?: (markdown: string) => void
   }) => void
   stop: () => void
   clear: () => void
@@ -62,7 +66,11 @@ export function createChatStore(welcome?: string) {
       })
     }
 
-    const handleAgentEvent = (event: AgentEvent) => {
+    const handleAgentEvent = (
+      event: AgentEvent,
+      onPatch?: (ops: MindMapOp[]) => void,
+      onSetMap?: (markdown: string) => void,
+    ) => {
       switch (event.type) {
         case 'text':
           updateLastAssistant(message => ({ ...message, content: message.content + event.delta }))
@@ -87,6 +95,12 @@ export function createChatStore(welcome?: string) {
                 : step),
           }))
           break
+        case 'mindmap-patch':
+          onPatch?.(event.ops)
+          break
+        case 'mindmap-set':
+          onSetMap?.(event.markdown)
+          break
         case 'error':
           updateLastAssistant(message => ({ ...message, error: event.message }))
           break
@@ -98,7 +112,7 @@ export function createChatStore(welcome?: string) {
       isLoading: false,
       controller: null,
 
-      send({ url, data, userText, userPdf, agentMode, onDone }) {
+      send({ url, data, userText, userPdf, agentMode, onDone, onPatch, onSetMap }) {
         if (get().isLoading)
           return
         set(state => ({
@@ -113,7 +127,7 @@ export function createChatStore(welcome?: string) {
             if (agentMode) {
               const event = decodeAgentEvent(raw)
               if (event)
-                handleAgentEvent(event)
+                handleAgentEvent(event, onPatch, onSetMap)
               return
             }
             updateLastAssistant(message => ({ ...message, content: message.content + raw }))

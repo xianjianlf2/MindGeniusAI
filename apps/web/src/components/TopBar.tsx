@@ -8,7 +8,7 @@ const MONO_LABEL = { fontSize: 9.5, color: 'var(--c-text-3)', letterSpacing: '0.
 
 export function TopBar() {
   const {
-    provider, setProvider, apiKey, setApiKey, proxy, setProxy,
+    provider, setProvider, apiKey, setApiKey, proxy, setProxy, model, setModel,
     nodeStyle, setNodeStyle, density, setDensity, accent, setAccent,
     sourcesOpen, setSourcesOpen, settingsOpen, setSettingsOpen,
     leftCollapsed, setLeftCollapsed,
@@ -212,7 +212,28 @@ export function TopBar() {
                 <input
                   value={proxy}
                   onChange={event => setProxy(event.target.value.trim())}
-                  placeholder="https://api.openai.com/v1"
+                  placeholder={provider === 'moonshot' ? 'https://api.moonshot.cn/v1' : 'https://api.openai.com/v1'}
+                  className="mono"
+                  style={{ flex: 1, background: 'transparent', outline: 'none', border: 'none', fontSize: 11.5, color: 'var(--c-text)' }}
+                />
+              </div>
+
+              <div className="mono" style={{ ...MONO_LABEL, margin: '12px 0 6px' }}>MODEL（可选，留空用服务端默认）</div>
+              <div
+                style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: 8,
+                  borderRadius: 8,
+                  padding: '8px 10px',
+                  background: 'var(--c-surface-2)',
+                  border: '1px solid var(--c-border)',
+                }}
+              >
+                <input
+                  value={model}
+                  onChange={event => setModel(event.target.value.trim())}
+                  placeholder={provider === 'moonshot' ? 'moonshot-v1-8k / kimi-k2-…' : provider === 'deepseek' ? 'deepseek-chat' : 'gpt-4o-mini'}
                   className="mono"
                   style={{ flex: 1, background: 'transparent', outline: 'none', border: 'none', fontSize: 11.5, color: 'var(--c-text)' }}
                 />

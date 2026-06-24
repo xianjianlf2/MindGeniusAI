@@ -1,7 +1,7 @@
 import { create } from 'zustand'
 import { StorageKey, storageManager } from '@/utils/storage'
 
-export type Provider = 'openai' | 'anthropic' | 'deepseek'
+export type Provider = 'openai' | 'anthropic' | 'deepseek' | 'moonshot'
 export type NodeStyle = 'mono' | 'colorful' | 'card'
 export type Density = 'comfy' | 'compact'
 
@@ -9,6 +9,7 @@ export const PROVIDERS: { id: Provider; name: string; sub: string; dot: string }
   { id: 'openai', name: 'OpenAI', sub: 'GPT', dot: '#34D399' },
   { id: 'anthropic', name: 'Claude', sub: 'Anthropic', dot: '#FF6F59' },
   { id: 'deepseek', name: 'DeepSeek', sub: 'V3', dot: '#5B8DEF' },
+  { id: 'moonshot', name: 'Kimi', sub: 'Moonshot', dot: '#8E7BFF' },
 ]
 
 export const ACCENTS = [
@@ -35,6 +36,7 @@ interface UiState {
   provider: Provider
   apiKey: string
   proxy: string
+  model: string
   nodeStyle: NodeStyle
   density: Density
   accent: string
@@ -45,6 +47,7 @@ interface UiState {
   setProvider: (provider: Provider) => void
   setApiKey: (key: string) => void
   setProxy: (proxy: string) => void
+  setModel: (model: string) => void
   setNodeStyle: (style: NodeStyle) => void
   setDensity: (density: Density) => void
   setAccent: (accent: string) => void
@@ -68,6 +71,7 @@ export const useUiStore = create<UiState>(set => ({
   provider: (storageManager.get(StorageKey.LLM_PROVIDER) as Provider) || 'openai',
   apiKey: storageManager.get(StorageKey.OPENAI_KEY) ?? '',
   proxy: storageManager.get(StorageKey.OPENAI_PROXY) ?? '',
+  model: storageManager.get(StorageKey.LLM_MODEL) ?? '',
   nodeStyle: (storageManager.get(PREF_NODE_STYLE) as NodeStyle) || 'mono',
   density: (storageManager.get(PREF_DENSITY) as Density) || 'comfy',
   accent: initialAccent,
@@ -93,6 +97,13 @@ export const useUiStore = create<UiState>(set => ({
     else
       storageManager.remove(StorageKey.OPENAI_PROXY)
     set({ proxy })
+  },
+  setModel(model) {
+    if (model)
+      storageManager.set(StorageKey.LLM_MODEL, model)
+    else
+      storageManager.remove(StorageKey.LLM_MODEL)
+    set({ model })
   },
   setNodeStyle(nodeStyle) {
     storageManager.set(PREF_NODE_STYLE, nodeStyle)

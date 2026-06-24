@@ -27,6 +27,7 @@ export function fetchStream(options: StreamOptions): AbortController {
       'Authorization': `Bearer ${storageManager.get(StorageKey.OPENAI_KEY) ?? ''}`,
       'OpenAI-proxy': storageManager.get(StorageKey.OPENAI_PROXY) ?? '',
       'X-LLM-Provider': storageManager.get(StorageKey.LLM_PROVIDER) ?? '',
+      'X-LLM-Model': storageManager.get(StorageKey.LLM_MODEL) ?? '',
     },
     signal: controller.signal,
     openWhenHidden: true,

@@ -90,7 +90,11 @@ function CanvasEmpty({ onPickExample }: { onPickExample: (prompt: string) => voi
   )
 }
 
-export function MindMapCanvas({ onPickExample }: { onPickExample: (prompt: string) => void }) {
+export function MindMapCanvas({ onPickExample, onController }: {
+  onPickExample: (prompt: string) => void
+  /** 把画布控制器上交给上层，用于发送当前导图轮廓 / 应用 Agent 增量编辑 */
+  onController?: (controller: MindMapController | null) => void
+}) {
   const containerRef = useRef<HTMLDivElement>(null)
   const controllerRef = useRef<MindMapController | null>(null)
   const [graph, setGraph] = useState<Graph | null>(null)
@@ -114,6 +118,7 @@ export function MindMapCanvas({ onPickExample }: { onPickExample: (prompt: strin
 
     const controller = new MindMapController(instance)
     controllerRef.current = controller
+    onController?.(controller)
 
     instance.on('history:change', () => {
       setHistory({ canUndo: instance.canUndo(), canRedo: instance.canRedo() })
@@ -136,12 +141,18 @@ export function MindMapCanvas({ onPickExample }: { onPickExample: (prompt: strin
     return () => {
       instance.dispose()
       controllerRef.current = null
+      onController?.(null)
     }
   }, [])
 
   useEffect(() => {
-    if (nodes && controllerRef.current)
-      controllerRef.current.setData(nodes)
+    const controller = controllerRef.current
+    if (!controller)
+      return
+    if (nodes)
+      controller.setData(nodes)
+    else
+      controller.clear()
   }, [nodes])
 
   const fit = () => graph?.zoomToFit({ padding: 20, minScale: 0.3, maxScale: 1.15 })

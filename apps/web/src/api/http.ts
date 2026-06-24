@@ -13,6 +13,12 @@ http.interceptors.request.use((config) => {
   const proxy = storageManager.get(StorageKey.OPENAI_PROXY)
   if (proxy)
     config.headers['OpenAI-proxy'] = proxy
+  const provider = storageManager.get(StorageKey.LLM_PROVIDER)
+  if (provider)
+    config.headers['X-LLM-Provider'] = provider
+  const model = storageManager.get(StorageKey.LLM_MODEL)
+  if (model)
+    config.headers['X-LLM-Model'] = model
   return config
 })
 
