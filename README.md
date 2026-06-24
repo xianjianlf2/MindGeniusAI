@@ -11,9 +11,15 @@
 
 Talk to **Hermas** — an autonomous agent that plans, retrieves your documents, and draws editable mind maps for you, with every tool call visible in real time.
 
-> 🔗 **Live demo:** _coming soon_ — bring your own OpenAI / Claude / DeepSeek key; it never leaves your browser.
+> 🔗 **Live demo:** _coming soon_ — bring your own OpenAI / Claude / DeepSeek / Kimi key; it never leaves your browser.
 
-<!-- TODO(demo): 30s GIF — upload PDF → rag_query tool card → mindmap_generate → map grows → "add a node under X" → mindmap_edit patches it in place. Drop assets in docs/assets/ (see docs/assets/README.md), then embed them here. -->
+## Demo
+
+<!-- 💡 Replace the static screenshot below with a short screen-recording GIF
+     (agent picking tools → drawing the map → editing a node in place). A GIF converts far better than a still image.
+     TODO(demo): upload PDF → rag_query card → mindmap_generate → map grows → "add a node under X" → mindmap_edit patches it. Assets go in docs/assets/. -->
+
+![mindmap](https://github.com/xianjianlf2/MindGeniusAI/blob/main/markdownImg/newSample.png?raw=true)
 
 ## Why it's different
 
