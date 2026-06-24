@@ -1,6 +1,7 @@
 # MindGenius AI
 
 <p>
+  <a href="https://mindgenius.onrender.com"><img src="https://img.shields.io/badge/Live%20Demo-online-brightgreen?style=flat" alt="Live Demo" /></a>
   <a href="https://github.com/xianjianlf2/MindGeniusAI/actions/workflows/ci.yml"><img src="https://github.com/xianjianlf2/MindGeniusAI/actions/workflows/ci.yml/badge.svg" alt="CI" /></a>
   <a href="LICENSE"><img src="https://img.shields.io/badge/License-MIT-blue.svg" alt="License: MIT" /></a>
   <a href="package.json"><img src="https://img.shields.io/badge/node-%3E%3D20-brightgreen" alt="Node" /></a>
@@ -11,21 +12,30 @@
 
 和 **Hermas** 对话 —— 一个会自主规划、检索你的文档、并实时为你画出可编辑思维导图的智能体，每一步工具调用都看得见。
 
-> 🔗 **在线体验：** _即将上线_ —— 自带 OpenAI / Claude / DeepSeek 的 API Key，密钥只存在你的浏览器里。
+> 🔗 **[在线体验 →](https://mindgenius.onrender.com)** —— 自带 OpenAI / Claude / DeepSeek / Kimi 的 API Key，密钥只存在你的浏览器里。_(免费托管 —— 首次打开可能要等约 30 秒唤醒)_
 
-<!-- TODO(demo): 30 秒 GIF —— 上传 PDF → rag_query 工具卡片 → mindmap_generate → 导图在画布上生长。素材放在 docs/assets/。 -->
+## 演示
+
+<!-- 💡 把下面的静态截图换成一段简短的录屏 GIF（智能体选工具 → 画出导图 → 原地编辑某个节点），GIF 的转化率远高于静态图。
+     TODO(demo)：上传 PDF → rag_query 卡片 → mindmap_generate → 导图生长 → 说一句「在 X 下加个节点」→ mindmap_edit 原地打补丁。素材放在 docs/assets/。 -->
+
+![mindmap](https://github.com/xianjianlf2/MindGeniusAI/blob/main/markdownImg/newSample.png?raw=true)
 
 ## 它有什么不一样
 
 **🤖 真正的智能体，不是套壳 prompt。** 大多数「AI 思维导图」工具只是「一次 prompt → markdown → 渲染」。Hermas 跑的是多步工具调用循环（Vercel AI SDK v5）：它自己决定去检索你上传的 PDF（`rag_query`）、生成导图结构（`mindmap_generate`）、扩展分支（`node_expand`）—— 自动串联，每一步都以可展开的工具卡片实时呈现（含输入/输出）。
 
+**✏️ 它能对你正在做的图做外科手术式编辑。** 说一句「把定价分支改名」或「在市场分支下加一个竞品分析节点」，Hermas 就会调用 `mindmap_edit`，对你的实时画布发出精确的 `add`/`update`/`remove` 指令。它按节点 id 精准打补丁，而不是整图重画 —— 所以你手动的调整不会被冲掉，你能看着画布原地变化。
+
 **📄 边画边读你的文档。** 在输入框点 📎 附加一份 PDF：上传 → 切块 → 向量化 → 内存向量索引，全程约 100 行代码，不依赖 LangChain。Hermas 会引用检索到的段落并融入导图。
 
-**🔑 自带 Key，隐私自主。** OpenAI / Anthropic (Claude) / DeepSeek，运行时可切换。Key 只存在你浏览器的 localStorage，每次请求发往*你自己的*后端 —— 服务端从不存储。支持自定义网关（base URL）。
+**🔑 自带 Key，隐私自主。** OpenAI / Anthropic (Claude) / DeepSeek / Kimi (Moonshot) —— 或任意 OpenAI 兼容端点（在「设置」里填 base URL + 模型名，例如本地 Ollama 或自建网关），运行时可切换。Key 只存在你浏览器的 localStorage，每次请求发往*你自己的*后端 —— 服务端从不存储。
+
+> ℹ️ DeepSeek 与 Kimi 不提供 embeddings 接口，所以在它们上面 PDF 检索（`rag_query`）会自动降级 —— 不影响导图生成。想在这些模型下保留 RAG，把 `EMBEDDING_API_KEY` 指向任意 OpenAI 兼容的 embeddings 端点即可（见 `apps/server/.env.example`）。
 
 **🔁 重构但不破坏任何东西。** 技术栈从 Vue/Koa/LangChain 渐进式迁移到 React/Hono/AI SDK：旧的 SSE 信封 `{status, data}` 和所有旧接口依然可用 —— 智能体事件是叠加在既有协议（`packages/shared`）之内，而非另起炉灶。
 
-**🎨 一块专注的工作台。** 对话面板 + 可编辑的 X6 画布 + 文档抽屉，同屏呈现。可增删改节点、对任意分支做 AI 头脑风暴、撤销/重做、导出 PNG。克制的暗色设计系统，零 UI 框架依赖（自定义 token 与组件，不用 antd）。
+**🎨 一块专注的工作台。** 对话面板 + 可编辑的 X6 画布 + 文档抽屉，同屏呈现。可增删改节点、对任意分支做 AI 头脑风暴、撤销/重做，并导出为 **PNG / SVG / Markdown / OPML**。导图与对话**刷新不丢**（localStorage），布局**自适应到平板**。克制的暗色设计系统，零 UI 框架依赖（自定义 token 与组件，不用 antd）。
 
 ## 架构
 
@@ -37,9 +47,10 @@
     └── shared/     # 两端共用的 SSE / 智能体事件协议
 ```
 
-- **智能体循环**：`streamText` + `stopWhen: stepCountIs(8)`，工具用 zod schema 定义
+- **智能体循环**：`streamText` + `stopWhen: stepCountIs(8)`，四个 zod 强类型工具（`mindmap_generate` / `node_expand` / `rag_query` / `mindmap_edit`）
+- **实时画布编辑**：`mindmap_edit` 产出结构化的 `add`/`update`/`remove` 指令，按节点 id 应用到现有树 —— 不整图重渲染，保留手动编辑
 - **RAG**：pdf-parse → 重叠切块（含测试）→ `embedMany` → 余弦检索，进程内完成
-- **多供应商**：每个请求从 `Authorization` / `X-LLM-Provider` / `OpenAI-proxy` 请求头解析
+- **多供应商**：每个请求从 `Authorization` / `X-LLM-Provider` / `X-LLM-Model` / `OpenAI-proxy` 请求头解析
 - **CI**：每次 push 跑 lint → typecheck → test → build；支持 workspace 的 Docker 构建
 
 完整设计见 [docs/REFACTOR_PLAN.md](docs/REFACTOR_PLAN.md)。
@@ -80,6 +91,10 @@ docker compose up --build   # 全部在 http://localhost:3000
 [![Deploy to Spaces](https://huggingface.co/datasets/huggingface/badges/resolve/main/deploy-to-spaces-lg.svg)](https://huggingface.co/new-space?sdk=docker&name=mindgenius)
 
 在 Hugging Face Spaces 免费跑（Docker，16 GB 内存）。把 Space 指向本仓库的 `Dockerfile`，保留其 frontmatter `sdk: docker` / `app_port: 3000`，再把 `OPENAI_API_KEY` 设为 Space secret —— 或留空走「访客自带 Key」。
+
+### 托管护栏（保护免费实例）
+
+服务端自带护栏，免费托管也扛得住：单文件 ≤ `MAX_UPLOAD_MB`（默认 10MB）、最多索引 `MAX_INDEXED_DOCS` 篇（默认 20，超出淘汰最旧）、单篇 ≤ `MAX_CHUNKS_PER_DOC` 块。真不放心，设 `DISABLE_UPLOAD=true` 即可彻底关闭上传、纯画导图。配合**服务端 Key 留空**，你的 API 成本为零（embeddings/生成都记访客账上）。
 
 ### 使用统计（可选，零成本）
 

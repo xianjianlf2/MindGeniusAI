@@ -36,7 +36,7 @@ Talk to **Hermas** — an autonomous agent that plans, retrieves your documents,
 
 **🔁 Rebuilt without breaking anything.** The stack was migrated from Vue/Koa/LangChain to React/Hono/AI SDK incrementally: the legacy SSE envelope `{status, data}` and every old endpoint still work — agent events are layered inside the existing protocol (`packages/shared`), not bolted on beside it.
 
-**🎨 A focused single workbench.** Chat panel + editable X6 canvas + document drawer in one screen. Add/rename/delete nodes, AI-brainstorm any branch, undo/redo, export PNG. Dark, restrained design system with zero UI-framework dependency (custom tokens & components — no antd).
+**🎨 A focused single workbench.** Chat panel + editable X6 canvas + document drawer in one screen. Add/rename/delete nodes, AI-brainstorm any branch, undo/redo, and export to **PNG / SVG / Markdown / OPML**. Your map and chat **persist across refreshes**, and the layout **adapts down to tablet**. Dark, restrained design system with zero UI-framework dependency (custom tokens & components — no antd).
 
 ## Architecture
 
