@@ -1,7 +1,6 @@
-import { useEffect, useMemo, useRef } from 'react'
+import { Suspense, lazy, useEffect, useMemo, useRef } from 'react'
 import type { ErrorKind } from '@/components/Conversation'
 import { Conversation } from '@/components/Conversation'
-import { MindMapCanvas } from '@/components/MindMapCanvas'
 import { SourcesDrawer } from '@/components/SourcesDrawer'
 import { TopBar } from '@/components/TopBar'
 import { Icon } from '@/components/ui/Icon'
@@ -11,6 +10,9 @@ import { useNodeStore } from '@/stores/nodeStore'
 import { PROVIDERS, useUiStore } from '@/stores/uiStore'
 import { track } from '@/utils/analytics'
 import { extractMarkdownBlock } from '@/utils/convertMarkdown'
+
+// 懒加载画布：X6/AntV 这块重型依赖延迟到首屏之后再载，TopBar + 对话先即时渲染
+const MindMapCanvas = lazy(() => import('@/components/MindMapCanvas').then(m => ({ default: m.MindMapCanvas })))
 
 const NARROW = 1280
 
@@ -159,7 +161,9 @@ export default function App() {
           </div>
         )}
 
-        <MindMapCanvas onPickExample={handleSend} />
+        <Suspense fallback={<div className="mg-grid" style={{ flex: 1, minWidth: 0, height: '100%', background: 'var(--c-bg)' }} />}>
+          <MindMapCanvas onPickExample={handleSend} />
+        </Suspense>
 
         {sourcesOpen && (
           <div style={{ width: 360, flexShrink: 0 }}>
