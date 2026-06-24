@@ -7,11 +7,14 @@ dotenv.config()
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url))
 
-export type ProviderName = 'openai' | 'anthropic' | 'deepseek'
+export type ProviderName = 'openai' | 'anthropic' | 'deepseek' | 'moonshot'
 
 export const config = {
   port: Number(process.env.PORT ?? 3000),
   uploadDir: path.resolve(__dirname, '../uploads'),
+  // 设置后，server 直接托管已构建的 web 产物（单进程一体化部署）。
+  // 相对路径，相对于 server 启动时的工作目录（见 serveStatic 约束）。
+  webDir: process.env.WEB_DIR,
   defaultProvider: (process.env.LLM_PROVIDER ?? 'openai') as ProviderName,
   providers: {
     openai: {
@@ -29,8 +32,18 @@ export const config = {
       baseURL: process.env.DEEPSEEK_BASE_URL,
       model: process.env.DEEPSEEK_MODEL ?? 'deepseek-chat',
     },
+    // Kimi / Moonshot —— OpenAI 协议兼容，走 createOpenAI + baseURL
+    moonshot: {
+      apiKey: process.env.MOONSHOT_API_KEY,
+      baseURL: process.env.MOONSHOT_BASE_URL ?? 'https://api.moonshot.cn/v1',
+      model: process.env.MOONSHOT_MODEL ?? 'moonshot-v1-8k',
+    },
   },
+  // RAG 向量化独立配置：chat 走 Kimi/DeepSeek（无 embeddings 接口）时，
+  // 仍可让检索指向一个真正的 OpenAI 兼容 embeddings 端点；缺省回落到 OpenAI 的 key/网关。
   embedding: {
     model: process.env.EMBEDDING_MODEL ?? 'text-embedding-3-small',
+    apiKey: process.env.EMBEDDING_API_KEY ?? process.env.OPENAI_API_KEY,
+    baseURL: process.env.EMBEDDING_BASE_URL ?? process.env.OPENAI_PROXY_URL,
   },
 } as const

@@ -5,7 +5,7 @@ import pdfParse from 'pdf-parse/lib/pdf-parse.js'
 import { config } from '../config'
 import { logger } from '../lib/logger'
 import type { LLMRequestConfig } from '../llm/provider'
-import { embeddingModel } from '../llm/provider'
+import { embeddingModelFor } from '../llm/provider'
 
 interface IndexedChunk {
   text: string
@@ -59,6 +59,10 @@ export async function indexDocument(fileName: string, cfg: LLMRequestConfig) {
   if (!fs.existsSync(filePath))
     return false
 
+  const model = embeddingModelFor(cfg)
+  if (!model)
+    throw new Error('当前模型不支持文档向量化（RAG）。请改用 OpenAI，或在服务端配置 EMBEDDING_API_KEY 指向一个 OpenAI 兼容的 embeddings 端点。')
+
   const buffer = await fs.promises.readFile(filePath)
   const { text } = await pdfParse(buffer)
   const chunks = splitText(text)
@@ -66,7 +70,7 @@ export async function indexDocument(fileName: string, cfg: LLMRequestConfig) {
     return false
 
   const { embeddings } = await embedMany({
-    model: embeddingModel(cfg),
+    model,
     values: chunks,
   })
   documentIndex.set(
@@ -82,8 +86,12 @@ export async function retrieveChunks(fileName: string, question: string, cfg: LL
   if (!index)
     return []
 
+  const model = embeddingModelFor(cfg)
+  if (!model)
+    return []
+
   const { embedding } = await embed({
-    model: embeddingModel(cfg),
+    model,
     value: question,
   })
 
