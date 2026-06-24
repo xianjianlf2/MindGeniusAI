@@ -11,6 +11,7 @@ import { MindMapController } from '@/mindmap/controller'
 import { registerMindMapShapes } from '@/mindmap/registry'
 import { useNodeStore } from '@/stores/nodeStore'
 import { useUiStore } from '@/stores/uiStore'
+import { downloadText, treeToMarkdown, treeToOPML } from '@/utils/export'
 
 const EXAMPLE_TOPICS: { icon: IconName; title: string; sub: string; prompt: string }[] = [
   { icon: 'file', title: '拆解一份 PDF 文档', sub: '上传后让 Hermas 检索并结构化', prompt: '帮我把上传的文档拆解成一张结构化思维导图，覆盖核心论点和关键细节。' },
@@ -97,8 +98,38 @@ export function MindMapCanvas({ onPickExample }: { onPickExample: (prompt: strin
   const [graph, setGraph] = useState<Graph | null>(null)
   const [history, setHistory] = useState({ canUndo: false, canRedo: false })
   const [zoom, setZoom] = useState(1)
+  const [exportMenu, setExportMenu] = useState(false)
   const nodes = useNodeStore(state => state.nodes)
   const flash = useUiStore(state => state.flash)
+
+  const exportAs = (kind: 'png' | 'svg' | 'md' | 'opml') => {
+    setExportMenu(false)
+    if (kind === 'png') {
+      graph?.toPNG((dataUri) => {
+        DataUri.downloadDataUri(dataUri, 'mindmap.png')
+        flash('已导出 mindmap.png')
+      }, { backgroundColor: '#0B0D11', padding: 20 })
+      return
+    }
+    if (kind === 'svg') {
+      graph?.toSVG((svg) => {
+        downloadText('mindmap.svg', svg, 'image/svg+xml')
+        flash('已导出 mindmap.svg')
+      })
+      return
+    }
+    const tree = useNodeStore.getState().nodes
+    if (!tree)
+      return
+    if (kind === 'md') {
+      downloadText('mindmap.md', treeToMarkdown(tree), 'text/markdown')
+      flash('已导出 mindmap.md')
+    }
+    else {
+      downloadText('mindmap.opml', treeToOPML(tree), 'text/x-opml')
+      flash('已导出 mindmap.opml')
+    }
+  }
 
   useEffect(() => {
     registerMindMapShapes()
@@ -195,14 +226,59 @@ export function MindMapCanvas({ onPickExample }: { onPickExample: (prompt: strin
           <IconButton icon="zoomIn" label="放大" onClick={() => graph?.zoom(0.15)} />
           <IconButton icon="fit" label="适应屏幕" onClick={fit} />
           <span style={{ width: 1, height: 18, background: 'var(--c-border)' }} />
-          <IconButton
-            icon="download"
-            label="导出 PNG"
-            onClick={() => graph?.toPNG((dataUri) => {
-              DataUri.downloadDataUri(dataUri, 'mindmap.png')
-              flash('已导出 mindmap.png')
-            }, { backgroundColor: '#0A0E17', padding: 20 })}
-          />
+          <div style={{ position: 'relative' }}>
+            <IconButton icon="download" label="导出" active={exportMenu} onClick={() => setExportMenu(open => !open)} />
+            {exportMenu && (
+              <>
+                <button
+                  type="button"
+                  aria-label="关闭导出菜单"
+                  onClick={() => setExportMenu(false)}
+                  style={{ position: 'fixed', inset: 0, zIndex: 39, cursor: 'default' }}
+                />
+                <div
+                  className="mg-fade-in"
+                  style={{
+                    position: 'absolute',
+                    bottom: 'calc(100% + 8px)',
+                    right: 0,
+                    zIndex: 40,
+                    minWidth: 152,
+                    borderRadius: 10,
+                    padding: 6,
+                    background: 'var(--c-overlay)',
+                    border: '1px solid var(--c-border-strong)',
+                    boxShadow: 'var(--sh-3)',
+                  }}
+                >
+                  {([['png', 'PNG 图片'], ['svg', 'SVG 矢量'], ['md', 'Markdown'], ['opml', 'OPML 大纲']] as const).map(([kind, label]) => (
+                    <button
+                      key={kind}
+                      type="button"
+                      onClick={() => exportAs(kind)}
+                      className="no-drag"
+                      style={{
+                        width: '100%',
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: 8,
+                        borderRadius: 7,
+                        padding: '7px 9px',
+                        textAlign: 'left',
+                        fontSize: 12.5,
+                        color: 'var(--c-text)',
+                      }}
+                      onMouseEnter={e => (e.currentTarget.style.background = 'var(--c-elevated)')}
+                      onMouseLeave={e => (e.currentTarget.style.background = 'transparent')}
+                    >
+                      <Icon name="download" size={13} style={{ color: 'var(--c-text-3)' }} />
+                      {label}
+                    </button>
+                  ))}
+                </div>
+              </>
+            )}
+          </div>
         </div>
       )}
     </div>
