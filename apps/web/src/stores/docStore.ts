@@ -1,5 +1,7 @@
 import { create } from 'zustand'
 import { getFileListRequest, initDocumentRequest, uploadFileRequest } from '@/api/requests'
+import { translate } from '@/i18n'
+import { useUiStore } from '@/stores/uiStore'
 
 export type DocStatus = 'idle' | 'uploading' | 'indexing' | 'ready'
 
@@ -61,7 +63,7 @@ export const useDocStore = create<DocState>((set, get) => {
         formData.append('files', file)
         const result = await uploadFileRequest(formData, percent => patch(tempName, { progress: percent }))
         if (!result.success || !result.fileName)
-          throw new Error(result.message ?? '上传失败')
+          throw new Error(result.message ?? translate(useUiStore.getState().locale, 'err.uploadFailed'))
         const serverName = result.fileName
         set(state => ({
           files: state.files.map(item =>
@@ -87,7 +89,7 @@ export const useDocStore = create<DocState>((set, get) => {
           patch(name, { status: 'ready' })
           return true
         }
-        patch(name, { status: 'idle', error: result.message ?? '索引失败' })
+        patch(name, { status: 'idle', error: result.message ?? translate(useUiStore.getState().locale, 'err.indexFailed') })
         return false
       }
       catch (error) {

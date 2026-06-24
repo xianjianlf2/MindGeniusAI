@@ -10,6 +10,7 @@ import { useNodeStore } from '@/stores/nodeStore'
 import { PROVIDERS, useUiStore } from '@/stores/uiStore'
 import { track } from '@/utils/analytics'
 import { extractMarkdownBlock } from '@/utils/convertMarkdown'
+import { useT } from '@/i18n'
 
 // 懒加载画布：X6/AntV 这块重型依赖延迟到首屏之后再载，TopBar + 对话先即时渲染
 const MindMapCanvas = lazy(() => import('@/components/MindMapCanvas').then(m => ({ default: m.MindMapCanvas })))
@@ -29,6 +30,7 @@ export default function App() {
     sourcesOpen, setSourcesOpen, setSettingsOpen, toast, flash,
   } = useUiStore()
   const { files, attached, setAttached, refresh, upload } = useDocStore()
+  const t = useT()
 
   const lastSentRef = useRef('')
   const mapSetThisTurnRef = useRef(false)
@@ -59,7 +61,7 @@ export default function App() {
   const setMapFromMarkdown = (markdown: string) => {
     if (generateFromMarkdown(markdown).ok) {
       mapSetThisTurnRef.current = true
-      flash('思维导图已生成')
+      flash(t('toast.mapGenerated'))
     }
   }
 
@@ -98,7 +100,7 @@ export default function App() {
       onPatch: (ops) => {
         const applied = useNodeStore.getState().patch(ops)
         if (applied)
-          flash(`已更新画布 ${applied} 处`)
+          flash(t('toast.mapUpdated', { n: applied }))
       },
     })
   }
@@ -106,7 +108,7 @@ export default function App() {
   const handleErrorAction = (kind: ErrorKind) => {
     if (kind === 'apikey') {
       setSettingsOpen(true)
-      flash('请在右上角「设置」中填入 API Key')
+      flash(t('toast.fillApiKey'))
       return
     }
     if (lastSentRef.current)
@@ -128,7 +130,7 @@ export default function App() {
       await upload(file, { attach: true })
     }
     catch (error) {
-      flash(`上传失败：${(error as Error).message}`)
+      flash(t('toast.uploadFailed', { msg: (error as Error).message }))
     }
   }
 
@@ -189,7 +191,7 @@ export default function App() {
         {overlay && (!leftCollapsed || sourcesOpen) && (
           <button
             type="button"
-            aria-label="关闭侧栏"
+            aria-label={t('app.closeSidebar')}
             onClick={() => {
               setLeftCollapsed(true)
               setSourcesOpen(false)
@@ -232,16 +234,16 @@ export default function App() {
               <div style={{ width: 40, height: 40, margin: '0 auto 16px', display: 'grid', placeItems: 'center', borderRadius: 10, background: 'var(--c-accent)' }}>
                 <Icon name="node" size={22} style={{ color: '#0E1116' }} />
               </div>
-              <h2 style={{ fontSize: 18, fontWeight: 600, color: 'var(--c-text)', marginBottom: 10 }}>更适合在大屏使用</h2>
+              <h2 style={{ fontSize: 18, fontWeight: 600, color: 'var(--c-text)', marginBottom: 10 }}>{t('app.phoneTitle')}</h2>
               <p style={{ fontSize: 13, lineHeight: 1.65, color: 'var(--c-text-2)', marginBottom: 20 }}>
-                MindGenius 是一个桌面思维导图工作台，画布编辑在手机上体验有限。建议用平板或电脑打开。
+                {t('app.phoneBody')}
               </p>
               <button
                 type="button"
                 onClick={() => setPhoneNoticeDismissed(true)}
                 style={{ borderRadius: 8, padding: '8px 18px', fontSize: 13, fontWeight: 560, color: '#0E1116', background: 'var(--c-accent)' }}
               >
-                仍要继续
+                {t('app.phoneContinue')}
               </button>
             </div>
           </div>

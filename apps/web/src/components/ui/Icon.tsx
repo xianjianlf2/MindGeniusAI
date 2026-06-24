@@ -5,7 +5,7 @@ export type IconName =
   | 'fit' | 'download' | 'search' | 'file' | 'chevDown' | 'chevRight' | 'x'
   | 'sliders' | 'panelLeft' | 'check' | 'alert' | 'clock' | 'gauge' | 'edit'
   | 'zoomIn' | 'zoomOut' | 'refresh' | 'book' | 'key' | 'layers' | 'node'
-  | 'arrowUpRight'
+  | 'arrowUpRight' | 'globe'
 
 interface IconProps {
   name: IconName
@@ -46,6 +46,7 @@ const paths: Record<IconName, ReactNode> = {
   layers: <><path d="M12 4l8 4-8 4-8-4 8-4z" /><path d="M4 12l8 4 8-4" /></>,
   node: <><circle cx="6" cy="12" r="2.4" /><circle cx="18" cy="6" r="2.4" /><circle cx="18" cy="18" r="2.4" /><path d="M8.2 11l7.6-3.8" /><path d="M8.2 13l7.6 3.8" /></>,
   arrowUpRight: <><path d="M7 17L17 7" /><path d="M8 7h9v9" /></>,
+  globe: <><circle cx="12" cy="12" r="8" /><path d="M4 12h16" /><path d="M12 4a12 12 0 0 1 0 16 12 12 0 0 1 0-16z" /></>,
 }
 
 /** 设计稿图标集：24×24 线性图标，stroke=currentColor */

@@ -9,6 +9,7 @@ import { Spinner } from '@/components/ui/primitives'
 import { useNodeStore } from '@/stores/nodeStore'
 import { useUiStore } from '@/stores/uiStore'
 import { extractListItems } from '@/utils/convertMarkdown'
+import { useT } from '@/i18n'
 
 /** 彩色分层模式下一级分支的色相环 */
 const BRANCH_HUES = ['#5B8DEF', '#34D399', '#F2B14C', '#A78BFA', '#F4566B', '#FF6F59']
@@ -49,6 +50,7 @@ function NodeAction({ icon, title, danger, onClick }: {
 
 /** X6 react-shape 节点：双击编辑，悬浮操作（加子节点 / AI 头脑风暴 / 重命名 / 删除） */
 export function TopicNode({ node }: { node: Node; graph: Graph }) {
+  const t = useT()
   const { label, type, branchIndex } = node.getData<NodeComponentData>()
   const nodeStyle = useUiStore(state => state.nodeStyle)
   const [hovered, setHovered] = useState(false)
@@ -197,14 +199,14 @@ export function TopicNode({ node }: { node: Node; graph: Graph }) {
           }}
         >
           {canHaveChildren && (
-            <NodeAction icon="plus" title={isRoot ? '加分支' : '加子节点'} onClick={() => useNodeStore.getState().addChild(node.id)} />
+            <NodeAction icon="plus" title={isRoot ? t('node.addBranch') : t('node.addChild')} onClick={() => useNodeStore.getState().addChild(node.id)} />
           )}
           {canHaveChildren && !expanding && (
-            <NodeAction icon="spark" title="AI 头脑风暴" onClick={expandWithAI} />
+            <NodeAction icon="spark" title={t('node.brainstorm')} onClick={expandWithAI} />
           )}
-          <NodeAction icon="edit" title="重命名" onClick={() => setEditing(true)} />
+          <NodeAction icon="edit" title={t('node.rename')} onClick={() => setEditing(true)} />
           {!isRoot && (
-            <NodeAction icon="trash" title="删除" danger onClick={() => useNodeStore.getState().removeNode(node.id)} />
+            <NodeAction icon="trash" title={t('node.delete')} danger onClick={() => useNodeStore.getState().removeNode(node.id)} />
           )}
         </div>
       )}

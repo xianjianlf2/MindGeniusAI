@@ -4,6 +4,7 @@ import { StorageKey, storageManager } from '@/utils/storage'
 export type Provider = 'openai' | 'anthropic' | 'deepseek' | 'moonshot'
 export type NodeStyle = 'mono' | 'colorful' | 'card'
 export type Density = 'comfy' | 'compact'
+export type Locale = 'zh' | 'en'
 
 export const PROVIDERS: { id: Provider; name: string; sub: string; dot: string }[] = [
   { id: 'openai', name: 'OpenAI', sub: 'GPT', dot: '#34D399' },
@@ -13,11 +14,11 @@ export const PROVIDERS: { id: Provider; name: string; sub: string; dot: string }
 ]
 
 export const ACCENTS = [
-  { id: '#FF6F59', name: '珊瑚' },
-  { id: '#5B8DEF', name: '靛蓝' },
-  { id: '#34D399', name: '翠绿' },
-  { id: '#A78BFA', name: '紫' },
-]
+  { id: '#FF6F59', nameKey: 'accent.coral' },
+  { id: '#5B8DEF', nameKey: 'accent.indigo' },
+  { id: '#34D399', nameKey: 'accent.emerald' },
+  { id: '#A78BFA', nameKey: 'accent.violet' },
+] as const
 
 /** 从主色派生 hover/soft 等 CSS 变量 */
 function applyAccent(hex: string) {
@@ -40,6 +41,7 @@ interface UiState {
   nodeStyle: NodeStyle
   density: Density
   accent: string
+  locale: Locale
   leftCollapsed: boolean
   sourcesOpen: boolean
   settingsOpen: boolean
@@ -51,6 +53,7 @@ interface UiState {
   setNodeStyle: (style: NodeStyle) => void
   setDensity: (density: Density) => void
   setAccent: (accent: string) => void
+  setLocale: (locale: Locale) => void
   setLeftCollapsed: (collapsed: boolean) => void
   setSourcesOpen: (open: boolean) => void
   setSettingsOpen: (open: boolean) => void
@@ -60,10 +63,14 @@ interface UiState {
 const PREF_NODE_STYLE = 'MINDGENIUS_NODE_STYLE'
 const PREF_DENSITY = 'MINDGENIUS_DENSITY'
 const PREF_ACCENT = 'MINDGENIUS_ACCENT'
+const PREF_LOCALE = 'MINDGENIUS_LOCALE'
 
 const initialAccent = storageManager.get(PREF_ACCENT) ?? '#FF6F59'
 if (typeof document !== 'undefined')
   applyAccent(initialAccent)
+
+const sysLocale: Locale = (typeof navigator !== 'undefined' && navigator.language?.toLowerCase().startsWith('zh')) ? 'zh' : 'en'
+const initialLocale = (storageManager.get(PREF_LOCALE) as Locale) ?? sysLocale
 
 let toastTimer: ReturnType<typeof setTimeout> | undefined
 
@@ -75,6 +82,7 @@ export const useUiStore = create<UiState>(set => ({
   nodeStyle: (storageManager.get(PREF_NODE_STYLE) as NodeStyle) || 'mono',
   density: (storageManager.get(PREF_DENSITY) as Density) || 'comfy',
   accent: initialAccent,
+  locale: initialLocale,
   leftCollapsed: typeof window !== 'undefined' && window.innerWidth < 1280,
   sourcesOpen: false,
   settingsOpen: false,
@@ -117,6 +125,10 @@ export const useUiStore = create<UiState>(set => ({
     storageManager.set(PREF_ACCENT, accent)
     applyAccent(accent)
     set({ accent })
+  },
+  setLocale(locale) {
+    storageManager.set(PREF_LOCALE, locale)
+    set({ locale })
   },
   setLeftCollapsed: leftCollapsed => set({ leftCollapsed }),
   setSourcesOpen: sourcesOpen => set({ sourcesOpen }),

@@ -4,12 +4,14 @@ import { IconButton, Spinner, StatusPill } from './ui/primitives'
 import type { DocFile } from '@/stores/docStore'
 import { docDisplayName, useDocStore } from '@/stores/docStore'
 import { useUiStore } from '@/stores/uiStore'
+import { useT } from '@/i18n'
 
 function PdfRow({ doc, expanded, onExpand }: {
   doc: DocFile
   expanded: boolean
   onExpand: (name: string | null) => void
 }) {
+  const t = useT()
   const { attached, setAttached, index } = useDocStore()
   const isAttached = attached === doc.name
 
@@ -18,7 +20,7 @@ function PdfRow({ doc, expanded, onExpand }: {
       return (
         <div style={{ marginTop: 8 }}>
           <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 4 }}>
-            <StatusPill tone="info">上传中</StatusPill>
+            <StatusPill tone="info">{t('sources.uploading')}</StatusPill>
             <span className="mono tnum" style={{ fontSize: 10.5, color: 'var(--c-text-3)' }}>{doc.progress ?? 0}%</span>
           </div>
           <div style={{ height: 4, borderRadius: 99, overflow: 'hidden', background: 'var(--c-bg)' }}>
@@ -31,7 +33,7 @@ function PdfRow({ doc, expanded, onExpand }: {
       return (
         <div style={{ marginTop: 8 }}>
           <div style={{ marginBottom: 6 }}>
-            <StatusPill tone="indexing">索引中</StatusPill>
+            <StatusPill tone="indexing">{t('sources.indexing')}</StatusPill>
           </div>
           <div style={{ display: 'flex', gap: 4 }}>
             {[0, 1, 2, 3, 4, 5].map(i => (
@@ -44,14 +46,14 @@ function PdfRow({ doc, expanded, onExpand }: {
     if (doc.status === 'ready') {
       return (
         <div style={{ marginTop: 8, display: 'flex', alignItems: 'center', gap: 8 }}>
-          <StatusPill tone="ready">就绪</StatusPill>
-          <span className="mono" style={{ fontSize: 10.5, color: 'var(--c-text-3)' }}>已索引 · 可检索</span>
+          <StatusPill tone="ready">{t('sources.ready')}</StatusPill>
+          <span className="mono" style={{ fontSize: 10.5, color: 'var(--c-text-3)' }}>{t('sources.indexed')}</span>
         </div>
       )
     }
     return (
       <div style={{ marginTop: 8, display: 'flex', alignItems: 'center', gap: 8, flexWrap: 'wrap' }}>
-        <StatusPill tone="idle">未索引</StatusPill>
+        <StatusPill tone="idle">{t('sources.unindexed')}</StatusPill>
         <button
           type="button"
           onClick={() => index(doc.name)}
@@ -66,7 +68,7 @@ function PdfRow({ doc, expanded, onExpand }: {
             padding: '2px 8px',
           }}
         >
-          建立索引
+          {t('sources.buildIndex')}
         </button>
         {doc.error && <span style={{ fontSize: 10.5, color: 'var(--c-err)' }}>{doc.error}</span>}
       </div>
@@ -128,7 +130,7 @@ function PdfRow({ doc, expanded, onExpand }: {
             }}
           >
             <Icon name="clip" size={13} />
-            {isAttached ? '已作为对话上下文' : '用作对话上下文'}
+            {isAttached ? t('sources.attached') : t('sources.useAsContext')}
           </button>
           <button
             type="button"
@@ -144,7 +146,7 @@ function PdfRow({ doc, expanded, onExpand }: {
               borderLeft: '1px solid var(--c-border)',
             }}
           >
-            {expanded ? '收起预览' : '预览'}
+            {expanded ? t('sources.collapsePreview') : t('sources.preview')}
             <span style={{ transform: expanded ? 'rotate(90deg)' : 'none', transition: 'transform .15s', color: 'var(--c-text-3)', display: 'grid' }}>
               <Icon name="chevRight" size={13} />
             </span>
@@ -166,6 +168,7 @@ function PdfRow({ doc, expanded, onExpand }: {
 }
 
 export function SourcesDrawer() {
+  const t = useT()
   const { files, upload } = useDocStore()
   const { setSourcesOpen, flash } = useUiStore()
   const [expanded, setExpanded] = useState<string | null>(null)
@@ -181,7 +184,7 @@ export function SourcesDrawer() {
       await upload(file)
     }
     catch (error) {
-      flash(`上传失败：${(error as Error).message}`)
+      flash(t('toast.uploadFailed', { msg: (error as Error).message }))
     }
   }
 
@@ -189,12 +192,12 @@ export function SourcesDrawer() {
     <div className="mg-drawer-in" style={{ display: 'flex', flexDirection: 'column', height: '100%', background: 'var(--c-surface)', borderLeft: '1px solid var(--c-border)' }}>
       <div style={{ height: 52, display: 'flex', alignItems: 'center', gap: 8, padding: '0 14px', flexShrink: 0, borderBottom: '1px solid var(--c-border)' }}>
         <Icon name="book" size={17} style={{ color: 'var(--c-text-2)' }} />
-        <span style={{ fontSize: 13, fontWeight: 600, color: 'var(--c-text)' }}>资料源</span>
+        <span style={{ fontSize: 13, fontWeight: 600, color: 'var(--c-text)' }}>{t('sources.title')}</span>
         <span className="mono" style={{ fontSize: 10, color: 'var(--c-text-3)', background: 'var(--c-elevated)', borderRadius: 99, padding: '1px 6px' }}>
-          {ready}/{files.length} 就绪
+          {t('sources.countReady', { ready, total: files.length })}
         </span>
         <div style={{ marginLeft: 'auto' }}>
-          <IconButton icon="x" label="收起" size={16} btn={30} onClick={() => setSourcesOpen(false)} />
+          <IconButton icon="x" label={t('sources.collapse')} size={16} btn={30} onClick={() => setSourcesOpen(false)} />
         </div>
       </div>
 
@@ -217,9 +220,9 @@ export function SourcesDrawer() {
               >
                 <Icon name="book" size={20} />
               </span>
-              <div style={{ fontSize: 12.5, color: 'var(--c-text-2)', lineHeight: 1.6 }}>还没有资料源</div>
+              <div style={{ fontSize: 12.5, color: 'var(--c-text-2)', lineHeight: 1.6 }}>{t('sources.empty')}</div>
               <div style={{ marginTop: 4, fontSize: 11, color: 'var(--c-text-3)', lineHeight: 1.6 }}>
-                上传 PDF，Hermas 在对话中会自动检索引用。
+                {t('sources.emptyDesc')}
               </div>
             </div>
           </div>
@@ -269,7 +272,7 @@ export function SourcesDrawer() {
           }}
         >
           <Icon name="plus" size={15} />
-          上传 PDF
+          {t('sources.uploadPdf')}
         </button>
       </div>
     </div>

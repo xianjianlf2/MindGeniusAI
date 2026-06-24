@@ -12,33 +12,36 @@ import { registerMindMapShapes } from '@/mindmap/registry'
 import { useNodeStore } from '@/stores/nodeStore'
 import { useUiStore } from '@/stores/uiStore'
 import { downloadText, treeToMarkdown, treeToOPML } from '@/utils/export'
+import type { TKey } from '@/i18n'
+import { useT } from '@/i18n'
 
-const EXAMPLE_TOPICS: { icon: IconName; title: string; sub: string; prompt: string }[] = [
-  { icon: 'file', title: '拆解一份 PDF 文档', sub: '上传后让 Hermas 检索并结构化', prompt: '帮我把上传的文档拆解成一张结构化思维导图，覆盖核心论点和关键细节。' },
-  { icon: 'gauge', title: '规划产品上线 (GTM)', sub: '市场 · 渠道 · 定价 · 节奏', prompt: '为一款 AI 笔记工具规划 Q3 上线计划，覆盖市场定位、渠道增长、定价与发布节奏。' },
-  { icon: 'layers', title: '整理学习路线', sub: '把一个主题拆成可执行路径', prompt: '帮我整理一条「从零学习机器学习」的学习路线图，分阶段、给资源。' },
-  { icon: 'spark', title: '头脑风暴选题', sub: '围绕一个方向发散想法', prompt: '围绕「面向开发者的技术播客」头脑风暴 12 个选题方向。' },
+const EXAMPLE_TOPICS: { icon: IconName; titleKey: TKey; subKey: TKey; promptKey: TKey }[] = [
+  { icon: 'file', titleKey: 'canvas.exampleDocTitle', subKey: 'canvas.exampleDocSub', promptKey: 'canvas.exampleDocPrompt' },
+  { icon: 'gauge', titleKey: 'canvas.exampleGtmTitle', subKey: 'canvas.exampleGtmSub', promptKey: 'canvas.exampleGtmPrompt' },
+  { icon: 'layers', titleKey: 'canvas.exampleRoadmapTitle', subKey: 'canvas.exampleRoadmapSub', promptKey: 'canvas.exampleRoadmapPrompt' },
+  { icon: 'spark', titleKey: 'canvas.exampleBrainstormTitle', subKey: 'canvas.exampleBrainstormSub', promptKey: 'canvas.exampleBrainstormPrompt' },
 ]
 
 function CanvasEmpty({ onPickExample }: { onPickExample: (prompt: string) => void }) {
+  const t = useT()
   return (
     <div style={{ position: 'absolute', inset: 0, display: 'grid', placeItems: 'center', padding: '0 24px', zIndex: 10 }}>
       <div style={{ width: '100%', maxWidth: 560 }}>
         <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', textAlign: 'center' }}>
           <HermasMark size={46} glow />
           <h2 style={{ marginTop: 20, fontSize: 23, fontWeight: 600, color: 'var(--c-text)', letterSpacing: '-0.01em' }}>
-            和 Hermas 一起，把想法画成导图
+            {t('canvas.emptyHeading')}
           </h2>
           <p style={{ marginTop: 10, fontSize: 14, color: 'var(--c-text-2)', lineHeight: 1.65, maxWidth: 440 }}>
-            用一句话描述你的目标。Hermas 会自主规划、检索你上传的 PDF，并实时生成可编辑的思维导图。
+            {t('canvas.emptyDesc')}
           </p>
         </div>
         <div style={{ marginTop: 28, display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10 }}>
           {EXAMPLE_TOPICS.map(topic => (
             <button
               type="button"
-              key={topic.title}
-              onClick={() => onPickExample(topic.prompt)}
+              key={topic.titleKey}
+              onClick={() => onPickExample(t(topic.promptKey))}
               className="no-drag"
               style={{
                 textAlign: 'left',
@@ -74,9 +77,9 @@ function CanvasEmpty({ onPickExample }: { onPickExample: (prompt: string) => voi
                   <Icon name={topic.icon} size={16} />
                 </span>
                 <span style={{ minWidth: 0 }}>
-                  <span style={{ display: 'block', fontSize: 13, fontWeight: 560, color: 'var(--c-text)' }}>{topic.title}</span>
+                  <span style={{ display: 'block', fontSize: 13, fontWeight: 560, color: 'var(--c-text)' }}>{t(topic.titleKey)}</span>
                   <span style={{ display: 'block', fontSize: 11.5, color: 'var(--c-text-3)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
-                    {topic.sub}
+                    {t(topic.subKey)}
                   </span>
                 </span>
               </div>
@@ -84,7 +87,7 @@ function CanvasEmpty({ onPickExample }: { onPickExample: (prompt: string) => voi
           ))}
         </div>
         <p className="mono" style={{ marginTop: 20, textAlign: 'center', fontSize: 11, color: 'var(--c-text-3)' }}>
-          或在左侧对话框直接输入 · 支持 📎 上传 PDF 作为上下文
+          {t('canvas.emptyHint')}
         </p>
       </div>
     </div>
@@ -101,20 +104,21 @@ export function MindMapCanvas({ onPickExample }: { onPickExample: (prompt: strin
   const [exportMenu, setExportMenu] = useState(false)
   const nodes = useNodeStore(state => state.nodes)
   const flash = useUiStore(state => state.flash)
+  const t = useT()
 
   const exportAs = (kind: 'png' | 'svg' | 'md' | 'opml') => {
     setExportMenu(false)
     if (kind === 'png') {
       graph?.toPNG((dataUri) => {
         DataUri.downloadDataUri(dataUri, 'mindmap.png')
-        flash('已导出 mindmap.png')
+        flash(t('canvas.exported', { file: 'mindmap.png' }))
       }, { backgroundColor: '#0B0D11', padding: 20 })
       return
     }
     if (kind === 'svg') {
       graph?.toSVG((svg) => {
         downloadText('mindmap.svg', svg, 'image/svg+xml')
-        flash('已导出 mindmap.svg')
+        flash(t('canvas.exported', { file: 'mindmap.svg' }))
       })
       return
     }
@@ -123,11 +127,11 @@ export function MindMapCanvas({ onPickExample }: { onPickExample: (prompt: strin
       return
     if (kind === 'md') {
       downloadText('mindmap.md', treeToMarkdown(tree), 'text/markdown')
-      flash('已导出 mindmap.md')
+      flash(t('canvas.exported', { file: 'mindmap.md' }))
     }
     else {
       downloadText('mindmap.opml', treeToOPML(tree), 'text/x-opml')
-      flash('已导出 mindmap.opml')
+      flash(t('canvas.exported', { file: 'mindmap.opml' }))
     }
   }
 
@@ -211,10 +215,10 @@ export function MindMapCanvas({ onPickExample }: { onPickExample: (prompt: strin
             boxShadow: 'var(--sh-3)',
           }}
         >
-          <IconButton icon="undo" label="撤销" kbd="⌘Z" disabled={!history.canUndo} onClick={() => graph?.undo()} />
-          <IconButton icon="redo" label="重做" kbd="⌘⇧Z" disabled={!history.canRedo} onClick={() => graph?.redo()} />
+          <IconButton icon="undo" label={t('canvas.undo')} kbd="⌘Z" disabled={!history.canUndo} onClick={() => graph?.undo()} />
+          <IconButton icon="redo" label={t('canvas.redo')} kbd="⌘⇧Z" disabled={!history.canRedo} onClick={() => graph?.redo()} />
           <span style={{ width: 1, height: 18, background: 'var(--c-border)' }} />
-          <IconButton icon="zoomOut" label="缩小" onClick={() => graph?.zoom(-0.15)} />
+          <IconButton icon="zoomOut" label={t('canvas.zoomOut')} onClick={() => graph?.zoom(-0.15)} />
           <button
             type="button"
             onClick={fit}
@@ -223,16 +227,16 @@ export function MindMapCanvas({ onPickExample }: { onPickExample: (prompt: strin
           >
             {Math.round(zoom * 100)}%
           </button>
-          <IconButton icon="zoomIn" label="放大" onClick={() => graph?.zoom(0.15)} />
-          <IconButton icon="fit" label="适应屏幕" onClick={fit} />
+          <IconButton icon="zoomIn" label={t('canvas.zoomIn')} onClick={() => graph?.zoom(0.15)} />
+          <IconButton icon="fit" label={t('canvas.fit')} onClick={fit} />
           <span style={{ width: 1, height: 18, background: 'var(--c-border)' }} />
           <div style={{ position: 'relative' }}>
-            <IconButton icon="download" label="导出" active={exportMenu} onClick={() => setExportMenu(open => !open)} />
+            <IconButton icon="download" label={t('canvas.export')} active={exportMenu} onClick={() => setExportMenu(open => !open)} />
             {exportMenu && (
               <>
                 <button
                   type="button"
-                  aria-label="关闭导出菜单"
+                  aria-label={t('canvas.closeExportMenu')}
                   onClick={() => setExportMenu(false)}
                   style={{ position: 'fixed', inset: 0, zIndex: 39, cursor: 'default' }}
                 />
@@ -251,7 +255,7 @@ export function MindMapCanvas({ onPickExample }: { onPickExample: (prompt: strin
                     boxShadow: 'var(--sh-3)',
                   }}
                 >
-                  {([['png', 'PNG 图片'], ['svg', 'SVG 矢量'], ['md', 'Markdown'], ['opml', 'OPML 大纲']] as const).map(([kind, label]) => (
+                  {([['png', 'canvas.exportPng'], ['svg', 'canvas.exportSvg'], ['md', 'canvas.exportMd'], ['opml', 'canvas.exportOpml']] as const).map(([kind, labelKey]) => (
                     <button
                       key={kind}
                       type="button"
@@ -272,7 +276,7 @@ export function MindMapCanvas({ onPickExample }: { onPickExample: (prompt: strin
                       onMouseLeave={e => (e.currentTarget.style.background = 'transparent')}
                     >
                       <Icon name="download" size={13} style={{ color: 'var(--c-text-3)' }} />
-                      {label}
+                      {t(labelKey)}
                     </button>
                   ))}
                 </div>

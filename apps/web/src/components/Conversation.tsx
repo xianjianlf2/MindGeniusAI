@@ -4,13 +4,15 @@ import type { IconName } from './ui/Icon'
 import { Icon } from './ui/Icon'
 import { HermasMark, IconButton, Spinner, StatusPill } from './ui/primitives'
 import type { AgentStep, UiMessage } from '@/stores/chatStore'
+import type { TKey } from '@/i18n'
+import { useT } from '@/i18n'
 
 /* ---------- 工具元信息（与 apps/server/src/agent/tools.ts 对应） ---------- */
-const TOOL_META: Record<string, { label: string; icon: IconName }> = {
-  mindmap_generate: { label: '生成思维导图', icon: 'node' },
-  node_expand: { label: '扩展节点', icon: 'spark' },
-  rag_query: { label: '检索文档', icon: 'search' },
-  mindmap_edit: { label: '编辑画布节点', icon: 'edit' },
+const TOOL_META: Record<string, { labelKey: TKey; icon: IconName }> = {
+  mindmap_generate: { labelKey: 'conv.toolMindmapGenerate', icon: 'node' },
+  node_expand: { labelKey: 'conv.toolNodeExpand', icon: 'spark' },
+  rag_query: { labelKey: 'conv.toolRagQuery', icon: 'search' },
+  mindmap_edit: { labelKey: 'conv.toolMindmapEdit', icon: 'edit' },
 }
 
 /* ---------- 错误分类 ---------- */
@@ -27,11 +29,11 @@ export function classifyError(message: string): ErrorKind {
   return 'generic'
 }
 
-const ERROR_META: Record<ErrorKind, { icon: IconName; title: string; desc?: string; action: string; tone: 'error' | 'warn' }> = {
-  apikey: { icon: 'alert', title: '未配置 API Key', desc: '当前模型供应商缺少有效的 API Key，无法发起请求。', action: '前往设置', tone: 'error' },
-  ratelimit: { icon: 'gauge', title: '请求过于频繁 (429)', desc: '已触发供应商限流，请稍候片刻重试，或切换其它模型。', action: '重试', tone: 'warn' },
-  timeout: { icon: 'clock', title: '请求超时', desc: '模型长时间未返回结果，可能是网络波动或上下文过长。', action: '重新生成', tone: 'warn' },
-  generic: { icon: 'alert', title: '请求失败', action: '重试', tone: 'error' },
+const ERROR_META: Record<ErrorKind, { icon: IconName; titleKey: TKey; descKey?: TKey; actionKey: TKey; tone: 'error' | 'warn' }> = {
+  apikey: { icon: 'alert', titleKey: 'conv.errorApikeyTitle', descKey: 'conv.errorApikeyDesc', actionKey: 'conv.errorApikeyAction', tone: 'error' },
+  ratelimit: { icon: 'gauge', titleKey: 'conv.errorRatelimitTitle', descKey: 'conv.errorRatelimitDesc', actionKey: 'conv.errorRatelimitAction', tone: 'warn' },
+  timeout: { icon: 'clock', titleKey: 'conv.errorTimeoutTitle', descKey: 'conv.errorTimeoutDesc', actionKey: 'conv.errorTimeoutAction', tone: 'warn' },
+  generic: { icon: 'alert', titleKey: 'conv.errorGenericTitle', actionKey: 'conv.errorGenericAction', tone: 'error' },
 }
 
 /* ---------- 紧凑 key/value 渲染 ---------- */
@@ -105,11 +107,14 @@ function ToolOutput({ step }: { step: AgentStep }) {
 
 /* ---------- 工具步骤卡片 ---------- */
 function ToolCard({ step, working }: { step: AgentStep; working: boolean }) {
+  const t = useT()
   const [open, setOpen] = useState(false)
-  const meta = TOOL_META[step.toolName] ?? { label: step.toolName, icon: 'layers' as IconName }
+  const meta = TOOL_META[step.toolName]
+  const label = meta ? t(meta.labelKey) : step.toolName
+  const icon: IconName = meta?.icon ?? 'layers'
   const status = step.done ? 'done' : working ? 'running' : 'stopped'
   const tone = status === 'done' ? 'done' : status === 'stopped' ? 'idle' : 'running'
-  const statusLabel = status === 'done' ? '完成' : status === 'stopped' ? '已停止' : '运行中'
+  const statusLabel = status === 'done' ? t('conv.statusDone') : status === 'stopped' ? t('conv.statusStopped') : t('conv.statusRunning')
 
   return (
     <div
@@ -141,14 +146,14 @@ function ToolCard({ step, working }: { step: AgentStep; working: boolean }) {
             color: status === 'running' ? 'var(--c-ember)' : 'var(--c-accent)',
           }}
         >
-          <Icon name={meta.icon} size={15} />
+          <Icon name={icon} size={15} />
         </span>
         <span style={{ minWidth: 0, flex: 1 }}>
           <span className="mono" style={{ display: 'block', fontSize: 11, color: 'var(--c-text-3)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
             {step.toolName}
           </span>
           <span style={{ display: 'block', fontSize: 12.5, color: 'var(--c-text)', fontWeight: 500, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
-            {meta.label}
+            {label}
           </span>
         </span>
         <StatusPill tone={tone}>{statusLabel}</StatusPill>
@@ -168,7 +173,7 @@ function ToolCard({ step, working }: { step: AgentStep; working: boolean }) {
             ? (
               <div style={{ display: 'flex', alignItems: 'center', gap: 8, paddingTop: 10, fontSize: 11, color: 'var(--c-text-3)' }}>
                 <Spinner size={12} />
-                {' 正在执行…'}
+                {` ${t('conv.executing')}`}
               </div>
               )
             : (
@@ -185,6 +190,7 @@ function ToolCard({ step, working }: { step: AgentStep; working: boolean }) {
 
 /* ---------- 错误卡片 ---------- */
 function ErrorCard({ message, onAction }: { message: string; onAction: (kind: ErrorKind) => void }) {
+  const t = useT()
   const kind = classifyError(message)
   const meta = ERROR_META[kind]
   const color = meta.tone === 'error' ? 'var(--c-err)' : 'var(--c-warn)'
@@ -193,9 +199,9 @@ function ErrorCard({ message, onAction }: { message: string; onAction: (kind: Er
     <div className="mg-card-in" style={{ display: 'flex', gap: 10, borderRadius: 10, padding: 12, background, border: `1px solid ${color}33` }}>
       <span style={{ color, flexShrink: 0, marginTop: 2 }}><Icon name={meta.icon} size={17} /></span>
       <div style={{ minWidth: 0 }}>
-        <div style={{ fontSize: 12.5, fontWeight: 600, color: 'var(--c-text)' }}>{meta.title}</div>
+        <div style={{ fontSize: 12.5, fontWeight: 600, color: 'var(--c-text)' }}>{t(meta.titleKey)}</div>
         <div style={{ marginTop: 2, fontSize: 11.5, color: 'var(--c-text-2)', lineHeight: 1.55, wordBreak: 'break-word' }}>
-          {meta.desc ?? message}
+          {meta.descKey ? t(meta.descKey) : message}
         </div>
         <button
           type="button"
@@ -216,7 +222,7 @@ function ErrorCard({ message, onAction }: { message: string; onAction: (kind: Er
           }}
         >
           <Icon name={kind === 'apikey' ? 'sliders' : 'refresh'} size={13} />
-          {meta.action}
+          {t(meta.actionKey)}
         </button>
       </div>
     </div>
@@ -295,6 +301,7 @@ export function Conversation({
   messages, working, providerName, attached, attachedDisplay,
   onSend, onStop, onNewChat, onCollapse, onAttach, onRemoveAttach, onErrorAction,
 }: ConversationProps) {
+  const t = useT()
   const [text, setText] = useState('')
   const scrollRef = useRef<HTMLDivElement>(null)
   const taRef = useRef<HTMLTextAreaElement>(null)
@@ -334,15 +341,15 @@ export function Conversation({
                 className={working ? 'an-breath' : undefined}
                 style={{ width: 5, height: 5, borderRadius: 99, background: working ? 'var(--c-signal)' : 'var(--c-ok)', boxShadow: working ? '0 0 8px var(--c-signal)' : 'none' }}
               />
-              {working ? '工作中' : '就绪'}
+              {working ? t('conv.working') : t('conv.ready')}
             </span>
           </div>
           <div className="mono" style={{ fontSize: 10.5, color: 'var(--c-text-3)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
-            AI 思维导图助手 · {providerName}
+            {t('conv.subtitle')} · {providerName}
           </div>
         </div>
-        <IconButton icon="refresh" label="新会话" size={16} btn={30} onClick={onNewChat} />
-        <IconButton icon="panelLeft" label="折叠面板" size={16} btn={30} onClick={onCollapse} />
+        <IconButton icon="refresh" label={t('conv.newChat')} size={16} btn={30} onClick={onNewChat} />
+        <IconButton icon="panelLeft" label={t('conv.collapse')} size={16} btn={30} onClick={onCollapse} />
       </div>
 
       {/* 消息流 */}
@@ -389,7 +396,7 @@ export function Conversation({
                 send()
               }
             }}
-            placeholder="给 Hermas 描述你的目标，或 Shift+Enter 换行…"
+            placeholder={t('conv.placeholder')}
             style={{
               width: '100%',
               background: 'transparent',
@@ -404,9 +411,9 @@ export function Conversation({
             }}
           />
           <div style={{ display: 'flex', alignItems: 'center', gap: 4, padding: '0 8px 8px' }}>
-            <IconButton icon="clip" label="上传 PDF 作为上下文" size={17} btn={30} onClick={onAttach} />
+            <IconButton icon="clip" label={t('conv.uploadPdf')} size={17} btn={30} onClick={onAttach} />
             <span className="mono" style={{ marginLeft: 'auto', marginRight: 4, fontSize: 10, color: 'var(--c-text-3)' }}>
-              {working ? 'Hermas 正在工作…' : 'Enter 发送'}
+              {working ? t('conv.hintWorking') : t('conv.hintEnter')}
             </span>
             {working
               ? (
@@ -428,7 +435,7 @@ export function Conversation({
                   }}
                 >
                   <Icon name="stop" size={13} />
-                  停止
+                  {t('conv.stop')}
                 </button>
                 )
               : (

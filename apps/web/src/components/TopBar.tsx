@@ -3,6 +3,7 @@ import { Icon } from './ui/Icon'
 import { IconButton, Popover, Segmented } from './ui/primitives'
 import { ACCENTS, PROVIDERS, useUiStore } from '@/stores/uiStore'
 import { useDocStore } from '@/stores/docStore'
+import { useT } from '@/i18n'
 
 const MONO_LABEL = { fontSize: 9.5, color: 'var(--c-text-3)', letterSpacing: '0.06em' } as const
 
@@ -11,8 +12,9 @@ export function TopBar() {
     provider, setProvider, apiKey, setApiKey, proxy, setProxy, model, setModel,
     nodeStyle, setNodeStyle, density, setDensity, accent, setAccent,
     sourcesOpen, setSourcesOpen, settingsOpen, setSettingsOpen,
-    leftCollapsed, setLeftCollapsed,
+    leftCollapsed, setLeftCollapsed, locale, setLocale,
   } = useUiStore()
+  const t = useT()
   const pdfCount = useDocStore(state => state.files.length)
   const [modelMenu, setModelMenu] = useState(false)
 
@@ -64,7 +66,7 @@ export function TopBar() {
           }}
         >
           <Icon name="panelLeft" size={15} />
-          {' 对话'}
+          {` ${t('topbar.openConversation')}`}
         </button>
       )}
 
@@ -92,13 +94,13 @@ export function TopBar() {
           <span style={{ width: 8, height: 8, borderRadius: 99, background: current.dot }} />
           <span style={{ fontWeight: 560 }}>{current.name}</span>
           <span className="mono" style={{ fontSize: 10.5, color: 'var(--c-text-3)' }}>{current.sub}</span>
-          {!keyOk && <span title="未配置 Key" style={{ width: 5, height: 5, borderRadius: 99, background: 'var(--c-warn)' }} />}
+          {!keyOk && <span title={t('topbar.keyMissing')} style={{ width: 5, height: 5, borderRadius: 99, background: 'var(--c-warn)' }} />}
           <Icon name="chevDown" size={13} style={{ color: 'var(--c-text-3)' }} />
         </button>
         {modelMenu && (
           <Popover onClose={() => setModelMenu(false)} width={244}>
             <div style={{ padding: 6 }}>
-              <div className="mono" style={{ ...MONO_LABEL, padding: '6px 8px' }}>模型供应商</div>
+              <div className="mono" style={{ ...MONO_LABEL, padding: '6px 8px' }}>{t('topbar.provider')}</div>
               {PROVIDERS.map((item) => {
                 const on = item.id === provider
                 return (
@@ -154,7 +156,7 @@ export function TopBar() {
         }}
       >
         <Icon name="book" size={15} />
-        {' 资料源'}
+        {` ${t('topbar.sources')}`}
         {pdfCount > 0 && (
           <span className="mono" style={{ fontSize: 9.5, padding: '0 5px', borderRadius: 99, background: 'var(--c-elevated)', color: 'var(--c-text-2)' }}>
             {pdfCount}
@@ -162,14 +164,38 @@ export function TopBar() {
         )}
       </button>
 
+      {/* 语言切换 */}
+      <button
+        type="button"
+        onClick={() => setLocale(locale === 'zh' ? 'en' : 'zh')}
+        className="no-drag"
+        title={t('topbar.language')}
+        style={{
+          display: 'flex',
+          alignItems: 'center',
+          gap: 5,
+          borderRadius: 8,
+          padding: '6px 9px',
+          fontSize: 12,
+          fontWeight: 560,
+          color: 'var(--c-text-2)',
+          background: 'transparent',
+          border: '1px solid var(--c-border)',
+          transition: 'background .15s, color .15s',
+        }}
+      >
+        <Icon name="globe" size={15} />
+        <span className="mono">{locale === 'zh' ? '中' : 'EN'}</span>
+      </button>
+
       {/* 设置与偏好 */}
       <div style={{ position: 'relative' }}>
-        <IconButton icon="sliders" label="设置与偏好" active={settingsOpen} onClick={() => setSettingsOpen(!settingsOpen)} />
+        <IconButton icon="sliders" label={t('topbar.settings')} active={settingsOpen} onClick={() => setSettingsOpen(!settingsOpen)} />
         {settingsOpen && (
           <Popover onClose={() => setSettingsOpen(false)} width={300}>
             <div style={{ padding: 12 }}>
               <div className="mono" style={{ ...MONO_LABEL, marginBottom: 6 }}>
-                API KEY · {current.name}
+                {t('topbar.apiKey')} · {current.name}
               </div>
               <div
                 style={{
@@ -188,16 +214,16 @@ export function TopBar() {
                   type="password"
                   value={apiKey}
                   onChange={event => setApiKey(event.target.value.trim())}
-                  placeholder="粘贴 sk-… 以启用请求"
+                  placeholder={t('topbar.apiKeyPlaceholder')}
                   className="mono"
                   style={{ flex: 1, background: 'transparent', outline: 'none', border: 'none', fontSize: 11.5, color: 'var(--c-text)' }}
                 />
               </div>
               <div className="mono" style={{ fontSize: 10, marginBottom: 12, color: keyOk ? 'var(--c-ok)' : 'var(--c-warn)' }}>
-                {keyOk ? '● 已配置，仅存于浏览器，仅随请求发给你自己的后端' : '● 未配置 — 发送将提示错误'}
+                {keyOk ? t('topbar.keyConfigured') : t('topbar.keyUnconfigured')}
               </div>
 
-              <div className="mono" style={{ ...MONO_LABEL, marginBottom: 6 }}>API BASE URL（可选代理）</div>
+              <div className="mono" style={{ ...MONO_LABEL, marginBottom: 6 }}>{t('topbar.apiBaseUrl')}</div>
               <div
                 style={{
                   display: 'flex',
@@ -218,7 +244,7 @@ export function TopBar() {
                 />
               </div>
 
-              <div className="mono" style={{ ...MONO_LABEL, margin: '12px 0 6px' }}>MODEL（可选，留空用服务端默认）</div>
+              <div className="mono" style={{ ...MONO_LABEL, margin: '12px 0 6px' }}>{t('topbar.model')}</div>
               <div
                 style={{
                   display: 'flex',
@@ -241,34 +267,34 @@ export function TopBar() {
 
               <div style={{ height: 1, margin: '12px 0', background: 'var(--c-border)' }} />
 
-              <div className="mono" style={{ ...MONO_LABEL, marginBottom: 8 }}>画布节点风格</div>
+              <div className="mono" style={{ ...MONO_LABEL, marginBottom: 8 }}>{t('topbar.nodeStyle')}</div>
               <Segmented
                 value={nodeStyle}
                 onChange={setNodeStyle}
                 options={[
-                  { value: 'mono', label: '克制' },
-                  { value: 'colorful', label: '彩色分层' },
-                  { value: 'card', label: '卡片' },
+                  { value: 'mono', label: t('topbar.nodeStyleMono') },
+                  { value: 'colorful', label: t('topbar.nodeStyleColorful') },
+                  { value: 'card', label: t('topbar.nodeStyleCard') },
                 ]}
               />
 
-              <div className="mono" style={{ ...MONO_LABEL, margin: '12px 0 8px' }}>密度</div>
+              <div className="mono" style={{ ...MONO_LABEL, margin: '12px 0 8px' }}>{t('topbar.density')}</div>
               <Segmented
                 value={density}
                 onChange={setDensity}
                 options={[
-                  { value: 'comfy', label: '舒适' },
-                  { value: 'compact', label: '紧凑' },
+                  { value: 'comfy', label: t('topbar.densityComfy') },
+                  { value: 'compact', label: t('topbar.densityCompact') },
                 ]}
               />
 
-              <div className="mono" style={{ ...MONO_LABEL, margin: '12px 0 8px' }}>强调色</div>
+              <div className="mono" style={{ ...MONO_LABEL, margin: '12px 0 8px' }}>{t('topbar.accent')}</div>
               <div style={{ display: 'flex', gap: 8 }}>
                 {ACCENTS.map(item => (
                   <button
                     type="button"
                     key={item.id}
-                    title={item.name}
+                    title={t(item.nameKey)}
                     onClick={() => setAccent(item.id)}
                     className="no-drag"
                     style={{
