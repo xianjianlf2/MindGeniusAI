@@ -1,5 +1,6 @@
 import type { MindMapOp, MindMapOutline } from '@mindgenius/shared'
 import { create } from 'zustand'
+import { persist } from 'zustand/middleware'
 import type { MindMapData } from '@/utils/convertMarkdown'
 import { buildMindMap } from '@/utils/convertMarkdown'
 import { applyOps, toOutline } from '@/utils/patch'
@@ -21,7 +22,7 @@ interface NodeState {
   reset: () => void
 }
 
-export const useNodeStore = create<NodeState>((set, get) => ({
+export const useNodeStore = create<NodeState>()(persist((set, get) => ({
   nodes: null,
   markdown: '',
   reset: () => set({ nodes: null, markdown: '' }),
@@ -61,4 +62,7 @@ export const useNodeStore = create<NodeState>((set, get) => ({
     const tree = get().nodes
     return tree ? toOutline(tree) : null
   },
+}), {
+  name: 'mindgenius-map', // localStorage：刷新/重开不丢图
+  partialize: state => ({ nodes: state.nodes, markdown: state.markdown }),
 }))

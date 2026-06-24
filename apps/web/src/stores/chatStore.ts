@@ -2,6 +2,7 @@ import type { AgentEvent, MindMapOp } from '@mindgenius/shared'
 import { decodeAgentEvent } from '@mindgenius/shared'
 import { v4 as uuidv4 } from 'uuid'
 import { create } from 'zustand'
+import { persist } from 'zustand/middleware'
 import { fetchStream } from '@/api/sse'
 
 export interface AgentStep {
@@ -53,7 +54,7 @@ function newMessage(role: UiMessage['role'], content: string): UiMessage {
 
 /** 每个聊天面板一个独立 store（导图聊天 / 文档问答各自隔离） */
 export function createChatStore(welcome?: string) {
-  return create<ChatState>((set, get) => {
+  return create<ChatState>()(persist((set, get) => {
     const updateLastAssistant = (updater: (message: UiMessage) => UiMessage) => {
       set((state) => {
         const messages = [...state.messages]
@@ -162,5 +163,8 @@ export function createChatStore(welcome?: string) {
         })
       },
     }
-  })
+  }, {
+    name: 'mindgenius-chat', // localStorage：刷新不丢对话（仅存 messages，运行态不持久化）
+    partialize: state => ({ messages: state.messages }),
+  }))
 }
