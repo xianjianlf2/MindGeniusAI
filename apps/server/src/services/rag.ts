@@ -65,9 +65,18 @@ export async function indexDocument(fileName: string, cfg: LLMRequestConfig) {
 
   const buffer = await fs.promises.readFile(filePath)
   const { text } = await pdfParse(buffer)
-  const chunks = splitText(text)
+  // 限制每篇分块数，挡住超大文档的内存/embedding 调用爆量
+  const chunks = splitText(text).slice(0, config.rag.maxChunksPerDoc)
   if (chunks.length === 0)
     return false
+
+  // 索引文档数达上限时淘汰最旧的（Map 按插入序），防进程内存无限增长
+  while (documentIndex.size >= config.rag.maxIndexedDocs) {
+    const oldest = documentIndex.keys().next().value
+    if (oldest === undefined)
+      break
+    documentIndex.delete(oldest)
+  }
 
   const { embeddings } = await embedMany({
     model,

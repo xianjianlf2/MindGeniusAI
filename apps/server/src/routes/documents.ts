@@ -15,12 +15,16 @@ import { llmConfigFrom } from './middleware'
 export const documentRoutes = new Hono()
 
 documentRoutes.post('/uploadFile', async (c) => {
+  if (config.upload.disabled)
+    return c.json({ success: false, message: '该部署已关闭文档上传' }, 403)
   const body = await c.req.parseBody()
   const file = body.files
   if (!(file instanceof File))
     return c.json({ success: false, message: 'No file' }, 400)
   if (file.type !== 'application/pdf' || !file.name.toLowerCase().endsWith('.pdf'))
     return c.json({ success: false, message: 'Only PDF is supported' }, 400)
+  if (file.size > config.upload.maxBytes)
+    return c.json({ success: false, message: `文件超过上限 ${Math.round(config.upload.maxBytes / 1024 / 1024)}MB` }, 413)
 
   const fileName = `${crypto.randomUUID()}.pdf`
   await fs.promises.writeFile(

@@ -46,4 +46,13 @@ export const config = {
     apiKey: process.env.EMBEDDING_API_KEY ?? process.env.OPENAI_API_KEY,
     baseURL: process.env.EMBEDDING_BASE_URL ?? process.env.OPENAI_PROXY_URL,
   },
+  // 上传/索引护栏：保护免费托管（内存/磁盘）不被大文件或无限累积拖垮
+  upload: {
+    disabled: process.env.DISABLE_UPLOAD === 'true',
+    maxBytes: Number(process.env.MAX_UPLOAD_MB ?? 10) * 1024 * 1024,
+  },
+  rag: {
+    maxIndexedDocs: Number(process.env.MAX_INDEXED_DOCS ?? 20),
+    maxChunksPerDoc: Number(process.env.MAX_CHUNKS_PER_DOC ?? 200),
+  },
 } as const
