@@ -1,7 +1,8 @@
 import Hierarchy from '@antv/hierarchy'
 import type { Cell, Graph } from '@antv/x6'
+import type { MindMapOp, MindMapOutline } from '@mindgenius/shared'
 import type { MindMapData, MindMapNodeType } from '@/utils/convertMarkdown'
-import { measureText } from '@/utils/measureText'
+import { applyOps, toOutline } from '@/utils/patch'
 
 interface HierarchyResult {
   id: string
@@ -34,15 +35,28 @@ export class MindMapController {
     this.graph.zoomToFit({ padding: 20, minScale: 0.5, maxScale: 1 })
   }
 
+  /** 清空画布（新建对话时调用，避免把旧导图当作上下文发给 Agent） */
+  clear() {
+    this.data = null
+    this.graph.clearCells()
+  }
+
+  /** 当前导图的精简轮廓，随请求发给 Hermas 以便精准增量编辑 */
+  toOutline(): MindMapOutline | null {
+    return this.data ? toOutline(this.data) : null
+  }
+
   render() {
     if (!this.data)
       return
+    // 标准 AntV mindmap 配置：布局尺寸 = 节点真实 width/height，间距用常量。
+    // （旧版用 width*2 / getHGap=height 是对旧测宽方式的 hack，测宽改准后会导致错位+堆叠）
     const result: HierarchyResult = Hierarchy.mindmap(this.data, {
       direction: 'H',
       getHeight: (d: MindMapData) => d.height ?? 40,
-      getWidth: (d: MindMapData) => (d.width ? d.width * 2 : 100),
-      getHGap: (d: MindMapData) => d.height ?? 40,
-      getVGap: () => 40,
+      getWidth: (d: MindMapData) => d.width ?? 100,
+      getHGap: () => 48,
+      getVGap: () => 18,
       getSide: () => 'right',
     })
 
@@ -79,63 +93,25 @@ export class MindMapController {
     this.graph.centerContent()
   }
 
-  private findItem(
-    node: MindMapData,
-    id: string,
-    parent: MindMapData | null = null,
-  ): { parent: MindMapData | null; node: MindMapData } | null {
-    if (node.id === id)
-      return { parent, node }
-    for (const child of node.children ?? []) {
-      const result = this.findItem(child, id, node)
-      if (result)
-        return result
-    }
-    return null
+  /** 批量应用增量指令（Agent 编辑），仅在有变更时重渲染一次，返回成功条数 */
+  applyPatch(ops: MindMapOp[]): number {
+    if (!this.data)
+      return 0
+    const applied = applyOps(this.data, ops)
+    if (applied)
+      this.render()
+    return applied
   }
 
   addChild(id: string, label?: string): boolean {
-    if (!this.data)
-      return false
-    const found = this.findItem(this.data, id)
-    if (!found)
-      return false
-    const { node } = found
-    if (node.type === 'topic-child')
-      return false
-
-    const childType: MindMapNodeType = node.type === 'topic' ? 'topic-branch' : 'topic-child'
-    const length = node.children?.length ?? 0
-    const text = label ?? `${childType}-${length + 1}`
-    const child: MindMapData = {
-      id: `${id}-${length + 1}-${Date.now()}`,
-      type: childType,
-      label: text,
-      ...measureText(text),
-    }
-    node.children = [...(node.children ?? []), child]
-    this.render()
-    return true
+    return this.applyPatch([{ op: 'add', parentId: id, label: label ?? '' }]) > 0
   }
 
   removeNode(id: string): boolean {
-    if (!this.data)
-      return false
-    const found = this.findItem(this.data, id)
-    if (!found?.parent?.children)
-      return false
-    found.parent.children = found.parent.children.filter(item => item.id !== id)
-    this.render()
-    return true
+    return this.applyPatch([{ op: 'remove', id }]) > 0
   }
 
   updateLabel(id: string, label: string) {
-    if (!this.data)
-      return
-    const found = this.findItem(this.data, id)
-    if (!found)
-      return
-    Object.assign(found.node, { label, ...measureText(label) })
-    this.render()
+    this.applyPatch([{ op: 'update', id, label }])
   }
 }
