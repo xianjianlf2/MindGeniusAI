@@ -1,14 +1,6 @@
-import Hierarchy from '@antv/hierarchy'
 import type { Cell, Graph } from '@antv/x6'
+import { layoutMindMap } from './layout'
 import type { MindMapData, MindMapNodeType } from '@/utils/convertMarkdown'
-
-interface HierarchyResult {
-  id: string
-  x: number
-  y: number
-  data: MindMapData
-  children?: HierarchyResult[]
-}
 
 export interface NodeComponentData {
   label: string
@@ -24,52 +16,42 @@ export interface NodeComponentData {
 export class MindMapController {
   constructor(public graph: Graph) {}
 
-  /** 渲染给定的树；传入 null 则清空画布 */
+  /** 渲染给定的树；传入 null 则清空画布。布局由纯函数 layoutMindMap 计算，这里只建 X6 cell。 */
   render(tree: MindMapData | null) {
     if (!tree) {
       this.graph.clearCells()
       return
     }
 
-    // 标准 AntV mindmap 配置：布局尺寸 = 节点真实 width/height，间距用常量。
-    const result: HierarchyResult = Hierarchy.mindmap(tree, {
-      direction: 'H',
-      getHeight: (d: MindMapData) => d.height ?? 40,
-      getWidth: (d: MindMapData) => d.width ?? 100,
-      getHGap: () => 48,
-      getVGap: () => 18,
-      getSide: () => 'right',
-    })
-
+    const { nodes, edges } = layoutMindMap(tree)
     const cells: Cell[] = []
-    const traverse = (item: HierarchyResult, branchIndex?: number) => {
-      const { data, children } = item
-      const node = this.graph.createNode({
-        id: data.id,
-        shape: data.type === 'topic-child' ? 'topic-child' : 'topic',
-        x: item.x,
-        y: item.y,
-        width: data.width,
-        height: data.height,
-      })
-      node.setData({ label: data.label, type: data.type, branchIndex } satisfies NodeComponentData)
-      cells.push(node)
 
-      children?.forEach((child, index) => {
-        cells.push(this.graph.createEdge({
-          shape: 'mindmap-edge',
-          source: {
-            cell: item.id,
-            anchor: child.data.type === 'topic-child'
-              ? { name: 'right', args: { dx: -16 } }
-              : { name: 'center', args: { dx: '25%' } },
-          },
-          target: { cell: child.id, anchor: { name: 'left' } },
-        }))
-        traverse(child, branchIndex ?? index)
+    for (const n of nodes) {
+      const node = this.graph.createNode({
+        id: n.id,
+        shape: n.type === 'topic-child' ? 'topic-child' : 'topic',
+        x: n.x,
+        y: n.y,
+        width: n.width,
+        height: n.height,
       })
+      node.setData({ label: n.label, type: n.type, branchIndex: n.branchIndex } satisfies NodeComponentData)
+      cells.push(node)
     }
-    traverse(result)
+
+    for (const e of edges) {
+      cells.push(this.graph.createEdge({
+        shape: 'mindmap-edge',
+        source: {
+          cell: e.source,
+          anchor: e.targetType === 'topic-child'
+            ? { name: 'right', args: { dx: -16 } }
+            : { name: 'center', args: { dx: '25%' } },
+        },
+        target: { cell: e.target, anchor: { name: 'left' } },
+      }))
+    }
+
     this.graph.resetCells(cells)
     this.graph.centerContent()
   }
