@@ -50,10 +50,14 @@ MindGeniusAI/                      # pnpm monorepo
 - 旧端点全部保留且协议不变：`/chat` `/chatMindMap` `/chatNode` `/uploadFile`
   `/document/*` `/compressContent`
 
-### 阶段 3：前端配合改造（后续 PR）
-- Agent 执行过程可视化（消息流中展示工具调用步骤）
-- Agent 直接操作画布：结构化节点指令（add/update/delete）增量更新，替代全量重渲染
-- 拆分 `TopicNode.vue`（268 行 → 编辑器 / 右键菜单 / AI 弹窗）
+### 阶段 3：前端配合改造（进行中）
+- Agent 执行过程可视化（消息流中展示工具调用步骤）✅
+- Agent 直接操作画布：`mindmap_edit` 工具产出结构化指令（add/update/delete），
+  按节点 id 增量打补丁，替代全量重渲染，保留用户手动编辑 ✅
+  - 请求携带 `mindMap` 轮廓（id+label）→ system prompt 注入 → 模型按 id 定位
+  - `AgentEvent: mindmap-patch` 经 SSE 推前端 → `controller.applyPatch` 就地应用
+  - 纯函数 `utils/patch.ts`（`applyOps`/`toOutline`）有单测覆盖
+- 拆分 `TopicNode`（编辑器 / 右键菜单 / AI 弹窗）—— 待办
 
 ### 阶段 4：质量收尾（后续 PR）
 - 核心路径测试覆盖率提升（markdown→树、agent 调度、SSE 协议）
@@ -71,13 +75,42 @@ MindGeniusAI/                      # pnpm monorepo
 └──────┬───────────────────────┘
        │ tool calls（AI SDK 自动 loop）
    ┌───┴────┬─────────────┬──────────────┐
-mindmap_generate  node_expand  rag_query  （后续：web_search / mindmap_edit）
- 生成完整导图     分支头脑风暴   查询已上传PDF
+mindmap_generate  node_expand  rag_query  mindmap_edit  （后续：web_search）
+ 生成完整导图     分支头脑风暴   查询已上传PDF  增量编辑画布
 ```
 
 - 每个 tool 的入参/出参都有 zod schema，模型输出强校验
 - 所有中间步骤通过 SSE `AgentEvent` 推送，前端实时展示
 - `maxSteps` 上限防失控；任何 tool 抛错都会作为 observation 回喂给模型自行恢复
+
+## 阶段 5：稳健化重构（best-practice，增量·行为不变·每步可验证）
+
+> 原则：**不做大爆炸式 rewrite**。当前系统能跑，重构的目的是降债、不是换实现。
+> 每一步都保持行为不变 + 有测试/冒烟兜底 + 独立提交，可随时回滚。
+
+**R0 · 安全网（前置门槛）**
+- 在 `refactor/foundation` 分支上，把本轮全部改动作为「已验证基线」提交（build/test/lint 全绿）。
+- 补渲染/解析层特征测试：markdown→树、布局尺寸非 0、增量编辑后结构一致。
+
+**R1 · 统一思维导图单一数据源（最高价值）**
+- 现状三处持有「地图」：`controller.data`（手动编辑）/ `nodeStore.nodes`（生成）/ `nodeStore.markdown`。
+  发散导致反复 bug（手动编辑不回写、新会话残留轮廓、patch 不同步）。
+- 目标：`nodeStore` 唯一持有树；controller 退化为**纯渲染器**订阅它；
+  所有变更（生成/patch/手动增删改）统一走 store action。消除一整类同步 bug。
+
+**R2 · 解耦 agent 事件与 React 接线**
+- 现状 `onDone/onPatch/onSetMap` 回调层层穿 `send()→handleAgentEvent→App`，易乱。
+- 目标：抽一个「agent runtime」消费 `AgentEvent` 并派发到 store，React 只订阅结果。
+
+**R3 · 渲染/布局可测化 + measureText 健壮化**
+- 把纯逻辑（树构建、hierarchy 定位）从 X6 cell 创建里拆出来，单测覆盖（本轮 bug 高发区，零测试）。
+- measureText：字体加载时机、回退路径做稳。
+
+**R4 · 体积优化**：当前 web bundle ~833KB，按需懒加载 X6（画布首屏才载）。
+
+**R5 · 后端小清理**：抽出导图生成策略（单次/两段式/streamObject）为可插拔。
+
+> 执行顺序：R0 →（R1 ∥ R3 可并行）→ R2 → R4 → R5。R1 完成即消除大部分历史 bug 根因。
 
 ## 兼容性承诺
 
