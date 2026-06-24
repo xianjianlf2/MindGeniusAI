@@ -10,6 +10,7 @@ const TOOL_META: Record<string, { label: string; icon: IconName }> = {
   mindmap_generate: { label: '生成思维导图', icon: 'node' },
   node_expand: { label: '扩展节点', icon: 'spark' },
   rag_query: { label: '检索文档', icon: 'search' },
+  mindmap_edit: { label: '编辑画布节点', icon: 'edit' },
 }
 
 /* ---------- 错误分类 ---------- */
@@ -112,11 +113,13 @@ function ToolCard({ step, working }: { step: AgentStep; working: boolean }) {
 
   return (
     <div
-      className="mg-card-in"
+      className={status === 'running' ? 'mg-card-in an-beam' : 'mg-card-in'}
       style={{
         borderRadius: 10,
+        overflow: 'hidden',
         background: 'var(--c-surface-2)',
-        border: `1px solid ${status === 'running' ? 'var(--c-warn-soft)' : 'var(--c-border)'}`,
+        border: `1px solid ${status === 'running' ? 'var(--c-ember-line)' : 'var(--c-border)'}`,
+        boxShadow: status === 'running' ? 'var(--hl-top)' : 'none',
       }}
     >
       <button
@@ -135,7 +138,7 @@ function ToolCard({ step, working }: { step: AgentStep; working: boolean }) {
             borderRadius: 7,
             background: 'var(--c-bg)',
             border: '1px solid var(--c-border)',
-            color: status === 'running' ? 'var(--c-warn)' : 'var(--c-accent)',
+            color: status === 'running' ? 'var(--c-ember)' : 'var(--c-accent)',
           }}
         >
           <Icon name={meta.icon} size={15} />
@@ -326,8 +329,11 @@ export function Conversation({
         <div style={{ minWidth: 0, flex: 1 }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
             <span style={{ fontSize: 13.5, fontWeight: 600, color: 'var(--c-text)' }}>Hermas</span>
-            <span className="mono" style={{ display: 'inline-flex', alignItems: 'center', gap: 4, fontSize: 10, color: working ? 'var(--c-warn)' : 'var(--c-text-3)' }}>
-              <span style={{ width: 5, height: 5, borderRadius: 99, background: working ? 'var(--c-warn)' : 'var(--c-ok)' }} />
+            <span className="mono" style={{ display: 'inline-flex', alignItems: 'center', gap: 4, fontSize: 10, color: working ? 'var(--c-signal)' : 'var(--c-text-3)' }}>
+              <span
+                className={working ? 'an-breath' : undefined}
+                style={{ width: 5, height: 5, borderRadius: 99, background: working ? 'var(--c-signal)' : 'var(--c-ok)', boxShadow: working ? '0 0 8px var(--c-signal)' : 'none' }}
+              />
               {working ? '工作中' : '就绪'}
             </span>
           </div>
