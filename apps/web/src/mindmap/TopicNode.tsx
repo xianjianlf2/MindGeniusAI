@@ -6,6 +6,7 @@ import { fetchStream } from '@/api/sse'
 import type { IconName } from '@/components/ui/Icon'
 import { Icon } from '@/components/ui/Icon'
 import { Spinner } from '@/components/ui/primitives'
+import { useNodeStore } from '@/stores/nodeStore'
 import { useUiStore } from '@/stores/uiStore'
 import { extractListItems } from '@/utils/convertMarkdown'
 
@@ -48,7 +49,7 @@ function NodeAction({ icon, title, danger, onClick }: {
 
 /** X6 react-shape 节点：双击编辑，悬浮操作（加子节点 / AI 头脑风暴 / 重命名 / 删除） */
 export function TopicNode({ node }: { node: Node; graph: Graph }) {
-  const { label, type, controller, branchIndex } = node.getData<NodeComponentData>()
+  const { label, type, branchIndex } = node.getData<NodeComponentData>()
   const nodeStyle = useUiStore(state => state.nodeStyle)
   const [hovered, setHovered] = useState(false)
   const [editing, setEditing] = useState(false)
@@ -64,7 +65,7 @@ export function TopicNode({ node }: { node: Node; graph: Graph }) {
   const commitEdit = () => {
     setEditing(false)
     if (value.trim() && value !== label)
-      controller.updateLabel(node.id, value.trim())
+      useNodeStore.getState().updateLabel(node.id, value.trim())
   }
 
   const expandWithAI = () => {
@@ -78,7 +79,8 @@ export function TopicNode({ node }: { node: Node; graph: Graph }) {
       onMessage: (delta) => { buffer += delta },
       onDone: () => {
         setExpanding(false)
-        extractListItems(buffer).forEach(item => controller.addChild(node.id, item))
+        const add = useNodeStore.getState().addChild
+        extractListItems(buffer).forEach(item => add(node.id, item))
       },
       onError: () => setExpanding(false),
     })
@@ -195,14 +197,14 @@ export function TopicNode({ node }: { node: Node; graph: Graph }) {
           }}
         >
           {canHaveChildren && (
-            <NodeAction icon="plus" title={isRoot ? '加分支' : '加子节点'} onClick={() => controller.addChild(node.id)} />
+            <NodeAction icon="plus" title={isRoot ? '加分支' : '加子节点'} onClick={() => useNodeStore.getState().addChild(node.id)} />
           )}
           {canHaveChildren && !expanding && (
             <NodeAction icon="spark" title="AI 头脑风暴" onClick={expandWithAI} />
           )}
           <NodeAction icon="edit" title="重命名" onClick={() => setEditing(true)} />
           {!isRoot && (
-            <NodeAction icon="trash" title="删除" danger onClick={() => controller.removeNode(node.id)} />
+            <NodeAction icon="trash" title="删除" danger onClick={() => useNodeStore.getState().removeNode(node.id)} />
           )}
         </div>
       )}

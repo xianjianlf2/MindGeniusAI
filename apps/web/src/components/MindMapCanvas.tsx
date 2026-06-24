@@ -90,13 +90,10 @@ function CanvasEmpty({ onPickExample }: { onPickExample: (prompt: string) => voi
   )
 }
 
-export function MindMapCanvas({ onPickExample, onController }: {
-  onPickExample: (prompt: string) => void
-  /** 把画布控制器上交给上层，用于发送当前导图轮廓 / 应用 Agent 增量编辑 */
-  onController?: (controller: MindMapController | null) => void
-}) {
+export function MindMapCanvas({ onPickExample }: { onPickExample: (prompt: string) => void }) {
   const containerRef = useRef<HTMLDivElement>(null)
   const controllerRef = useRef<MindMapController | null>(null)
+  const prevRootId = useRef<string | null>(null)
   const [graph, setGraph] = useState<Graph | null>(null)
   const [history, setHistory] = useState({ canUndo: false, canRedo: false })
   const [zoom, setZoom] = useState(1)
@@ -118,7 +115,6 @@ export function MindMapCanvas({ onPickExample, onController }: {
 
     const controller = new MindMapController(instance)
     controllerRef.current = controller
-    onController?.(controller)
 
     instance.on('history:change', () => {
       setHistory({ canUndo: instance.canUndo(), canRedo: instance.canRedo() })
@@ -127,13 +123,13 @@ export function MindMapCanvas({ onPickExample, onController }: {
     instance.bindKey(['backspace', 'delete'], () => {
       const selected = instance.getSelectedCells().filter(cell => cell.isNode())
       if (selected.length)
-        controller.removeNode(selected[0].id)
+        useNodeStore.getState().removeNode(selected[0].id)
     })
     instance.bindKey('tab', (event) => {
       event.preventDefault()
       const selected = instance.getSelectedCells().filter(cell => cell.isNode())
       if (selected.length)
-        controller.addChild(selected[0].id)
+        useNodeStore.getState().addChild(selected[0].id)
     })
 
     setGraph(instance)
@@ -141,18 +137,19 @@ export function MindMapCanvas({ onPickExample, onController }: {
     return () => {
       instance.dispose()
       controllerRef.current = null
-      onController?.(null)
     }
   }, [])
 
+  // 单一数据源：nodes 变化即重渲染；仅在「新图」（根 id 变化）时缩放适配，编辑时保持视图
   useEffect(() => {
     const controller = controllerRef.current
     if (!controller)
       return
-    if (nodes)
-      controller.setData(nodes)
-    else
-      controller.clear()
+    controller.render(nodes)
+    const rootId = nodes?.id ?? null
+    if (rootId && rootId !== prevRootId.current)
+      controller.fit()
+    prevRootId.current = rootId
   }, [nodes])
 
   const fit = () => graph?.zoomToFit({ padding: 20, minScale: 0.3, maxScale: 1.15 })

@@ -5,7 +5,6 @@ import { MindMapCanvas } from '@/components/MindMapCanvas'
 import { SourcesDrawer } from '@/components/SourcesDrawer'
 import { TopBar } from '@/components/TopBar'
 import { Icon } from '@/components/ui/Icon'
-import type { MindMapController } from '@/mindmap/controller'
 import { docDisplayName, useDocStore } from '@/stores/docStore'
 import { createChatStore } from '@/stores/chatStore'
 import { useNodeStore } from '@/stores/nodeStore'
@@ -30,7 +29,6 @@ export default function App() {
   const { files, attached, setAttached, refresh, upload } = useDocStore()
 
   const lastSentRef = useRef('')
-  const controllerRef = useRef<MindMapController | null>(null)
   const mapSetThisTurnRef = useRef(false)
   const fileInputRef = useRef<HTMLInputElement>(null)
   const wasNarrow = useRef(typeof window !== 'undefined' && window.innerWidth < NARROW)
@@ -85,7 +83,7 @@ export default function App() {
         ],
         fileName: attached ?? undefined,
         // 画布已有导图时随请求带上轮廓，Hermas 可据此做增量编辑而非全量重画
-        mindMap: controllerRef.current?.toOutline() ?? undefined,
+        mindMap: useNodeStore.getState().outline() ?? undefined,
       },
       userText: text,
       userPdf: attachedDoc ? docDisplayName(attachedDoc) : undefined,
@@ -93,7 +91,7 @@ export default function App() {
       onDone: applyMarkdown,
       onSetMap: setMapFromMarkdown,
       onPatch: (ops) => {
-        const applied = controllerRef.current?.applyPatch(ops) ?? 0
+        const applied = useNodeStore.getState().patch(ops)
         if (applied)
           flash(`已更新画布 ${applied} 处`)
       },
@@ -161,10 +159,7 @@ export default function App() {
           </div>
         )}
 
-        <MindMapCanvas
-          onPickExample={handleSend}
-          onController={(controller) => { controllerRef.current = controller }}
-        />
+        <MindMapCanvas onPickExample={handleSend} />
 
         {sourcesOpen && (
           <div style={{ width: 360, flexShrink: 0 }}>
