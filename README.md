@@ -1,6 +1,7 @@
 # MindGenius AI
 
 <p>
+  <a href="https://mindgenius.onrender.com"><img src="https://img.shields.io/badge/Live%20Demo-online-brightgreen?style=flat" alt="Live Demo" /></a>
   <a href="https://github.com/xianjianlf2/MindGeniusAI/actions/workflows/ci.yml"><img src="https://github.com/xianjianlf2/MindGeniusAI/actions/workflows/ci.yml/badge.svg" alt="CI" /></a>
   <a href="LICENSE"><img src="https://img.shields.io/badge/License-MIT-blue.svg" alt="License: MIT" /></a>
   <a href="package.json"><img src="https://img.shields.io/badge/node-%3E%3D20-brightgreen" alt="Node" /></a>
@@ -11,7 +12,7 @@
 
 Talk to **Hermas** — an autonomous agent that plans, retrieves your documents, and draws editable mind maps for you, with every tool call visible in real time.
 
-> 🔗 **Live demo:** _coming soon_ — bring your own OpenAI / Claude / DeepSeek / Kimi key; it never leaves your browser.
+> 🔗 **[Live demo →](https://mindgenius.onrender.com)** — bring your own OpenAI / Claude / DeepSeek / Kimi key; it never leaves your browser. _(free tier — first load may take ~30s to wake)_
 
 ## Demo
 
