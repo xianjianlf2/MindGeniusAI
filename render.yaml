@@ -1,0 +1,15 @@
+# Render 一键部署蓝图（Blueprint）。
+# 在 Render 点 "New +" → "Blueprint" 选本仓库即可，单服务、单镜像。
+# 部署时会提示填 OPENAI_API_KEY（也可留空，让访客在应用内「设置」里自带 Key）。
+services:
+  - type: web
+    name: mindgenius
+    runtime: docker
+    dockerfilePath: ./Dockerfile
+    plan: free
+    healthCheckPath: /api/health
+    envVars:
+      - key: LLM_PROVIDER
+        value: openai
+      - key: OPENAI_API_KEY
+        sync: false # 部署时手动填写；留空则由访客自带 Key

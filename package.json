@@ -4,6 +4,7 @@
   "version": "1.0.0",
   "private": true,
   "scripts": {
+    "setup": "node scripts/setup.mjs",
     "dev": "pnpm --parallel -r dev",
     "dev:web": "pnpm --filter @mindgenius/web dev",
     "dev:server": "pnpm --filter @mindgenius/server dev",

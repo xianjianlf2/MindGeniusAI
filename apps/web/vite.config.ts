@@ -5,10 +5,10 @@ import { defineConfig } from 'vite'
 export default defineConfig({
   server: {
     proxy: {
+      // server 现在原样监听 /api/*，无需再剥前缀
       '/api': {
         target: 'http://localhost:3000',
         changeOrigin: true,
-        rewrite: path => path.replace(/^\/api/, ''),
       },
     },
   },
