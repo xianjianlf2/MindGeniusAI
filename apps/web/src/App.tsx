@@ -1,4 +1,4 @@
-import { Suspense, lazy, useEffect, useMemo, useRef } from 'react'
+import { Suspense, lazy, useEffect, useMemo, useRef, useState } from 'react'
 import type { ErrorKind } from '@/components/Conversation'
 import { Conversation } from '@/components/Conversation'
 import { SourcesDrawer } from '@/components/SourcesDrawer'
@@ -34,6 +34,8 @@ export default function App() {
   const mapSetThisTurnRef = useRef(false)
   const fileInputRef = useRef<HTMLInputElement>(null)
   const wasNarrow = useRef(typeof window !== 'undefined' && window.innerWidth < NARROW)
+  const [vw, setVw] = useState(() => (typeof window !== 'undefined' ? window.innerWidth : 1440))
+  const [phoneNoticeDismissed, setPhoneNoticeDismissed] = useState(false)
 
   useEffect(() => {
     refresh()
@@ -42,6 +44,7 @@ export default function App() {
   /* 窄屏（<1280）自动折叠左栏，跨断点时同步一次 */
   useEffect(() => {
     const onResize = () => {
+      setVw(window.innerWidth)
       const narrow = window.innerWidth < NARROW
       if (narrow !== wasNarrow.current) {
         wasNarrow.current = narrow
@@ -130,6 +133,9 @@ export default function App() {
   }
 
   const providerName = PROVIDERS.find(item => item.id === provider)?.name ?? provider
+  // <1280：对话/资料栏改为浮层盖在画布上，画布不被挤扁；<768：手机提示
+  const overlay = vw < NARROW
+  const phone = vw < 768
 
   return (
     <div
@@ -140,7 +146,11 @@ export default function App() {
 
       <div style={{ flex: 1, display: 'flex', minHeight: 0, position: 'relative' }}>
         {!leftCollapsed && (
-          <div style={{ width: 380, flexShrink: 0, borderRight: '1px solid var(--c-border)' }}>
+          <div
+            style={overlay
+              ? { position: 'absolute', left: 0, top: 0, bottom: 0, zIndex: 26, width: 'min(380px, 86vw)', background: 'var(--c-surface)', borderRight: '1px solid var(--c-border)', boxShadow: 'var(--sh-3)' }
+              : { width: 380, flexShrink: 0, borderRight: '1px solid var(--c-border)' }}
+          >
             <Conversation
               messages={messages}
               working={isLoading}
@@ -166,9 +176,27 @@ export default function App() {
         </Suspense>
 
         {sourcesOpen && (
-          <div style={{ width: 360, flexShrink: 0 }}>
+          <div
+            style={overlay
+              ? { position: 'absolute', right: 0, top: 0, bottom: 0, zIndex: 26, width: 'min(360px, 86vw)', background: 'var(--c-surface)', boxShadow: 'var(--sh-3)' }
+              : { width: 360, flexShrink: 0 }}
+          >
             <SourcesDrawer />
           </div>
+        )}
+
+        {/* 浮层模式下的半透明背板：点击关闭已打开的侧栏 */}
+        {overlay && (!leftCollapsed || sourcesOpen) && (
+          <button
+            type="button"
+            aria-label="关闭侧栏"
+            onClick={() => {
+              setLeftCollapsed(true)
+              setSourcesOpen(false)
+            }}
+            className="mg-fade-in"
+            style={{ position: 'absolute', inset: 0, zIndex: 25, background: 'rgba(0,0,0,0.45)', cursor: 'default' }}
+          />
         )}
 
         {toast && (
@@ -194,6 +222,28 @@ export default function App() {
           >
             <Icon name="check" size={14} style={{ color: 'var(--c-ok)' }} />
             {toast}
+          </div>
+        )}
+
+        {/* 手机：画布工作台体验有限，给一个可继续的提示 */}
+        {phone && !phoneNoticeDismissed && (
+          <div style={{ position: 'absolute', inset: 0, zIndex: 50, display: 'grid', placeItems: 'center', padding: 24, background: 'var(--c-bg)' }}>
+            <div style={{ maxWidth: 320, textAlign: 'center' }}>
+              <div style={{ width: 40, height: 40, margin: '0 auto 16px', display: 'grid', placeItems: 'center', borderRadius: 10, background: 'var(--c-accent)' }}>
+                <Icon name="node" size={22} style={{ color: '#0E1116' }} />
+              </div>
+              <h2 style={{ fontSize: 18, fontWeight: 600, color: 'var(--c-text)', marginBottom: 10 }}>更适合在大屏使用</h2>
+              <p style={{ fontSize: 13, lineHeight: 1.65, color: 'var(--c-text-2)', marginBottom: 20 }}>
+                MindGenius 是一个桌面思维导图工作台，画布编辑在手机上体验有限。建议用平板或电脑打开。
+              </p>
+              <button
+                type="button"
+                onClick={() => setPhoneNoticeDismissed(true)}
+                style={{ borderRadius: 8, padding: '8px 18px', fontSize: 13, fontWeight: 560, color: '#0E1116', background: 'var(--c-accent)' }}
+              >
+                仍要继续
+              </button>
+            </div>
           </div>
         )}
       </div>
