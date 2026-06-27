@@ -27,7 +27,7 @@ export async function runHermas(
   )
   const result = streamText({
     model: chatModel(cfg),
-    system: hermasSystemPrompt(request.mindMap),
+    system: hermasSystemPrompt(request.mindMap, request.recentEdits),
     messages: request.messages.map(message => ({
       role: message.role,
       content: message.content,

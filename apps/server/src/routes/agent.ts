@@ -15,6 +15,13 @@ const outlineSchema: z.ZodType<MindMapOutline> = z.lazy(() => z.object({
   children: z.array(outlineSchema).optional(),
 }))
 
+const opSchema = z.discriminatedUnion('op', [
+  z.object({ op: z.literal('add'), parentId: z.string(), label: z.string() }),
+  z.object({ op: z.literal('update'), id: z.string(), label: z.string() }),
+  z.object({ op: z.literal('remove'), id: z.string() }),
+  z.object({ op: z.literal('move'), id: z.string(), parentId: z.string(), index: z.number().optional() }),
+])
+
 const agentRequestSchema = z.object({
   messages: z.array(z.object({
     role: z.enum(['user', 'assistant', 'system']),
@@ -23,6 +30,7 @@ const agentRequestSchema = z.object({
   fileName: z.string().optional(), // 旧客户端兼容
   fileNames: z.array(z.string()).optional(),
   mindMap: outlineSchema.optional(),
+  recentEdits: z.array(opSchema).optional(), // 用户手动改动，喂给 Hermas 作协作上下文
 })
 
 /**

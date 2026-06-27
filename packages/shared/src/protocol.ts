@@ -65,6 +65,11 @@ export interface AgentRequest {
   fileNames?: string[]
   /** 画布上已存在的思维导图轮廓，供 mindmap_edit 增量编辑（不存在则全新生成） */
   mindMap?: MindMapOutline
+  /**
+   * 上一轮 agent 之后用户在画布上手动做的增量改动（按发生顺序）。
+   * 让 Hermas 知道「用户刚动了哪里」，而非仅看到改后的最新快照，从而像协作者一样顺势回应。
+   */
+  recentEdits?: MindMapOp[]
 }
 
 export const AGENT_EVENT_PREFIX = 'agent:'

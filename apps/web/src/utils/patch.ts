@@ -101,3 +101,43 @@ export function applyOps(root: MindMapData, ops: MindMapOp[]): number {
   }
   return applied
 }
+
+/**
+ * 压缩「用户手动改动」缓冲，去掉对 Agent 无意义的冗余，再作为协作上下文发出。
+ * 只做能由 id 确定判定的化简：
+ * - 某节点最终被 remove → 它先前的 update/move 全丢（终态就是没了）。
+ * - 同一节点多次 update / move → 只留最后一次（last-write-wins）。
+ * 不碰 add：add op 不带生成 id，无法与后续 update 关联，保留原样（信息无害）。
+ */
+export function coalesceEdits(ops: MindMapOp[]): MindMapOp[] {
+  const removed = new Set(ops.filter(op => op.op === 'remove').map(op => op.id))
+  const lastUpdate = new Map<string, MindMapOp>()
+  const lastMove = new Map<string, MindMapOp>()
+  for (const op of ops) {
+    if (op.op === 'update')
+      lastUpdate.set(op.id, op)
+    else if (op.op === 'move')
+      lastMove.set(op.id, op)
+  }
+  const emittedUpdate = new Set<string>()
+  const emittedMove = new Set<string>()
+  const out: MindMapOp[] = []
+  for (const op of ops) {
+    if (op.op === 'add' || op.op === 'remove') {
+      out.push(op)
+    }
+    else if (op.op === 'update') {
+      if (removed.has(op.id) || emittedUpdate.has(op.id))
+        continue
+      emittedUpdate.add(op.id)
+      out.push(lastUpdate.get(op.id)!) // 在首次出现的位置补上「最后一次」的值，顺序稳定
+    }
+    else if (op.op === 'move') {
+      if (removed.has(op.id) || emittedMove.has(op.id))
+        continue
+      emittedMove.add(op.id)
+      out.push(lastMove.get(op.id)!)
+    }
+  }
+  return out
+}

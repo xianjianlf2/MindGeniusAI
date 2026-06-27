@@ -3,7 +3,7 @@ import { create } from 'zustand'
 import { persist } from 'zustand/middleware'
 import type { MindMapData } from '@/utils/convertMarkdown'
 import { buildMindMap } from '@/utils/convertMarkdown'
-import { applyOps, find, toOutline } from '@/utils/patch'
+import { applyOps, coalesceEdits, find, toOutline } from '@/utils/patch'
 import { treeToMarkdown } from '@/utils/export'
 
 interface NodeState {
@@ -15,8 +15,13 @@ interface NodeState {
   generateFromMarkdown: (markdown: string) => { ok: boolean; error?: string }
   /** 直接载入一棵已存在的树（从画廊打开），同步重算 markdown */
   loadTree: (tree: MindMapData) => void
-  /** 批量增量编辑（agent mindmap_edit / 手动操作统一入口），返回成功条数 */
-  patch: (ops: MindMapOp[]) => number
+  /**
+   * 批量增量编辑（agent mindmap_edit / 手动操作统一入口），返回成功条数。
+   * origin='user'（默认）的成功改动会进缓冲，下次发消息时随请求带给 Hermas。
+   */
+  patch: (ops: MindMapOp[], origin?: 'user' | 'agent') => number
+  /** 取出并清空「上一轮 agent 后用户手动改动」的缓冲，随请求发给 Hermas */
+  drainUserEdits: () => MindMapOp[]
   /** 加子节点，返回新节点 id（供画布选中并进入编辑），失败返回 null */
   addChild: (id: string, label?: string) => string | null
   /** 加兄弟节点（在父节点下追加）；根节点无兄弟则退化为加子节点，返回新节点 id */
@@ -32,10 +37,16 @@ interface NodeState {
   reset: () => void
 }
 
+/** 用户手动改动缓冲：非持久化的运行态，刷新即弃（agent 上下文届时也已重置） */
+let pendingUserEdits: MindMapOp[] = []
+
 export const useNodeStore = create<NodeState>()(persist((set, get) => ({
   nodes: null,
   markdown: '',
-  reset: () => set({ nodes: null, markdown: '' }),
+  reset: () => {
+    pendingUserEdits = []
+    set({ nodes: null, markdown: '' })
+  },
 
   generateFromMarkdown(markdown: string) {
     if (!markdown)
@@ -43,23 +54,34 @@ export const useNodeStore = create<NodeState>()(persist((set, get) => ({
     const root = buildMindMap(markdown)
     if (!root)
       return { ok: false, error: 'There is no mind map generated.' }
+    pendingUserEdits = [] // 全量重画后，旧的逐条改动已无意义
     set({ nodes: root, markdown })
     return { ok: true }
   },
 
   loadTree(tree) {
+    pendingUserEdits = [] // 换了一张图，缓冲清零
     set({ nodes: structuredClone(tree), markdown: treeToMarkdown(tree) })
   },
 
-  patch(ops: MindMapOp[]) {
+  patch(ops: MindMapOp[], origin: 'user' | 'agent' = 'user') {
     const tree = get().nodes
     if (!tree)
       return 0
     const next = structuredClone(tree)
     const applied = applyOps(next, ops)
-    if (applied)
+    if (applied) {
       set({ nodes: next }) // 新引用 → 触发画布重渲染（单一数据源，无 controller.data 旁路）
+      if (origin === 'user')
+        pendingUserEdits.push(...ops) // 记进缓冲，下次发消息时告诉 Hermas 用户改了哪
+    }
     return applied
+  },
+
+  drainUserEdits() {
+    const edits = coalesceEdits(pendingUserEdits)
+    pendingUserEdits = []
+    return edits
   },
 
   addChild(id, label) {

@@ -1,6 +1,7 @@
+import type { MindMapOutline } from '@mindgenius/shared'
 import { describe, expect, it } from 'vitest'
 import { Language, detectLanguage } from '../src/lib/language'
-import { compressPrompt, mindMapPrompt, nodeExpandPrompt } from '../src/prompts'
+import { compressPrompt, hermasSystemPrompt, mindMapPrompt, nodeExpandPrompt } from '../src/prompts'
 
 describe('detectLanguage', () => {
   it('detects chinese including mixed text', () => {
@@ -26,5 +27,27 @@ describe('prompts pick template by language', () => {
 
   it('compress prompt embeds the content', () => {
     expect(compressPrompt('some content')).toContain('some content')
+  })
+})
+
+describe('hermasSystemPrompt feeds back user edits', () => {
+  const outline: MindMapOutline = {
+    id: 'root',
+    label: 'Plan',
+    children: [{ id: 'n1', label: 'GTM strategy' }],
+  }
+
+  it('omits the edit section when there are no recent edits', () => {
+    expect(hermasSystemPrompt(outline)).not.toContain('MANUALLY edited')
+  })
+
+  it('renders edits with ids resolved to human-readable labels', () => {
+    const prompt = hermasSystemPrompt(outline, [
+      { op: 'update', id: 'n1', label: 'GTM strategy' },
+      { op: 'add', parentId: 'root', label: 'Pricing' },
+    ])
+    expect(prompt).toContain('MANUALLY edited')
+    expect(prompt).toContain('renamed "GTM strategy"')
+    expect(prompt).toContain('added "Pricing" under "Plan"') // parentId 'root' → label 'Plan'
   })
 })

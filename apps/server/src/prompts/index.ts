@@ -1,4 +1,4 @@
-import type { MindMapOutline } from '@mindgenius/shared'
+import type { MindMapOp, MindMapOutline } from '@mindgenius/shared'
 import { Language, detectLanguage } from '../lib/language'
 
 /**
@@ -110,7 +110,35 @@ function renderOutline(node: MindMapOutline, depth = 0): string {
   return [line, ...children].join('\n')
 }
 
-export function hermasSystemPrompt(mindMap?: MindMapOutline): string {
+/** 把轮廓拍平成 id → label 映射，供把 op 里的裸 id 还原成可读标签 */
+function outlineLabels(node: MindMapOutline, map: Map<string, string> = new Map()): Map<string, string> {
+  map.set(node.id, node.label)
+  for (const child of node.children ?? [])
+    outlineLabels(child, map)
+  return map
+}
+
+/** 把用户手动改动渲染成人类可读的一行行，让 Hermas 知道「刚动了哪」 */
+function renderUserEdits(edits: MindMapOp[], mindMap?: MindMapOutline): string {
+  const labels = mindMap ? outlineLabels(mindMap) : new Map<string, string>()
+  const name = (id: string) => labels.get(id) ?? `[${id}]`
+  return edits.map((edit) => {
+    switch (edit.op) {
+      case 'add':
+        return `- added "${edit.label}" under "${name(edit.parentId)}"`
+      case 'update':
+        return `- renamed "${name(edit.id)}" to "${edit.label}"`
+      case 'remove':
+        return `- removed "${name(edit.id)}"`
+      case 'move':
+        return `- moved "${name(edit.id)}" under "${name(edit.parentId)}"`
+      default:
+        return ''
+    }
+  }).join('\n')
+}
+
+export function hermasSystemPrompt(mindMap?: MindMapOutline, recentEdits?: MindMapOp[]): string {
   const base = `You are Hermas, an autonomous mind-map assistant inside MindGenius AI.
 
 Your job: understand the user's goal, plan, and use your tools to get there — do not just chat.
@@ -130,6 +158,13 @@ Rules:
   if (!mindMap)
     return base
 
+  // 用户在上一轮之后手动改了画布：作为协作信号告诉 Hermas，它据此顺势回应而非视而不见
+  const editsSection = recentEdits?.length
+    ? `\n\nSince your last turn, the user MANUALLY edited the canvas:
+${renderUserEdits(recentEdits, mindMap)}
+Treat these as the authoritative current state and the user's intent. Acknowledge them naturally and build on them; do not undo them unless asked.`
+    : ''
+
   return `${base}
 
 A mind map ALREADY EXISTS on the canvas (outline below, each node prefixed with its stable id).
@@ -138,5 +173,5 @@ A mind map ALREADY EXISTS on the canvas (outline below, each node prefixed with 
 - For 'add' ops, parentId must be an existing id from the outline; new nodes get ids automatically.
 
 Current mind map outline (id → label):
-${renderOutline(mindMap)}`
+${renderOutline(mindMap)}${editsSection}`
 }

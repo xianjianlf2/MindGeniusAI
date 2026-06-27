@@ -1,7 +1,8 @@
+import type { MindMapOp } from '@mindgenius/shared'
 import { describe, expect, it } from 'vitest'
 import type { MindMapData } from '../src/utils/convertMarkdown'
 import { getNodes } from '../src/utils/convertMarkdown'
-import { applyOps, canMoveUnder, toOutline } from '../src/utils/patch'
+import { applyOps, canMoveUnder, coalesceEdits, toOutline } from '../src/utils/patch'
 
 const MARKDOWN = `# Roadmap
 ## Basics
@@ -113,6 +114,49 @@ describe('applyOps', () => {
     ])
     expect(applied).toBe(0)
     expect(root.children![0].children!.map(c => c.label)).toEqual(['types', 'interfaces'])
+  })
+})
+
+describe('coalesceEdits', () => {
+  it('collapses repeated updates on a node to the last value', () => {
+    const ops: MindMapOp[] = [
+      { op: 'update', id: 'a', label: 'first' },
+      { op: 'update', id: 'a', label: 'second' },
+      { op: 'update', id: 'b', label: 'other' },
+    ]
+    expect(coalesceEdits(ops)).toEqual([
+      { op: 'update', id: 'a', label: 'second' },
+      { op: 'update', id: 'b', label: 'other' },
+    ])
+  })
+
+  it('drops update/move on a node that is later removed, but keeps the remove', () => {
+    const ops: MindMapOp[] = [
+      { op: 'update', id: 'a', label: 'renamed' },
+      { op: 'move', id: 'a', parentId: 'p' },
+      { op: 'remove', id: 'a' },
+    ]
+    expect(coalesceEdits(ops)).toEqual([{ op: 'remove', id: 'a' }])
+  })
+
+  it('keeps every add untouched (no id to correlate)', () => {
+    const ops: MindMapOp[] = [
+      { op: 'add', parentId: 'root', label: '' },
+      { op: 'add', parentId: 'root', label: 'x' },
+    ]
+    expect(coalesceEdits(ops)).toEqual(ops)
+  })
+
+  it('keeps only the last move per node, preserving first-seen order', () => {
+    const ops: MindMapOp[] = [
+      { op: 'move', id: 'a', parentId: 'p1' },
+      { op: 'update', id: 'b', label: 'b' },
+      { op: 'move', id: 'a', parentId: 'p2', index: 1 },
+    ]
+    expect(coalesceEdits(ops)).toEqual([
+      { op: 'move', id: 'a', parentId: 'p2', index: 1 },
+      { op: 'update', id: 'b', label: 'b' },
+    ])
   })
 })
 

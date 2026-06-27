@@ -114,6 +114,8 @@ export default function App() {
         fileNames: attached.length ? attached : undefined,
         // 画布已有导图时随请求带上轮廓，Hermas 可据此做增量编辑而非全量重画
         mindMap: useNodeStore.getState().outline() ?? undefined,
+        // 上一轮后用户手动改了哪，告诉 Hermas，让它像协作者一样顺势回应
+        recentEdits: useNodeStore.getState().drainUserEdits(),
       },
       userText: text,
       userPdf: attachedDocs.length ? attachedDocs.map(docDisplayName).join('、') : undefined,
@@ -121,7 +123,7 @@ export default function App() {
       onDone: applyMarkdown,
       onSetMap: setMapFromMarkdown,
       onPatch: (ops) => {
-        const applied = useNodeStore.getState().patch(ops)
+        const applied = useNodeStore.getState().patch(ops, 'agent')
         if (applied)
           flash(t('toast.mapUpdated', { n: applied }))
       },
