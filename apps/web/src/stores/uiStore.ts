@@ -45,6 +45,9 @@ interface UiState {
   leftCollapsed: boolean
   sourcesOpen: boolean
   settingsOpen: boolean
+  /** ⌘K 命令面板（画廊 + 文档搜索）是否打开 */
+  paletteOpen: boolean
+  setPaletteOpen: (open: boolean) => void
   toast: string | null
   /** 需要进入重命名编辑态的节点 id（加子/兄弟节点或 F2 后置位，TopicNode 消费后清空） */
   editingNodeId: string | null
@@ -92,6 +95,7 @@ export const useUiStore = create<UiState>(set => ({
   leftCollapsed: typeof window !== 'undefined' && window.innerWidth < 1280,
   sourcesOpen: false,
   settingsOpen: false,
+  paletteOpen: false,
   toast: null,
   editingNodeId: null,
   dropTargetId: null,
@@ -143,6 +147,7 @@ export const useUiStore = create<UiState>(set => ({
   setLeftCollapsed: leftCollapsed => set({ leftCollapsed }),
   setSourcesOpen: sourcesOpen => set({ sourcesOpen }),
   setSettingsOpen: settingsOpen => set({ settingsOpen }),
+  setPaletteOpen: paletteOpen => set({ paletteOpen }),
   flash(message) {
     clearTimeout(toastTimer)
     set({ toast: message })

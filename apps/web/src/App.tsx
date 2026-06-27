@@ -1,5 +1,6 @@
 import { Suspense, lazy, useEffect, useMemo, useRef, useState } from 'react'
 import type { ErrorKind } from '@/components/Conversation'
+import { CommandPalette } from '@/components/CommandPalette'
 import { Conversation } from '@/components/Conversation'
 import { SourcesDrawer } from '@/components/SourcesDrawer'
 import { TopBar } from '@/components/TopBar'
@@ -7,6 +8,7 @@ import { Icon } from '@/components/ui/Icon'
 import { docDisplayName, useDocStore } from '@/stores/docStore'
 import { createChatStore } from '@/stores/chatStore'
 import { useNodeStore } from '@/stores/nodeStore'
+import { useSavedMapsStore } from '@/stores/savedMapsStore'
 import { PROVIDERS, useUiStore } from '@/stores/uiStore'
 import { track } from '@/utils/analytics'
 import { extractMarkdownBlock } from '@/utils/convertMarkdown'
@@ -25,9 +27,10 @@ export default function App() {
   const useChat = useMemo(() => createChatStore(), [])
   const { messages, isLoading, send, stop, clear } = useChat()
   const { generateFromMarkdown, reset: resetNodes } = useNodeStore()
+  const nodes = useNodeStore(state => state.nodes)
   const {
     provider, density, leftCollapsed, setLeftCollapsed,
-    sourcesOpen, setSourcesOpen, setSettingsOpen, toast, flash,
+    sourcesOpen, setSourcesOpen, setSettingsOpen, setPaletteOpen, toast, flash,
   } = useUiStore()
   const { files, attached, setAttached, refresh, upload } = useDocStore()
   const t = useT()
@@ -56,6 +59,26 @@ export default function App() {
     window.addEventListener('resize', onResize)
     return () => window.removeEventListener('resize', onResize)
   }, [setLeftCollapsed])
+
+  /* ⌘K / Ctrl+K 全局唤起命令面板 */
+  useEffect(() => {
+    const onKey = (event: KeyboardEvent) => {
+      if ((event.metaKey || event.ctrlKey) && event.key.toLowerCase() === 'k') {
+        event.preventDefault()
+        setPaletteOpen(!useUiStore.getState().paletteOpen)
+      }
+    }
+    window.addEventListener('keydown', onKey)
+    return () => window.removeEventListener('keydown', onKey)
+  }, [setPaletteOpen])
+
+  /* 当前导图自动快照进画廊（按根 id 去重），debounce 避免编辑过程中频繁写入 */
+  useEffect(() => {
+    if (!nodes)
+      return
+    const timer = setTimeout(() => useSavedMapsStore.getState().upsert(nodes, Date.now()), 800)
+    return () => clearTimeout(timer)
+  }, [nodes])
 
   /* 强保证出图：优先用 mindmap-set 事件直送的 markdown 渲染 */
   const setMapFromMarkdown = (markdown: string) => {
@@ -144,6 +167,7 @@ export default function App() {
       className={density === 'compact' ? 'density-compact' : undefined}
       style={{ display: 'flex', flexDirection: 'column', height: '100%' }}
     >
+      <CommandPalette />
       <TopBar />
 
       <div style={{ flex: 1, display: 'flex', minHeight: 0, position: 'relative' }}>

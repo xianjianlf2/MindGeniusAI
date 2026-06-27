@@ -4,6 +4,7 @@ import { persist } from 'zustand/middleware'
 import type { MindMapData } from '@/utils/convertMarkdown'
 import { buildMindMap } from '@/utils/convertMarkdown'
 import { applyOps, find, toOutline } from '@/utils/patch'
+import { treeToMarkdown } from '@/utils/export'
 
 interface NodeState {
   /** 思维导图树（根节点）——全应用唯一数据源 */
@@ -12,6 +13,8 @@ interface NodeState {
   markdown: string
   /** 从 markdown 重建整棵树（生成 / mindmap-set） */
   generateFromMarkdown: (markdown: string) => { ok: boolean; error?: string }
+  /** 直接载入一棵已存在的树（从画廊打开），同步重算 markdown */
+  loadTree: (tree: MindMapData) => void
   /** 批量增量编辑（agent mindmap_edit / 手动操作统一入口），返回成功条数 */
   patch: (ops: MindMapOp[]) => number
   /** 加子节点，返回新节点 id（供画布选中并进入编辑），失败返回 null */
@@ -42,6 +45,10 @@ export const useNodeStore = create<NodeState>()(persist((set, get) => ({
       return { ok: false, error: 'There is no mind map generated.' }
     set({ nodes: root, markdown })
     return { ok: true }
+  },
+
+  loadTree(tree) {
+    set({ nodes: structuredClone(tree), markdown: treeToMarkdown(tree) })
   },
 
   patch(ops: MindMapOp[]) {

@@ -12,7 +12,7 @@ export function TopBar() {
     provider, setProvider, apiKey, setApiKey, proxy, setProxy, model, setModel,
     nodeStyle, setNodeStyle, density, setDensity, accent, setAccent,
     sourcesOpen, setSourcesOpen, settingsOpen, setSettingsOpen,
-    leftCollapsed, setLeftCollapsed, locale, setLocale,
+    leftCollapsed, setLeftCollapsed, locale, setLocale, setPaletteOpen,
   } = useUiStore()
   const t = useT()
   const pdfCount = useDocStore(state => state.files.length)
@@ -71,6 +71,30 @@ export function TopBar() {
       )}
 
       <div style={{ flex: 1 }} />
+
+      {/* 命令面板搜索入口（也可 ⌘K 唤起） */}
+      <button
+        type="button"
+        onClick={() => setPaletteOpen(true)}
+        className="no-drag"
+        title={t('palette.search')}
+        style={{
+          display: 'flex',
+          alignItems: 'center',
+          gap: 8,
+          borderRadius: 8,
+          padding: '6px 8px 6px 10px',
+          fontSize: 12.5,
+          color: 'var(--c-text-3)',
+          background: 'var(--c-surface-2)',
+          border: '1px solid var(--c-border)',
+          transition: 'background .15s, color .15s',
+        }}
+      >
+        <Icon name="search" size={14} />
+        <span>{t('palette.search')}</span>
+        <span className="mono" style={{ fontSize: 10, padding: '1px 5px', borderRadius: 4, color: 'var(--c-text-2)', background: 'var(--c-elevated)', border: '1px solid var(--c-border)' }}>⌘K</span>
+      </button>
 
       {/* 模型供应商 */}
       <div style={{ position: 'relative' }}>
