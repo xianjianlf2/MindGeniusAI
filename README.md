@@ -29,8 +29,8 @@ No key at setup? Skip it and paste one later in the app's **Settings** (top-righ
 
 - 🤖 **Real agent, not a prompt wrapper** — multi-step tool loop (Vercel AI SDK v5) that decides when to search docs, generate the map, and expand branches, each shown as a live tool card.
 - ✏️ **Surgical edits** — "rename the pricing branch" patches exact nodes by id, so your manual tweaks survive (no full re-render).
-- 📄 **Reads your PDFs** — attach a PDF (📎): chunk → embed → in-memory retrieval, ~100 lines, no LangChain.
-- ⌨️ **Keyboard-first canvas** — `Tab` child · `Enter` sibling · `F2` rename · `Del` delete · `⌘Z` undo.
+- 📄 **Reads your PDFs** — attach one or more PDFs (📎): chunk → embed → in-memory retrieval (~100 lines, no LangChain). `rag_query` searches across all attached docs at once.
+- ⌨️ **Keyboard-first canvas** — `Tab` child · `Enter` sibling · `F2` rename · `Del` delete · `⌘Z` undo · **drag a node onto another to re-parent it**.
 - 🔁 **Import / export** — import Markdown / OPML, export **PNG · SVG · Markdown · OPML · Mermaid**.
 - 🔑 **Bring your own key** — OpenAI / Claude / DeepSeek / Kimi, or any OpenAI-compatible endpoint. Keys never touch the server's disk.
 - 🎨 **One focused workbench** — chat + canvas + doc drawer; persists across refresh; bilingual (EN / 中文); dark, dependency-free UI.
