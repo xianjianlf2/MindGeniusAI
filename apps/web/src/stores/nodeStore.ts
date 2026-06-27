@@ -21,6 +21,8 @@ interface NodeState {
   removeNode: (id: string) => void
   /** 批量删除（框选多个时一次删完） */
   removeNodes: (ids: string[]) => void
+  /** 拖拽改父：把节点重挂到新父节点下（index 省略则追加），返回是否成功 */
+  moveNode: (id: string, parentId: string, index?: number) => boolean
   updateLabel: (id: string, label: string) => void
   /** 当前树的精简轮廓，随请求发给 Hermas 做增量编辑定位 */
   outline: () => MindMapOutline | null
@@ -74,6 +76,9 @@ export const useNodeStore = create<NodeState>()(persist((set, get) => ({
   },
   removeNodes(ids) {
     get().patch(ids.map(id => ({ op: 'remove', id })))
+  },
+  moveNode(id, parentId, index) {
+    return get().patch([{ op: 'move', id, parentId, index }]) > 0
   },
   updateLabel(id, label) {
     get().patch([{ op: 'update', id, label }])

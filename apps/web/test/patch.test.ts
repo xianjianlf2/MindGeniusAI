@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest'
 import type { MindMapData } from '../src/utils/convertMarkdown'
 import { getNodes } from '../src/utils/convertMarkdown'
-import { applyOps, toOutline } from '../src/utils/patch'
+import { applyOps, canMoveUnder, toOutline } from '../src/utils/patch'
 
 const MARKDOWN = `# Roadmap
 ## Basics
@@ -81,5 +81,53 @@ describe('applyOps', () => {
     ])
     expect(n).toBe(2)
     expect(root.label).toBe('Roadmap v2')
+  })
+
+  it('moves a leaf under another branch and renormalizes its type', () => {
+    const root = tree()
+    const advancedId = root.children![1].id
+    const typesLeaf = root.children![0].children![0] // Basics > types (topic-child)
+    expect(applyOps(root, [{ op: 'move', id: typesLeaf.id, parentId: advancedId }])).toBe(1)
+    // 已从 Basics 移走、挂到 Advanced 末尾
+    expect(root.children![0].children!.map(c => c.label)).toEqual(['interfaces'])
+    expect(root.children![1].children!.map(c => c.label)).toEqual(['generics', 'types'])
+    expect(typesLeaf.type).toBe('topic-child') // depth 2 → 仍是叶子
+  })
+
+  it('promotes a branch to topic-branch when moved under root', () => {
+    const root = tree()
+    const typesLeaf = root.children![0].children![0]
+    applyOps(root, [{ op: 'move', id: typesLeaf.id, parentId: root.id }])
+    const moved = root.children!.find(c => c.label === 'types')!
+    expect(moved.type).toBe('topic-branch') // depth 1 → 升级为分支
+  })
+
+  it('rejects moving a node under itself or its own descendant (no cycle)', () => {
+    const root = tree()
+    const basics = root.children![0]
+    const typesLeaf = basics.children![0]
+    const applied = applyOps(root, [
+      { op: 'move', id: basics.id, parentId: typesLeaf.id }, // 移到自己的子孙下
+      { op: 'move', id: basics.id, parentId: basics.id }, // 移到自己下
+      { op: 'move', id: root.id, parentId: basics.id }, // 移动根
+    ])
+    expect(applied).toBe(0)
+    expect(root.children![0].children!.map(c => c.label)).toEqual(['types', 'interfaces'])
+  })
+})
+
+describe('canMoveUnder', () => {
+  it('allows moving a leaf under a sibling branch', () => {
+    const root = tree()
+    expect(canMoveUnder(root, root.children![0].children![0].id, root.children![1].id)).toBe(true)
+  })
+
+  it('forbids self, root, descendants, and unknown targets', () => {
+    const root = tree()
+    const basics = root.children![0]
+    expect(canMoveUnder(root, basics.id, basics.id)).toBe(false) // self
+    expect(canMoveUnder(root, root.id, basics.id)).toBe(false) // root can't move
+    expect(canMoveUnder(root, basics.id, basics.children![0].id)).toBe(false) // descendant
+    expect(canMoveUnder(root, basics.id, 'ghost')).toBe(false) // unknown target
   })
 })

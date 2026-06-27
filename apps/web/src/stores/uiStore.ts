@@ -49,6 +49,9 @@ interface UiState {
   /** 需要进入重命名编辑态的节点 id（加子/兄弟节点或 F2 后置位，TopicNode 消费后清空） */
   editingNodeId: string | null
   setEditingNodeId: (id: string | null) => void
+  /** 拖拽改父时鼠标悬停的合法落点节点 id，用于高亮提示 */
+  dropTargetId: string | null
+  setDropTargetId: (id: string | null) => void
   setProvider: (provider: Provider) => void
   setApiKey: (key: string) => void
   setProxy: (proxy: string) => void
@@ -91,8 +94,10 @@ export const useUiStore = create<UiState>(set => ({
   settingsOpen: false,
   toast: null,
   editingNodeId: null,
+  dropTargetId: null,
 
   setEditingNodeId: editingNodeId => set({ editingNodeId }),
+  setDropTargetId: dropTargetId => set({ dropTargetId }),
   setProvider(provider) {
     storageManager.set(StorageKey.LLM_PROVIDER, provider)
     set({ provider })

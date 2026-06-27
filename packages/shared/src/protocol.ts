@@ -43,6 +43,7 @@ export type MindMapOp =
   | { op: 'add'; parentId: string; label: string }
   | { op: 'update'; id: string; label: string }
   | { op: 'remove'; id: string }
+  | { op: 'move'; id: string; parentId: string; index?: number }
 
 /** Hermas Agent 推送的结构化事件，作为 JSON 字符串放进 SseEnvelope.data */
 export type AgentEvent =

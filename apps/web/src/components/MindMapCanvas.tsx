@@ -1,3 +1,4 @@
+import type { Node } from '@antv/x6'
 import { DataUri, Graph } from '@antv/x6'
 import { Export } from '@antv/x6-plugin-export'
 import { History } from '@antv/x6-plugin-history'
@@ -14,6 +15,7 @@ import { useNodeStore } from '@/stores/nodeStore'
 import { useUiStore } from '@/stores/uiStore'
 import { downloadText, treeToMarkdown, treeToMermaid, treeToOPML } from '@/utils/export'
 import { IMPORT_ACCEPT, importToMarkdown } from '@/utils/import'
+import { canMoveUnder } from '@/utils/patch'
 import type { TKey } from '@/i18n'
 import { useT } from '@/i18n'
 
@@ -26,6 +28,7 @@ const SHORTCUTS: { keys: string[]; labelKey: TKey }[] = [
   { keys: ['⌘', '⇧', 'Z'], labelKey: 'shortcut.redo' },
   { keys: ['Alt', '⊟'], labelKey: 'shortcut.multiSelect' },
   { keys: ['×2'], labelKey: 'shortcut.edit' },
+  { keys: ['Drag'], labelKey: 'shortcut.reparent' },
 ]
 
 const EXAMPLE_TOPICS: { icon: IconName; titleKey: TKey; subKey: TKey; promptKey: TKey }[] = [
@@ -226,6 +229,27 @@ export function MindMapCanvas({ onPickExample }: { onPickExample: (prompt: strin
       setHistory({ canUndo: instance.canUndo(), canRedo: instance.canRedo() })
     })
     instance.on('scale', () => setZoom(instance.zoom()))
+
+    // 拖拽改父：拖动节点到另一个合法节点上，松手即重挂为其子节点
+    const findDropTargetId = (dragged: Node): string | null => {
+      const tree = useNodeStore.getState().nodes
+      if (!tree)
+        return null
+      const center = dragged.getBBox().getCenter()
+      const under = instance.getNodesFromPoint(center.x, center.y).filter((cell: Node) => cell.id !== dragged.id)
+      return under.find((cell: Node) => canMoveUnder(tree, dragged.id, cell.id))?.id ?? null
+    }
+    instance.on('node:moving', ({ node }) => {
+      useUiStore.getState().setDropTargetId(findDropTargetId(node))
+    })
+    instance.on('node:moved', ({ node }) => {
+      const targetId = findDropTargetId(node)
+      useUiStore.getState().setDropTargetId(null)
+      const moved = targetId ? useNodeStore.getState().moveNode(node.id, targetId) : false
+      // 落点无效（或没移成）：从单一数据源重渲染，把自由拖动的节点复位到布局
+      if (!moved)
+        controllerRef.current?.render(useNodeStore.getState().nodes)
+    })
     // 焦点在输入框（节点重命名 / 对话框）时不抢快捷键
     const isTyping = () => {
       const el = document.activeElement

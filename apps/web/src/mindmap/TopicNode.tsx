@@ -53,6 +53,7 @@ export function TopicNode({ node }: { node: Node; graph: Graph }) {
   const t = useT()
   const { label, type, branchIndex } = node.getData<NodeComponentData>()
   const nodeStyle = useUiStore(state => state.nodeStyle)
+  const isDropTarget = useUiStore(state => state.dropTargetId === node.id)
   const [hovered, setHovered] = useState(false)
   const [editing, setEditing] = useState(false)
   const [value, setValue] = useState(label)
@@ -159,7 +160,9 @@ export function TopicNode({ node }: { node: Node; graph: Graph }) {
         padding: '0 6px',
         cursor: 'default',
         transition: 'box-shadow .15s, border-color .15s',
-        outline: hovered && !editing ? '2px solid var(--c-accent-line)' : 'none',
+        outline: isDropTarget
+          ? '2px dashed var(--c-accent)'
+          : hovered && !editing ? '2px solid var(--c-accent-line)' : 'none',
         outlineOffset: 2,
         ...box,
       }}
