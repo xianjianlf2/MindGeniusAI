@@ -3,7 +3,7 @@ import { create } from 'zustand'
 import { persist } from 'zustand/middleware'
 import type { MindMapData } from '@/utils/convertMarkdown'
 import { buildMindMap } from '@/utils/convertMarkdown'
-import { applyOps, toOutline } from '@/utils/patch'
+import { applyOps, find, toOutline } from '@/utils/patch'
 
 interface NodeState {
   /** 思维导图树（根节点）——全应用唯一数据源 */
@@ -14,8 +14,13 @@ interface NodeState {
   generateFromMarkdown: (markdown: string) => { ok: boolean; error?: string }
   /** 批量增量编辑（agent mindmap_edit / 手动操作统一入口），返回成功条数 */
   patch: (ops: MindMapOp[]) => number
-  addChild: (id: string, label?: string) => void
+  /** 加子节点，返回新节点 id（供画布选中并进入编辑），失败返回 null */
+  addChild: (id: string, label?: string) => string | null
+  /** 加兄弟节点（在父节点下追加）；根节点无兄弟则退化为加子节点，返回新节点 id */
+  addSibling: (id: string, label?: string) => string | null
   removeNode: (id: string) => void
+  /** 批量删除（框选多个时一次删完） */
+  removeNodes: (ids: string[]) => void
   updateLabel: (id: string, label: string) => void
   /** 当前树的精简轮廓，随请求发给 Hermas 做增量编辑定位 */
   outline: () => MindMapOutline | null
@@ -49,10 +54,26 @@ export const useNodeStore = create<NodeState>()(persist((set, get) => ({
   },
 
   addChild(id, label) {
-    get().patch([{ op: 'add', parentId: id, label: label ?? '' }])
+    const applied = get().patch([{ op: 'add', parentId: id, label: label ?? '' }])
+    if (!applied)
+      return null
+    // 新节点是父节点最后一个孩子（applyOps 追加在末尾）
+    const parent = get().nodes && find(get().nodes!, id)?.node
+    return parent?.children?.at(-1)?.id ?? null
+  },
+  addSibling(id, label) {
+    const tree = get().nodes
+    if (!tree)
+      return null
+    const parent = find(tree, id)?.parent
+    // 根节点无兄弟：退化为给根加分支，符合「Enter 继续画」的直觉
+    return get().addChild(parent?.id ?? id, label)
   },
   removeNode(id) {
     get().patch([{ op: 'remove', id }])
+  },
+  removeNodes(ids) {
+    get().patch(ids.map(id => ({ op: 'remove', id })))
   },
   updateLabel(id, label) {
     get().patch([{ op: 'update', id, label }])

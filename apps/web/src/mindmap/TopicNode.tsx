@@ -57,12 +57,31 @@ export function TopicNode({ node }: { node: Node; graph: Graph }) {
   const [editing, setEditing] = useState(false)
   const [value, setValue] = useState(label)
   const [expanding, setExpanding] = useState(false)
+  const [flipBelow, setFlipBelow] = useState(false)
   const inputRef = useRef<HTMLInputElement>(null)
+  const wrapperRef = useRef<HTMLDivElement>(null)
+
+  // 悬浮时按节点离画布顶边的距离决定操作条放上方还是下方，避免顶部行被裁切点不到
+  const onEnter = () => {
+    const top = wrapperRef.current?.getBoundingClientRect().top ?? 999
+    setFlipBelow(top < 72)
+    setHovered(true)
+  }
 
   useEffect(() => {
     if (editing)
       inputRef.current?.select()
   }, [editing])
+
+  // 加子/兄弟节点或 F2 后，画布把 editingNodeId 指向本节点 → 自动进入重命名
+  const editingNodeId = useUiStore(state => state.editingNodeId)
+  useEffect(() => {
+    if (editingNodeId === node.id) {
+      setValue(label)
+      setEditing(true)
+      useUiStore.getState().setEditingNodeId(null)
+    }
+  }, [editingNodeId, node.id, label])
 
   const commitEdit = () => {
     setEditing(false)
@@ -126,6 +145,7 @@ export function TopicNode({ node }: { node: Node; graph: Graph }) {
 
   return (
     <div
+      ref={wrapperRef}
       style={{
         width: '100%',
         height: '100%',
@@ -143,7 +163,7 @@ export function TopicNode({ node }: { node: Node; graph: Graph }) {
         outlineOffset: 2,
         ...box,
       }}
-      onMouseEnter={() => setHovered(true)}
+      onMouseEnter={onEnter}
       onMouseLeave={() => setHovered(false)}
       onDoubleClick={() => setEditing(true)}
     >
@@ -185,7 +205,7 @@ export function TopicNode({ node }: { node: Node; graph: Graph }) {
             position: 'absolute',
             left: '50%',
             transform: 'translateX(-50%)',
-            top: -36,
+            top: flipBelow ? 'calc(100% + 8px)' : -36,
             zIndex: 20,
             display: 'flex',
             alignItems: 'center',

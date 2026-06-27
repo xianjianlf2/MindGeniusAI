@@ -5,7 +5,7 @@ export type IconName =
   | 'fit' | 'download' | 'search' | 'file' | 'chevDown' | 'chevRight' | 'x'
   | 'sliders' | 'panelLeft' | 'check' | 'alert' | 'clock' | 'gauge' | 'edit'
   | 'zoomIn' | 'zoomOut' | 'refresh' | 'book' | 'key' | 'layers' | 'node'
-  | 'arrowUpRight' | 'globe'
+  | 'arrowUpRight' | 'globe' | 'upload' | 'newMap' | 'help'
 
 interface IconProps {
   name: IconName
@@ -47,6 +47,9 @@ const paths: Record<IconName, ReactNode> = {
   node: <><circle cx="6" cy="12" r="2.4" /><circle cx="18" cy="6" r="2.4" /><circle cx="18" cy="18" r="2.4" /><path d="M8.2 11l7.6-3.8" /><path d="M8.2 13l7.6 3.8" /></>,
   arrowUpRight: <><path d="M7 17L17 7" /><path d="M8 7h9v9" /></>,
   globe: <><circle cx="12" cy="12" r="8" /><path d="M4 12h16" /><path d="M12 4a12 12 0 0 1 0 16 12 12 0 0 1 0-16z" /></>,
+  upload: <><path d="M12 16V6" /><path d="M8 10l4-4 4 4" /><path d="M5 19h14" /></>,
+  newMap: <><path d="M7 3h7l4 4v13a1 1 0 0 1-1 1H7a1 1 0 0 1-1-1V4a1 1 0 0 1 1-1z" /><path d="M14 3v4h4" /><path d="M11 11v6" /><path d="M8 14h6" /></>,
+  help: <><circle cx="12" cy="12" r="8" /><path d="M9.6 9.5a2.4 2.4 0 0 1 4.5 1c0 1.6-2.1 1.9-2.1 3.3" /><path d="M12 17.2h.01" /></>,
 }
 
 /** 设计稿图标集：24×24 线性图标，stroke=currentColor */
