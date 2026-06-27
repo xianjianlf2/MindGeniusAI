@@ -29,6 +29,7 @@ No key at setup? Skip it and paste one later in the app's **Settings** (top-righ
 
 - 🤖 **Real agent, not a prompt wrapper** — multi-step tool loop (Vercel AI SDK v5) that decides when to search docs, generate the map, and expand branches, each shown as a live tool card.
 - ✏️ **Surgical edits** — "rename the pricing branch" patches exact nodes by id, so your manual tweaks survive (no full re-render).
+- 🤝 **Two-way canvas** — edit nodes by hand (rename, add, drag, delete) and Hermas sees *exactly what you changed* on your next message, then builds on it like a collaborator — not just the latest snapshot.
 - 📄 **Reads your PDFs** — attach one or more PDFs (📎): chunk → embed → in-memory retrieval (~100 lines, no LangChain). `rag_query` searches across all attached docs at once.
 - ⌨️ **Keyboard-first canvas** — `Tab` child · `Enter` sibling · `F2` rename · `Del` delete · `⌘Z` undo · **drag a node onto another to re-parent it**.
 - ⌘ **Command palette (⌘K)** — Cursor-style overlay to fuzzy-search your saved maps + uploaded docs; `↵` opens a map or attaches a doc.
@@ -80,6 +81,7 @@ packages/shared/  SSE / agent-event protocol shared by both ends
 
 - **Agent loop** — `streamText` + `stopWhen: stepCountIs(8)`, four zod-typed tools (`mindmap_generate` / `node_expand` / `rag_query` / `mindmap_edit`).
 - **Live edits** — `mindmap_edit` returns `add`/`update`/`remove` ops applied to the tree by node id.
+- **Two-way sync** — your manual canvas ops share that same op model; they're buffered (coalesced) and sent as `recentEdits` so the agent knows what *you* changed since its last turn, not just the current outline.
 - **RAG** — pdf-parse → overlap chunking → `embedMany` → cosine retrieval, in-process.
 - **Multi-provider** — resolved per request from request headers; keys never stored server-side.
 
