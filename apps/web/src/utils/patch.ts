@@ -12,7 +12,7 @@ export function toOutline(node: MindMapData): MindMapOutline {
   }
 }
 
-function find(
+export function find(
   node: MindMapData,
   id: string,
   parent: MindMapData | null = null,

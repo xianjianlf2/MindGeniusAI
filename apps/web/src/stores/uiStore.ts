@@ -46,6 +46,9 @@ interface UiState {
   sourcesOpen: boolean
   settingsOpen: boolean
   toast: string | null
+  /** 需要进入重命名编辑态的节点 id（加子/兄弟节点或 F2 后置位，TopicNode 消费后清空） */
+  editingNodeId: string | null
+  setEditingNodeId: (id: string | null) => void
   setProvider: (provider: Provider) => void
   setApiKey: (key: string) => void
   setProxy: (proxy: string) => void
@@ -87,7 +90,9 @@ export const useUiStore = create<UiState>(set => ({
   sourcesOpen: false,
   settingsOpen: false,
   toast: null,
+  editingNodeId: null,
 
+  setEditingNodeId: editingNodeId => set({ editingNodeId }),
   setProvider(provider) {
     storageManager.set(StorageKey.LLM_PROVIDER, provider)
     set({ provider })

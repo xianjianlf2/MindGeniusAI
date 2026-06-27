@@ -14,6 +14,25 @@ export function treeToMarkdown(root: MindMapData): string {
   return lines.join('\n')
 }
 
+/**
+ * 树 → Mermaid `mindmap`：缩进表层级，根用圆形 root，其余用带引号方形 + 显式 id。
+ * 标签统一塞进 "…" 以容纳括号等特殊字符（裸文本会被 Mermaid 当成 shape 语法误解析）。
+ * 产物可直接贴进 GitHub / mermaid.live 渲染。
+ */
+export function treeToMermaid(root: MindMapData): string {
+  const lines = ['mindmap']
+  let counter = 0
+  const esc = (text: string) => text.replace(/\s+/g, ' ').replace(/"/g, '\'').trim() || ' '
+  const walk = (node: MindMapData, depth: number) => {
+    const indent = '  '.repeat(depth + 1)
+    const label = esc(node.label)
+    lines.push(`${indent}${depth === 0 ? `root(("${label}"))` : `n${++counter}["${label}"]`}`)
+    node.children?.forEach(child => walk(child, depth + 1))
+  }
+  walk(root, 0)
+  return lines.join('\n')
+}
+
 function escapeXml(text: string): string {
   return text
     .replace(/&/g, '&amp;')
