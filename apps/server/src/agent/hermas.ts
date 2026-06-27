@@ -19,8 +19,10 @@ export async function runHermas(
   cfg: LLMRequestConfig,
   onEvent: (event: AgentEvent) => Promise<void>,
 ) {
+  // 兼容旧客户端的单 fileName，统一成 fileNames 数组
+  const fileNames = request.fileNames ?? (request.fileName ? [request.fileName] : [])
   logger.info(
-    { provider: cfg.provider, model: cfg.model, baseURL: cfg.baseURL ?? null, hasFile: !!request.fileName },
+    { provider: cfg.provider, model: cfg.model, baseURL: cfg.baseURL ?? null, docCount: fileNames.length },
     'hermas run',
   )
   const result = streamText({
@@ -30,7 +32,7 @@ export async function runHermas(
       role: message.role,
       content: message.content,
     })),
-    tools: createHermasTools({ cfg, fileName: request.fileName }),
+    tools: createHermasTools({ cfg, fileNames }),
     stopWhen: stepCountIs(MAX_STEPS),
   })
 

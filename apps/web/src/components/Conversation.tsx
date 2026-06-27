@@ -286,7 +286,8 @@ interface ConversationProps {
   messages: UiMessage[]
   working: boolean
   providerName: string
-  attached: string | null
+  /** 已附加为上下文的文档数（0 则不显示标签） */
+  attachedCount: number
   attachedDisplay?: string
   onSend: (text: string) => void
   onStop: () => void
@@ -298,7 +299,7 @@ interface ConversationProps {
 }
 
 export function Conversation({
-  messages, working, providerName, attached, attachedDisplay,
+  messages, working, providerName, attachedCount, attachedDisplay,
   onSend, onStop, onNewChat, onCollapse, onAttach, onRemoveAttach, onErrorAction,
 }: ConversationProps) {
   const t = useT()
@@ -372,13 +373,18 @@ export function Conversation({
       {/* 输入框 */}
       <div style={{ padding: '4px 14px 14px', flexShrink: 0 }}>
         <div style={{ borderRadius: 12, background: 'var(--c-surface-2)', border: '1px solid var(--c-border-strong)', boxShadow: 'var(--sh-1)' }}>
-          {attached && (
+          {attachedCount > 0 && (
             <div style={{ display: 'flex', alignItems: 'center', gap: 8, padding: '10px 10px 0' }}>
               <div style={{ display: 'flex', alignItems: 'center', gap: 6, borderRadius: 7, padding: '4px 8px', background: 'var(--c-bg)', border: '1px solid var(--c-border)' }}>
                 <Icon name="file" size={12} style={{ color: 'var(--c-accent)' }} />
                 <span className="mono" style={{ fontSize: 10.5, color: 'var(--c-text-2)', maxWidth: 180, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
-                  {attachedDisplay ?? attached}
+                  {attachedDisplay}
                 </span>
+                {attachedCount > 1 && (
+                  <span className="mono" style={{ fontSize: 9.5, padding: '0 4px', borderRadius: 99, background: 'var(--c-elevated)', color: 'var(--c-text-3)' }}>
+                    {attachedCount}
+                  </span>
+                )}
                 <button type="button" onClick={onRemoveAttach} className="no-drag" style={{ color: 'var(--c-text-3)', display: 'grid' }}>
                   <Icon name="x" size={12} />
                 </button>

@@ -12,8 +12,8 @@ function PdfRow({ doc, expanded, onExpand }: {
   onExpand: (name: string | null) => void
 }) {
   const t = useT()
-  const { attached, setAttached, index } = useDocStore()
-  const isAttached = attached === doc.name
+  const { attached, toggleAttached, index } = useDocStore()
+  const isAttached = attached.includes(doc.name)
 
   const statusNode = () => {
     if (doc.status === 'uploading') {
@@ -117,7 +117,7 @@ function PdfRow({ doc, expanded, onExpand }: {
         <div style={{ display: 'flex', borderTop: '1px solid var(--c-border)' }}>
           <button
             type="button"
-            onClick={() => setAttached(isAttached ? null : doc.name)}
+            onClick={() => toggleAttached(doc.name)}
             className="no-drag"
             style={{
               flex: 1,

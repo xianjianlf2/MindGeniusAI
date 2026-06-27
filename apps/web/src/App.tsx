@@ -80,7 +80,7 @@ export default function App() {
     mapSetThisTurnRef.current = false
     track('agent_run') // 仅计数「有人真正发起了一次生成」，不含任何内容
     setLeftCollapsed(false)
-    const attachedDoc = files.find(file => file.name === attached)
+    const attachedDocs = files.filter(file => attached.includes(file.name))
     send({
       url: '/api/agent',
       data: {
@@ -88,12 +88,12 @@ export default function App() {
           ...messages.filter(item => item.content).map(({ role, content }) => ({ role, content })),
           { role: 'user', content: text },
         ],
-        fileName: attached ?? undefined,
+        fileNames: attached.length ? attached : undefined,
         // 画布已有导图时随请求带上轮廓，Hermas 可据此做增量编辑而非全量重画
         mindMap: useNodeStore.getState().outline() ?? undefined,
       },
       userText: text,
-      userPdf: attachedDoc ? docDisplayName(attachedDoc) : undefined,
+      userPdf: attachedDocs.length ? attachedDocs.map(docDisplayName).join('、') : undefined,
       agentMode: true,
       onDone: applyMarkdown,
       onSetMap: setMapFromMarkdown,
@@ -157,17 +157,17 @@ export default function App() {
               messages={messages}
               working={isLoading}
               providerName={providerName}
-              attached={attached}
+              attachedCount={attached.length}
               attachedDisplay={(() => {
-                const doc = files.find(file => file.name === attached)
-                return doc ? docDisplayName(doc) : undefined
+                const docs = files.filter(file => attached.includes(file.name))
+                return docs.length ? docs.map(docDisplayName).join('、') : undefined
               })()}
               onSend={handleSend}
               onStop={stop}
               onNewChat={handleNewChat}
               onCollapse={() => setLeftCollapsed(true)}
               onAttach={handleAttach}
-              onRemoveAttach={() => setAttached(null)}
+              onRemoveAttach={() => setAttached([])}
               onErrorAction={handleErrorAction}
             />
           </div>

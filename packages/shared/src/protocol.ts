@@ -58,8 +58,10 @@ export type AgentEvent =
 
 export interface AgentRequest {
   messages: Pick<ChatMessage, 'role' | 'content'>[]
-  /** 已上传并完成索引的文件名，供 rag_query 工具检索 */
+  /** @deprecated 单文档检索目标，由 fileNames 取代；仍接收以兼容旧客户端 */
   fileName?: string
+  /** 已上传并完成索引的文件名集合，rag_query 跨这些文档统一检索 */
+  fileNames?: string[]
   /** 画布上已存在的思维导图轮廓，供 mindmap_edit 增量编辑（不存在则全新生成） */
   mindMap?: MindMapOutline
 }

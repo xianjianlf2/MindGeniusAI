@@ -17,12 +17,14 @@ export interface DocFile {
 
 interface DocState {
   files: DocFile[]
-  /** 作为对话上下文附加给 /agent 的文件（须已索引） */
-  attached: string | null
+  /** 作为对话上下文附加给 /agent 的文件集合（须已索引），rag_query 跨这些文档统一检索 */
+  attached: string[]
   refresh: () => Promise<void>
   upload: (file: File, options?: { attach?: boolean }) => Promise<void>
   index: (name: string) => Promise<boolean>
-  setAttached: (name: string | null) => void
+  /** 切换某文档的附加状态（多选） */
+  toggleAttached: (name: string) => void
+  setAttached: (names: string[]) => void
 }
 
 export const docDisplayName = (doc: DocFile) => doc.displayName ?? doc.name
@@ -33,7 +35,7 @@ export const useDocStore = create<DocState>((set, get) => {
 
   return {
     files: [],
-    attached: null,
+    attached: [],
 
     async refresh() {
       try {
@@ -73,7 +75,7 @@ export const useDocStore = create<DocState>((set, get) => {
         }))
         const ok = await get().index(serverName)
         if (ok && options?.attach)
-          set({ attached: serverName })
+          set(state => ({ attached: [...state.attached, serverName] }))
       }
       catch (error) {
         set(state => ({ files: state.files.filter(item => item.name !== tempName) }))
@@ -98,6 +100,11 @@ export const useDocStore = create<DocState>((set, get) => {
       }
     },
 
+    toggleAttached: name => set(state => ({
+      attached: state.attached.includes(name)
+        ? state.attached.filter(item => item !== name)
+        : [...state.attached, name],
+    })),
     setAttached: attached => set({ attached }),
   }
 })

@@ -20,7 +20,8 @@ const agentRequestSchema = z.object({
     role: z.enum(['user', 'assistant', 'system']),
     content: z.string(),
   })).min(1),
-  fileName: z.string().optional(),
+  fileName: z.string().optional(), // 旧客户端兼容
+  fileNames: z.array(z.string()).optional(),
   mindMap: outlineSchema.optional(),
 })
 

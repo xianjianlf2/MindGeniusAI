@@ -91,8 +91,29 @@ export async function indexDocument(fileName: string, cfg: LLMRequestConfig) {
 }
 
 export async function retrieveChunks(fileName: string, question: string, cfg: LLMRequestConfig, topK = 4): Promise<string[]> {
-  const index = documentIndex.get(fileName)
-  if (!index)
+  return retrieveAcross([fileName], question, cfg, topK)
+}
+
+/**
+ * 按余弦相似度对合并后的 chunk 池排序并取全局 topK（纯函数，可单测）。
+ * 「全局 topK」是成本关键：无论合并了几篇文档，喂给 LLM 的上下文都封顶在 topK 块，
+ * 不随文档数膨胀，故多文档检索几乎零额外 LLM 成本。
+ */
+export function rankChunks(queryEmbedding: number[], pool: IndexedChunk[], topK: number): string[] {
+  return pool
+    .map(chunk => ({ chunk, score: cosineSimilarity(queryEmbedding, chunk.embedding) }))
+    .sort((a, b) => b.score - a.score)
+    .slice(0, topK)
+    .map(({ chunk }) => chunk.text)
+}
+
+/**
+ * 跨多篇已索引文档统一检索：问题只 embed 一次（成本与单文档相同），
+ * 合并所有文档的 chunk 后取全局 topK。
+ */
+export async function retrieveAcross(fileNames: string[], question: string, cfg: LLMRequestConfig, topK = 5): Promise<string[]> {
+  const pool = fileNames.flatMap(name => documentIndex.get(name) ?? [])
+  if (pool.length === 0)
     return []
 
   const model = embeddingModelFor(cfg)
@@ -104,9 +125,5 @@ export async function retrieveChunks(fileName: string, question: string, cfg: LL
     value: question,
   })
 
-  return index
-    .map(chunk => ({ chunk, score: cosineSimilarity(embedding, chunk.embedding) }))
-    .sort((a, b) => b.score - a.score)
-    .slice(0, topK)
-    .map(({ chunk }) => chunk.text)
+  return rankChunks(embedding, pool, topK)
 }

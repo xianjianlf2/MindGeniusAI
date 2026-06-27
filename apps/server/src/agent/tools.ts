@@ -5,7 +5,7 @@ import { logger } from '../lib/logger'
 import type { LLMRequestConfig } from '../llm/provider'
 import { chatModel } from '../llm/provider'
 import { brainstormPrompt, mindMapDirectPrompt, mindMapPrompt, nodeExpandPrompt, structurePrompt } from '../prompts'
-import { retrieveChunks } from '../services/rag'
+import { retrieveAcross } from '../services/rag'
 
 /** 固定三级结构（root → 分支 → 要点），generateObject 据此强校验输出格式 */
 const mindMapStructure = z.object({
@@ -29,8 +29,8 @@ function structureToMarkdown(s: z.infer<typeof mindMapStructure>): string {
 
 export interface HermasContext {
   cfg: LLMRequestConfig
-  /** 已上传并完成索引的文档名，rag_query 的检索目标 */
-  fileName?: string
+  /** 已上传并完成索引的文档名集合，rag_query 跨这些文档统一检索 */
+  fileNames?: string[]
 }
 
 export function createHermasTools(ctx: HermasContext) {
@@ -102,16 +102,16 @@ export function createHermasTools(ctx: HermasContext) {
     }),
 
     rag_query: tool({
-      description: 'Search the user\'s uploaded PDF document for passages relevant to a question. Use before answering anything about the document.',
+      description: 'Search the user\'s uploaded document(s) for passages relevant to a question. Retrieves across all attached documents at once. Use before answering anything about the documents.',
       inputSchema: z.object({
-        question: z.string().describe('What to look up in the document'),
+        question: z.string().describe('What to look up in the document(s)'),
       }),
       execute: async ({ question }) => {
-        if (!ctx.fileName)
+        if (!ctx.fileNames?.length)
           return 'No document has been uploaded/indexed in this session.'
-        const chunks = await retrieveChunks(ctx.fileName, question, ctx.cfg)
+        const chunks = await retrieveAcross(ctx.fileNames, question, ctx.cfg)
         if (chunks.length === 0)
-          return 'The document index is empty or not initialized. Ask the user to initialize the document first.'
+          return 'The document index is empty or not initialized. Ask the user to initialize the document(s) first.'
         return chunks.map((chunk, i) => `[${i + 1}] ${chunk}`).join('\n\n')
       },
     }),
