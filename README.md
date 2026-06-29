@@ -11,7 +11,9 @@
 
 Chat with **Hermas**, an AI agent that plans, reads your PDFs, and draws editable mind maps live — every tool call visible as it works.
 
-🔗 **[Try the live demo →](https://mindgenius.onrender.com)** · bring your own API key (stays in your browser). _First load may take ~30s to wake._
+Turn a dense paper, meeting notes, or a half-formed idea into a structured, editable mind map in seconds — then refine it by chatting or dragging nodes. Great for **students** summarizing papers, **researchers** mapping a field, and **PMs** breaking down a plan.
+
+🔗 **[Try the live demo →](https://mindgenius.onrender.com)** · bring your own API key (stays in your browser). _First load may take ~30s to wake._ · ⭐ **Star it** if it's useful — it helps others find it.
 
 ![MindGenius AI — Hermas plans, then draws an editable mind map live](docs/assets/demo.gif)
 
