@@ -5,10 +5,21 @@ export class MissingApiKeyError extends Error {
   }
 }
 
+/** 访客免费体验额度用尽：引导用户填入自己的 Key 继续 */
+export class DemoQuotaError extends Error {
+  constructor() {
+    super('Free demo limit reached')
+    this.name = 'DemoQuotaError'
+  }
+}
+
 /** 把底层错误归类成对用户友好的提示，不向客户端泄漏堆栈 */
 export function toUserMessage(error: unknown): string {
   if (error instanceof MissingApiKeyError)
     return 'Please check your key'
+  // 含 "demo limit" 标记，前端据此识别为额度类错误并引导填 Key
+  if (error instanceof DemoQuotaError)
+    return 'Free demo limit reached — add your own API key in Settings to keep going'
 
   const message = error instanceof Error ? error.message : String(error)
   const status = (error as { statusCode?: number; status?: number })?.statusCode

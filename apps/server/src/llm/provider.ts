@@ -11,6 +11,8 @@ export interface LLMRequestConfig {
   apiKey: string
   baseURL?: string
   model: string
+  /** true = 用的是服务端共享 Key（访客没自带 Key），需走免费额度护栏 */
+  usingServerKey: boolean
 }
 
 const PROVIDERS: ProviderName[] = ['openai', 'anthropic', 'deepseek', 'moonshot']
@@ -33,7 +35,8 @@ export function resolveRequestConfig(headers: {
 
   const providerConfig = config.providers[provider]
   const headerKey = headers.authorization?.replace('Bearer ', '').trim()
-  const apiKey = (headerKey && headerKey.startsWith('sk-')) ? headerKey : providerConfig.apiKey
+  const hasUserKey = Boolean(headerKey && headerKey.startsWith('sk-'))
+  const apiKey = hasUserKey ? headerKey! : providerConfig.apiKey
 
   if (!apiKey)
     throw new MissingApiKeyError(provider)
@@ -41,6 +44,7 @@ export function resolveRequestConfig(headers: {
   return {
     provider,
     apiKey,
+    usingServerKey: !hasUserKey,
     baseURL: headers.openaiProxy || providerConfig.baseURL || undefined,
     model: headers.model?.trim() || providerConfig.model,
   }

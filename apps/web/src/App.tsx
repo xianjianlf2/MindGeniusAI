@@ -131,7 +131,7 @@ export default function App() {
   }
 
   const handleErrorAction = (kind: ErrorKind) => {
-    if (kind === 'apikey') {
+    if (kind === 'apikey' || kind === 'quota') {
       setSettingsOpen(true)
       flash(t('toast.fillApiKey'))
       return

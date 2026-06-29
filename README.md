@@ -61,7 +61,7 @@ docker run -p 3000:3000 -e OPENAI_API_KEY=sk-... ghcr.io/xianjianlf2/mindgeniusa
 
 Or build locally: `cp apps/server/.env.example apps/server/.env && docker compose up --build`.
 
-Omit the key to let each visitor bring their own from **Settings**.
+Omit the key to let each visitor bring their own from **Settings**. To run a public demo, set a server key **and** `DEMO_DAILY_LIMIT=5` — visitors get a few free runs per day (per IP) before being nudged to add their own key; BYO-key users are never limited.
 
 [![Deploy to Spaces](https://huggingface.co/datasets/huggingface/badges/resolve/main/deploy-to-spaces-lg.svg)](https://huggingface.co/new-space?sdk=docker&name=mindgenius) — free on Hugging Face Spaces (Docker). Keep `sdk: docker` / `app_port: 3000`; set `OPENAI_API_KEY` as a secret or leave it empty.
 

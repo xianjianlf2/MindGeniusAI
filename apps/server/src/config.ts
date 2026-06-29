@@ -55,4 +55,9 @@ export const config = {
     maxIndexedDocs: Number(process.env.MAX_INDEXED_DOCS ?? 20),
     maxChunksPerDoc: Number(process.env.MAX_CHUNKS_PER_DOC ?? 200),
   },
+  // 免 Key 体验：设了服务端 Key 时，访客每个 IP 每天可免费跑的 LLM 请求数。
+  // 0 = 不限流（保持旧的共享 Key 行为）；设为正数即开放安全的公开 demo。
+  demo: {
+    dailyLimit: Number(process.env.DEMO_DAILY_LIMIT ?? 0),
+  },
 } as const

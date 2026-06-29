@@ -7,14 +7,16 @@ import { legacySSE } from '../lib/sse'
 import type { LLMRequestConfig } from '../llm/provider'
 import { chatModel } from '../llm/provider'
 import { compressPrompt, mindMapPrompt, nodeExpandPrompt } from '../prompts'
-import { llmConfigFrom } from './middleware'
+import { enforceDemoQuota, llmConfigFrom } from './middleware'
 
 export const chatRoutes = new Hono()
 
 /** 把 streamText 的增量输出按旧协议推给前端 */
 function pipeTextStream(c: Context, run: (cfg: LLMRequestConfig) => ReturnType<typeof streamText>) {
   return legacySSE(c, async (emit) => {
-    const result = run(llmConfigFrom(c))
+    const cfg = llmConfigFrom(c)
+    enforceDemoQuota(c, cfg)
+    const result = run(cfg)
     for await (const delta of result.textStream)
       await emit.send(delta)
     await emit.done()
@@ -66,8 +68,10 @@ chatRoutes.post('/compressContent', async (c) => {
     return c.json({ success: false, message: 'No content' }, 400)
 
   try {
+    const cfg = llmConfigFrom(c)
+    enforceDemoQuota(c, cfg)
     const { text } = await generateText({
-      model: chatModel(llmConfigFrom(c)),
+      model: chatModel(cfg),
       prompt: compressPrompt(content),
       temperature: 0.1,
       maxOutputTokens: 1024,

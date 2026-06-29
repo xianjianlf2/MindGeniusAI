@@ -4,7 +4,7 @@ import { Hono } from 'hono'
 import { z } from 'zod'
 import { runHermas } from '../agent/hermas'
 import { legacySSE } from '../lib/sse'
-import { llmConfigFrom } from './middleware'
+import { enforceDemoQuota, llmConfigFrom } from './middleware'
 
 export const agentRoutes = new Hono()
 
@@ -48,6 +48,7 @@ agentRoutes.post('/agent', async (c) => {
 
   return legacySSE(c, async (emit) => {
     const cfg = llmConfigFrom(c)
+    enforceDemoQuota(c, cfg)
     await runHermas(request, cfg, event => emit.send(encodeAgentEvent(event)))
     await emit.done()
   })

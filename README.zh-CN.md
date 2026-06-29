@@ -61,7 +61,7 @@ docker run -p 3000:3000 -e OPENAI_API_KEY=sk-... ghcr.io/xianjianlf2/mindgeniusa
 
 或本地构建：`cp apps/server/.env.example apps/server/.env && docker compose up --build`。
 
-不填 Key 即让每位访客在**「设置」**里自带。
+不填 Key 即让每位访客在**「设置」**里自带。想开公开 demo：设服务端 Key **并**配 `DEMO_DAILY_LIMIT=5`，访客每天（按 IP）有几次免费试用,用完再引导填自己的 Key；自带 Key 的用户不受限。
 
 [![Deploy to Spaces](https://huggingface.co/datasets/huggingface/badges/resolve/main/deploy-to-spaces-lg.svg)](https://huggingface.co/new-space?sdk=docker&name=mindgenius) —— 在 Hugging Face Spaces 免费跑（Docker）。保留 `sdk: docker` / `app_port: 3000`；把 `OPENAI_API_KEY` 设为 secret 或留空走访客自带。
 

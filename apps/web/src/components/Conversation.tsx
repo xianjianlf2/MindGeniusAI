@@ -16,10 +16,13 @@ const TOOL_META: Record<string, { labelKey: TKey; icon: IconName }> = {
 }
 
 /* ---------- 错误分类 ---------- */
-export type ErrorKind = 'apikey' | 'ratelimit' | 'timeout' | 'generic'
+export type ErrorKind = 'quota' | 'apikey' | 'ratelimit' | 'timeout' | 'generic'
 
 export function classifyError(message: string): ErrorKind {
   const lower = message.toLowerCase()
+  // 免费额度用尽要先于 apikey 判定（其文案里也含 "api key"）
+  if (lower.includes('demo limit'))
+    return 'quota'
   if (lower.includes('key') || lower.includes('unauthorized') || lower.includes('401'))
     return 'apikey'
   if (lower.includes('429') || lower.includes('rate'))
@@ -30,6 +33,7 @@ export function classifyError(message: string): ErrorKind {
 }
 
 const ERROR_META: Record<ErrorKind, { icon: IconName; titleKey: TKey; descKey?: TKey; actionKey: TKey; tone: 'error' | 'warn' }> = {
+  quota: { icon: 'spark', titleKey: 'conv.errorQuotaTitle', descKey: 'conv.errorQuotaDesc', actionKey: 'conv.errorQuotaAction', tone: 'warn' },
   apikey: { icon: 'alert', titleKey: 'conv.errorApikeyTitle', descKey: 'conv.errorApikeyDesc', actionKey: 'conv.errorApikeyAction', tone: 'error' },
   ratelimit: { icon: 'gauge', titleKey: 'conv.errorRatelimitTitle', descKey: 'conv.errorRatelimitDesc', actionKey: 'conv.errorRatelimitAction', tone: 'warn' },
   timeout: { icon: 'clock', titleKey: 'conv.errorTimeoutTitle', descKey: 'conv.errorTimeoutDesc', actionKey: 'conv.errorTimeoutAction', tone: 'warn' },
