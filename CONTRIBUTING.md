@@ -44,4 +44,4 @@ Open an issue with: what you expected, what happened, steps to reproduce, and yo
 
 ## License
 
-By contributing, you agree that your contributions are licensed under the [MIT License](LICENSE).
+By contributing, you agree that your contributions are licensed under the project's [Business Source License 1.1](LICENSE), and you grant xianjianlf2 the right to license your contributions — including for commercial purposes — under that license and any future license the project adopts.

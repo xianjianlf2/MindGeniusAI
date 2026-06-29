@@ -2,7 +2,8 @@
 
 A ready-to-use launch checklist + copy for getting MindGenius AI in front of people.
 Edit the angle to taste, but the positioning is consistent: **a real document-aware
-agent that draws and edits mind maps live, bring-your-own-key, self-hostable, MIT.**
+agent that draws and edits mind maps live, bring-your-own-key, self-hostable,
+source-available (free for non-commercial use).**
 
 ## 0. Prerequisites (do these first — they gate everything else)
 
@@ -19,7 +20,7 @@ agent that draws and edits mind maps live, bring-your-own-key, self-hostable, MI
   bring your own key, self-host in one Docker command.
 - **Tweet-length:** Most "AI mind map" tools are one prompt → markdown. MindGenius runs a
   real tool-calling agent: it searches your uploaded PDF, builds the map, and edits exact
-  nodes live — every step visible. BYO key, MIT, one-image Docker.
+  nodes live — every step visible. BYO key, source-available (non-commercial free), one-image Docker.
 - **Tagline:** Your documents in, an editable mind map out — with the agent's work shown live.
 
 ## 2. Channel-specific copy
@@ -27,7 +28,8 @@ agent that draws and edits mind maps live, bring-your-own-key, self-hostable, MI
 ### Hacker News — "Show HN"
 > **Show HN: MindGenius AI – a document-aware agent that draws and edits mind maps live**
 >
-> It's an open-source (MIT) workbench where an agent (Hermas) plans, retrieves from your
+> It's a source-available workbench (BSL 1.1 — free for non-commercial use, converts to
+> Apache-2.0 in 2030) where an agent (Hermas) plans, retrieves from your
 > uploaded PDF, and renders an editable mind map — each tool call shown as an expandable
 > card. Unlike one-shot "prompt → markdown" tools, it runs a multi-step tool-calling loop
 > (Vercel AI SDK v5) and can edit the *existing* canvas surgically (add/rename/remove a
@@ -63,7 +65,7 @@ breaking the old SSE protocol" — links back to the repo and `docs/REFACTOR_PLA
 
 ## 3. GitHub repo metadata (1-minute, high-leverage SEO)
 
-- **Description:** `An AI agent that reads your documents and draws editable mind maps live — bring your own key, self-hostable, MIT.`
+- **Description:** `An AI agent that reads your documents and draws editable mind maps live — bring your own key, self-hostable, source-available (non-commercial free).`
 - **Topics:** `ai-agent`, `mindmap`, `mind-map`, `rag`, `llm`, `vercel-ai-sdk`,
   `openai`, `claude`, `deepseek`, `react`, `hono`, `typescript`, `antv-x6`,
   `self-hosted`, `bring-your-own-key`

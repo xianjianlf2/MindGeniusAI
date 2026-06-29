@@ -3,7 +3,7 @@
 <p>
   <a href="https://mindgenius.onrender.com"><img src="https://img.shields.io/badge/Live%20Demo-online-brightgreen?style=flat" alt="Live Demo" /></a>
   <a href="https://github.com/xianjianlf2/MindGeniusAI/actions/workflows/ci.yml"><img src="https://github.com/xianjianlf2/MindGeniusAI/actions/workflows/ci.yml/badge.svg" alt="CI" /></a>
-  <a href="LICENSE"><img src="https://img.shields.io/badge/License-MIT-blue.svg" alt="License: MIT" /></a>
+  <a href="LICENSE"><img src="https://img.shields.io/badge/License-BSL%201.1-blue.svg" alt="License: BSL 1.1" /></a>
   <a href="package.json"><img src="https://img.shields.io/badge/node-%3E%3D20-brightgreen" alt="Node" /></a>
 </p>
 
@@ -95,7 +95,7 @@ Cookieless, count-only (page views + an `agent_run` event) via Umami / GoatCount
 
 ## License
 
-[MIT](LICENSE)
+[Business Source License 1.1](LICENSE). Free for personal, academic, research, and non-profit use. **Commercial use requires a license** — contact mark-xian@foxmail.com. Each version converts to Apache-2.0 four years after release (Change Date: 2030-06-29).
 
 ## Star History
 

@@ -3,7 +3,7 @@
 <p>
   <a href="https://mindgenius.onrender.com"><img src="https://img.shields.io/badge/Live%20Demo-online-brightgreen?style=flat" alt="Live Demo" /></a>
   <a href="https://github.com/xianjianlf2/MindGeniusAI/actions/workflows/ci.yml"><img src="https://github.com/xianjianlf2/MindGeniusAI/actions/workflows/ci.yml/badge.svg" alt="CI" /></a>
-  <a href="LICENSE"><img src="https://img.shields.io/badge/License-MIT-blue.svg" alt="License: MIT" /></a>
+  <a href="LICENSE"><img src="https://img.shields.io/badge/License-BSL%201.1-blue.svg" alt="License: BSL 1.1" /></a>
   <a href="package.json"><img src="https://img.shields.io/badge/node-%3E%3D20-brightgreen" alt="Node" /></a>
 </p>
 
@@ -97,7 +97,7 @@ packages/shared/  两端共用的 SSE / 智能体事件协议
 
 ## 许可证
 
-[MIT](LICENSE)
+[Business Source License 1.1](LICENSE)。个人、学术、研究、非营利用途免费使用；**商业用途须获得授权**——联系 mark-xian@foxmail.com。每个版本在发布 4 年后自动转为 Apache-2.0（Change Date：2030-06-29）。
 
 ## Star 趋势
 
