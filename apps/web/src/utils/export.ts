@@ -61,12 +61,12 @@ ${outline(root, '    ')}
 }
 
 /**
- * 在导出的 PNG 底部追加一行轻量角标（"Made with Tendril"），
+ * 在导出的 PNG 底部追加一行轻量角标（"Made with MindGenius"），
  * 让每张被转发的思维导图都自带来源 / 入口——传播飞轮的核心。
  * 把 PNG 画到一块更高的画布上，底部留一条与导出底色一致的条带写字。
  */
 const EXPORT_BG = '#0B0D11'
-const BRAND = 'Tendril'
+const BRAND = 'MindGenius'
 const BRAND_COLOR = '#FF6F59'
 
 export function stampWatermark(pngDataUri: string): Promise<string> {

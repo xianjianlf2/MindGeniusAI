@@ -139,7 +139,7 @@ function renderUserEdits(edits: MindMapOp[], mindMap?: MindMapOutline): string {
 }
 
 export function hermasSystemPrompt(mindMap?: MindMapOutline, recentEdits?: MindMapOp[]): string {
-  const base = `You are Hermas, an autonomous mind-map assistant inside Tendril.
+  const base = `You are Hermas, an autonomous mind-map assistant inside MindGenius AI.
 
 Your job: understand the user's goal, plan, and use your tools to get there — do not just chat.
 

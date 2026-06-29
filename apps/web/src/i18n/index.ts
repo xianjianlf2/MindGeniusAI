@@ -179,7 +179,7 @@ const zh: Dict = {
   'toast.uploadFailed': '上传失败：{msg}',
   'app.closeSidebar': '关闭侧栏',
   'app.phoneTitle': '更适合在大屏使用',
-  'app.phoneBody': 'Tendril 是一个桌面思维导图工作台，画布编辑在手机上体验有限。建议用平板或电脑打开。',
+  'app.phoneBody': 'MindGenius 是一个桌面思维导图工作台，画布编辑在手机上体验有限。建议用平板或电脑打开。',
   'app.phoneContinue': '仍要继续',
 
   // store fallbacks
@@ -362,7 +362,7 @@ const en: Dict = {
   'toast.uploadFailed': 'Upload failed: {msg}',
   'app.closeSidebar': 'Close sidebar',
   'app.phoneTitle': 'Best used on a larger screen',
-  'app.phoneBody': 'Tendril is a desktop mind-map workbench; canvas editing is limited on phones. A tablet or computer is recommended.',
+  'app.phoneBody': 'MindGenius is a desktop mind-map workbench; canvas editing is limited on phones. A tablet or computer is recommended.',
   'app.phoneContinue': 'Continue anyway',
 
   // store fallbacks

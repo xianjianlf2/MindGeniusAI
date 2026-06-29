@@ -1,6 +1,6 @@
 # Promotion kit
 
-A ready-to-use launch checklist + copy for getting Tendril in front of people.
+A ready-to-use launch checklist + copy for getting MindGenius in front of people.
 Primary wedge: **a self-hostable, privacy-first document-aware mind-map agent — your
 files and API key never leave your machine.** Lead every channel with self-host +
 privacy; the "real agent / live tool calls" angle is the demo hook, not the headline.
@@ -22,7 +22,7 @@ by design). Let the shareable artifact + demo GIF pull students in as a free top
 - **Short:** A self-hostable AI agent that turns your PDFs into editable mind maps —
   your files and key never leave your machine. One Docker command.
 - **Tweet-length:** Every "AI mind map" tool wants to upload your documents to its cloud.
-  Tendril runs the whole thing on your box: a real tool-calling agent reads your PDF,
+  MindGenius runs the whole thing on your box: a real tool-calling agent reads your PDF,
   builds the map, and edits exact nodes live — BYO key (stays in your browser), one-image
   Docker, source-available.
 - **Tagline:** Your documents in, an editable mind map out — on infrastructure you control.
@@ -30,10 +30,10 @@ by design). Let the shareable artifact + demo GIF pull students in as a free top
 ## 2. Channel-specific copy
 
 ### Hacker News — "Show HN"
-> **Show HN: Tendril – a self-hostable, document-aware mind-map agent (your files stay local)**
+> **Show HN: MindGenius – a self-hostable, document-aware mind-map agent (your files stay local)**
 >
 > Most "AI mind map" tools are cloud SaaS: you upload your documents to their servers and
-> your model key lives in their backend. Tendril runs entirely on infrastructure you
+> your model key lives in their backend. MindGenius runs entirely on infrastructure you
 > control — one Docker image, BYO key (stays in your browser, sent only to your own
 > backend), nothing written to the server's disk.
 >
@@ -49,7 +49,7 @@ by design). Let the shareable artifact + demo GIF pull students in as a free top
 Post Tue–Thu, ~8–10am ET. Reply to every comment in the first 2 hours.
 
 ### Product Hunt
-- **Name:** Tendril
+- **Name:** MindGenius AI
 - **Tagline:** Self-hostable AI mind-map agent — your docs and key never leave your machine
 - **First comment:** the "why it's different" framing — self-host + privacy first, then
   real agent vs prompt wrapper, live `mindmap_edit`, BYO-key. Link the demo.

@@ -1,4 +1,4 @@
-# Contributing to Tendril
+# Contributing to MindGeniusAI
 
 Thanks for your interest in contributing! 🎉 Issues, ideas, and pull requests are all welcome.
 

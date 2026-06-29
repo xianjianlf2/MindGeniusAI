@@ -26,7 +26,7 @@ Drop marketing media here, then reference it from the root `README.md`.
 ## Embed snippet (paste into root README once assets exist)
 
 ```md
-![Tendril — Hermas workbench](docs/assets/hero.png)
+![MindGenius AI — Hermas workbench](docs/assets/hero.png)
 
 ![Hermas generating and editing a mind map live](docs/assets/demo.gif)
 ```

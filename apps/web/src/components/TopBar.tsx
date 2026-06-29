@@ -48,7 +48,8 @@ export function TopBar() {
           <Icon name="node" size={16} style={{ color: '#190b07' }} />
         </div>
         <span style={{ fontSize: 14, fontWeight: 650, color: 'var(--c-text)', letterSpacing: '-0.01em' }}>
-          Tendril
+          MindGenius
+          <span style={{ color: 'var(--c-accent)' }}> AI</span>
         </span>
       </div>
 

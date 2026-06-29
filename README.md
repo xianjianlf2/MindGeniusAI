@@ -1,4 +1,4 @@
-# Tendril
+# MindGenius AI
 
 > **A self-hostable AI agent that turns your documents into editable mind maps — your files and API keys never leave your machine.**
 
@@ -11,17 +11,17 @@
 
 **English** · [简体中文](README.zh-CN.md)
 
-Chat with **Hermas**, Tendril's AI agent that plans, reads your PDFs, and draws editable mind maps live — every tool call visible as it works.
+Chat with **Hermas**, an AI agent that plans, reads your PDFs, and draws editable mind maps live — every tool call visible as it works.
 
-Most AI mind-map tools are cloud SaaS — your documents get uploaded to *their* servers and your model key lives in *their* backend. Tendril runs entirely on infrastructure you control: **one Docker image, bring-your-own-key, nothing stored server-side.** Built for **privacy-conscious knowledge workers**, **self-hosters**, and **teams with sensitive documents** (legal, research, internal specs) that can't be pasted into a third-party cloud.
+Most AI mind-map tools are cloud SaaS — your documents get uploaded to *their* servers and your model key lives in *their* backend. MindGenius runs entirely on infrastructure you control: **one Docker image, bring-your-own-key, nothing stored server-side.** Built for **privacy-conscious knowledge workers**, **self-hosters**, and **teams with sensitive documents** (legal, research, internal specs) that can't be pasted into a third-party cloud.
 
 🔗 **[Try the live demo →](https://mindgenius.onrender.com)** · bring your own API key (stays in your browser). _First load may take ~30s to wake._ · ⭐ **Star it** if it's useful — it helps others find it.
 
-![Tendril — Hermas plans, then draws an editable mind map live](docs/assets/demo.gif)
+![MindGenius AI — Hermas plans, then draws an editable mind map live](docs/assets/demo.gif)
 
-## 🔒 Why Tendril
+## 🔒 Why MindGenius
 
-|  | **Tendril** | Typical cloud AI mind-map tools |
+|  | **MindGenius** | Typical cloud AI mind-map tools |
 | --- | --- | --- |
 | Runs on your own machine | ✅ one Docker image | ❌ their cloud only |
 | Your documents stay local | ✅ never leave your box | ❌ uploaded to their servers |
