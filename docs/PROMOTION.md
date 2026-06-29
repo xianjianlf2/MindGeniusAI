@@ -1,6 +1,6 @@
 # Promotion kit
 
-A ready-to-use launch checklist + copy for getting MindGenius AI in front of people.
+A ready-to-use launch checklist + copy for getting Tendril in front of people.
 Edit the angle to taste, but the positioning is consistent: **a real document-aware
 agent that draws and edits mind maps live, bring-your-own-key, self-hostable,
 source-available (free for non-commercial use).**
@@ -18,7 +18,7 @@ source-available (free for non-commercial use).**
 
 - **Short:** Talk to an AI agent that reads your PDFs and draws editable mind maps —
   bring your own key, self-host in one Docker command.
-- **Tweet-length:** Most "AI mind map" tools are one prompt → markdown. MindGenius runs a
+- **Tweet-length:** Most "AI mind map" tools are one prompt → markdown. Tendril runs a
   real tool-calling agent: it searches your uploaded PDF, builds the map, and edits exact
   nodes live — every step visible. BYO key, source-available (non-commercial free), one-image Docker.
 - **Tagline:** Your documents in, an editable mind map out — with the agent's work shown live.
@@ -26,7 +26,7 @@ source-available (free for non-commercial use).**
 ## 2. Channel-specific copy
 
 ### Hacker News — "Show HN"
-> **Show HN: MindGenius AI – a document-aware agent that draws and edits mind maps live**
+> **Show HN: Tendril – a document-aware agent that draws and edits mind maps live**
 >
 > It's a source-available workbench (BSL 1.1 — free for non-commercial use, converts to
 > Apache-2.0 in 2030) where an agent (Hermas) plans, retrieves from your
@@ -43,7 +43,7 @@ source-available (free for non-commercial use).**
 Post Tue–Thu, ~8–10am ET. Reply to every comment in the first 2 hours.
 
 ### Product Hunt
-- **Name:** MindGenius AI
+- **Name:** Tendril
 - **Tagline:** An AI agent that reads your docs and draws editable mind maps
 - **First comment:** the "why it's different" framing — real agent vs prompt wrapper,
   live `mindmap_edit`, BYO-key privacy, one-command self-host. Link the demo.

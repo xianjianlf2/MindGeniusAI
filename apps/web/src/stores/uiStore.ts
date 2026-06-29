@@ -13,6 +13,35 @@ export const PROVIDERS: { id: Provider; name: string; sub: string; dot: string }
   { id: 'moonshot', name: 'Kimi', sub: 'Moonshot', dot: '#8E7BFF' },
 ]
 
+/**
+ * 每家 provider 的常用模型预设。第一个为推荐默认（够用、便宜）。
+ * 设置面板把它做成可点选项，省去手打模型名的认知负担；仍保留“自定义”兜底。
+ */
+export type ModelTag = 'rec' | 'max'
+export const MODEL_PRESETS: Record<Provider, { id: string; tag?: ModelTag }[]> = {
+  openai: [
+    { id: 'gpt-4o-mini', tag: 'rec' },
+    { id: 'gpt-4o' },
+    { id: 'gpt-4.1' },
+    { id: 'gpt-4.1-mini' },
+  ],
+  anthropic: [
+    { id: 'claude-sonnet-4-6', tag: 'rec' },
+    { id: 'claude-opus-4-8', tag: 'max' },
+    { id: 'claude-haiku-4-5' },
+  ],
+  deepseek: [
+    { id: 'deepseek-chat', tag: 'rec' },
+    { id: 'deepseek-reasoner' },
+  ],
+  moonshot: [
+    { id: 'kimi-k2-0905-preview', tag: 'rec' },
+    { id: 'moonshot-v1-8k' },
+    { id: 'moonshot-v1-32k' },
+    { id: 'moonshot-v1-128k' },
+  ],
+}
+
 export const ACCENTS = [
   { id: '#FF6F59', nameKey: 'accent.coral' },
   { id: '#5B8DEF', nameKey: 'accent.indigo' },

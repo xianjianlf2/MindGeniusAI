@@ -1,4 +1,6 @@
-# MindGenius AI
+# Tendril
+
+> **上传一篇文档，AI 智能体当场把它读成一张可编辑的思维导图。**
 
 <p>
   <a href="https://mindgenius.onrender.com"><img src="https://img.shields.io/badge/Live%20Demo-online-brightgreen?style=flat" alt="Live Demo" /></a>
@@ -9,13 +11,13 @@
 
 [English](README.md) · **简体中文**
 
-和 **Hermas** 对话 —— 一个会自主规划、读你的 PDF、并实时画出可编辑思维导图的 AI 智能体，每一步工具调用都看得见。
+和 **Hermas** 对话 —— Tendril 的 AI 智能体，会自主规划、读你的 PDF、并实时画出可编辑思维导图，每一步工具调用都看得见。
 
 几秒内把一篇密集的论文、会议记录、或一个还没成形的想法，变成结构化、可编辑的思维导图 —— 再通过对话或拖拽节点不断打磨。适合**学生**梳理论文、**研究者**梳理领域、**产品经理**拆解方案。
 
 🔗 **[在线体验 →](https://mindgenius.onrender.com)** · 自带 API Key（只存在你的浏览器里）。_首次打开可能要等约 30 秒唤醒。_ · ⭐ 觉得有用就 **Star** 一下，能帮更多人发现它。
 
-![MindGenius AI —— Hermas 规划后，把可编辑思维导图实时画出来](docs/assets/demo.gif)
+![Tendril —— Hermas 规划后，把可编辑思维导图实时画出来](docs/assets/demo.gif)
 
 ## ⚡️ 快速开始
 

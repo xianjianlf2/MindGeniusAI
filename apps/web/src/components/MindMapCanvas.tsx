@@ -13,7 +13,7 @@ import { MindMapController } from '@/mindmap/controller'
 import { registerMindMapShapes } from '@/mindmap/registry'
 import { useNodeStore } from '@/stores/nodeStore'
 import { useUiStore } from '@/stores/uiStore'
-import { downloadText, treeToMarkdown, treeToMermaid, treeToOPML } from '@/utils/export'
+import { downloadText, stampWatermark, treeToMarkdown, treeToMermaid, treeToOPML } from '@/utils/export'
 import { IMPORT_ACCEPT, importToMarkdown } from '@/utils/import'
 import { canMoveUnder } from '@/utils/patch'
 import type { TKey } from '@/i18n'
@@ -180,8 +180,10 @@ export function MindMapCanvas({ onPickExample }: { onPickExample: (prompt: strin
     setExportMenu(false)
     if (kind === 'png') {
       graph?.toPNG((dataUri) => {
-        DataUri.downloadDataUri(dataUri, 'mindmap.png')
-        flash(t('canvas.exported', { file: 'mindmap.png' }))
+        stampWatermark(dataUri).then((stamped) => {
+          DataUri.downloadDataUri(stamped, 'mindmap.png')
+          flash(t('canvas.exported', { file: 'mindmap.png' }))
+        })
       }, { backgroundColor: '#0B0D11', padding: 20 })
       return
     }

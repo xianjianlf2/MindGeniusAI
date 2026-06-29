@@ -1,4 +1,6 @@
-# MindGenius AI
+# Tendril
+
+> **Upload a document — an AI agent reads it and draws an editable mind map, live.**
 
 <p>
   <a href="https://mindgenius.onrender.com"><img src="https://img.shields.io/badge/Live%20Demo-online-brightgreen?style=flat" alt="Live Demo" /></a>
@@ -9,13 +11,13 @@
 
 **English** · [简体中文](README.zh-CN.md)
 
-Chat with **Hermas**, an AI agent that plans, reads your PDFs, and draws editable mind maps live — every tool call visible as it works.
+Chat with **Hermas**, Tendril's AI agent that plans, reads your PDFs, and draws editable mind maps live — every tool call visible as it works.
 
 Turn a dense paper, meeting notes, or a half-formed idea into a structured, editable mind map in seconds — then refine it by chatting or dragging nodes. Great for **students** summarizing papers, **researchers** mapping a field, and **PMs** breaking down a plan.
 
 🔗 **[Try the live demo →](https://mindgenius.onrender.com)** · bring your own API key (stays in your browser). _First load may take ~30s to wake._ · ⭐ **Star it** if it's useful — it helps others find it.
 
-![MindGenius AI — Hermas plans, then draws an editable mind map live](docs/assets/demo.gif)
+![Tendril — Hermas plans, then draws an editable mind map live](docs/assets/demo.gif)
 
 ## ⚡️ Quick Start
 

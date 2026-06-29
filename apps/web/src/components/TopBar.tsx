@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import { Icon } from './ui/Icon'
 import { IconButton, Popover, Segmented } from './ui/primitives'
-import { ACCENTS, PROVIDERS, useUiStore } from '@/stores/uiStore'
+import { ACCENTS, MODEL_PRESETS, PROVIDERS, useUiStore } from '@/stores/uiStore'
 import { useDocStore } from '@/stores/docStore'
 import { useT } from '@/i18n'
 
@@ -17,9 +17,15 @@ export function TopBar() {
   const t = useT()
   const pdfCount = useDocStore(state => state.files.length)
   const [modelMenu, setModelMenu] = useState(false)
+  const [advancedOpen, setAdvancedOpen] = useState(false)
+  const [customOpen, setCustomOpen] = useState(false)
 
   const current = PROVIDERS.find(item => item.id === provider) ?? PROVIDERS[0]
   const keyOk = apiKey.length > 0
+  const presets = MODEL_PRESETS[provider]
+  // 当前模型是否落在预设之外（即用户手填的自定义名）
+  const modelIsCustom = model.length > 0 && !presets.some(item => item.id === model)
+  const showCustomInput = customOpen || modelIsCustom
 
   return (
     <div
@@ -42,8 +48,7 @@ export function TopBar() {
           <Icon name="node" size={16} style={{ color: '#190b07' }} />
         </div>
         <span style={{ fontSize: 14, fontWeight: 650, color: 'var(--c-text)', letterSpacing: '-0.01em' }}>
-          MindGenius
-          <span style={{ color: 'var(--c-accent)' }}> AI</span>
+          Tendril
         </span>
       </div>
 
@@ -247,47 +252,94 @@ export function TopBar() {
                 {keyOk ? t('topbar.keyConfigured') : t('topbar.keyUnconfigured')}
               </div>
 
-              <div className="mono" style={{ ...MONO_LABEL, marginBottom: 6 }}>{t('topbar.apiBaseUrl')}</div>
-              <div
-                style={{
-                  display: 'flex',
-                  alignItems: 'center',
-                  gap: 8,
-                  borderRadius: 8,
-                  padding: '8px 10px',
-                  background: 'var(--c-surface-2)',
-                  border: '1px solid var(--c-border)',
-                }}
-              >
-                <input
-                  value={proxy}
-                  onChange={event => setProxy(event.target.value.trim())}
-                  placeholder={provider === 'moonshot' ? 'https://api.moonshot.cn/v1' : 'https://api.openai.com/v1'}
-                  className="mono"
-                  style={{ flex: 1, background: 'transparent', outline: 'none', border: 'none', fontSize: 11.5, color: 'var(--c-text)' }}
-                />
+              {/* 模型：预设一点即用，自定义兜底，省去手打模型名的认知负担 */}
+              <div className="mono" style={{ ...MONO_LABEL, marginBottom: 8 }}>{t('topbar.model')} · {current.name}</div>
+              <div style={{ display: 'flex', flexWrap: 'wrap', gap: 6 }}>
+                {presets.map((item) => {
+                  // model 为空时服务端走第一项（推荐默认），故高亮第一项
+                  const on = !showCustomInput && (model === item.id || (model === '' && presets[0].id === item.id))
+                  return (
+                    <button
+                      type="button"
+                      key={item.id}
+                      onClick={() => {
+                        setCustomOpen(false)
+                        setModel(item.id)
+                      }}
+                      className="no-drag"
+                      style={{
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: 5,
+                        borderRadius: 7,
+                        padding: '5px 9px',
+                        fontSize: 11.5,
+                        color: on ? 'var(--c-accent)' : 'var(--c-text-2)',
+                        background: on ? 'var(--c-accent-soft)' : 'var(--c-surface-2)',
+                        border: `1px solid ${on ? 'transparent' : 'var(--c-border)'}`,
+                      }}
+                    >
+                      <span className="mono">{item.id}</span>
+                      {item.tag && (
+                        <span className="mono" style={{ fontSize: 9, padding: '0 4px', borderRadius: 4, color: 'var(--c-text-3)', background: 'var(--c-elevated)' }}>
+                          {item.tag === 'max' ? t('topbar.tagMax') : t('topbar.tagRec')}
+                        </span>
+                      )}
+                    </button>
+                  )
+                })}
+                <button
+                  type="button"
+                  onClick={() => setCustomOpen(true)}
+                  className="no-drag"
+                  style={{
+                    borderRadius: 7,
+                    padding: '5px 9px',
+                    fontSize: 11.5,
+                    color: showCustomInput ? 'var(--c-accent)' : 'var(--c-text-2)',
+                    background: showCustomInput ? 'var(--c-accent-soft)' : 'var(--c-surface-2)',
+                    border: `1px solid ${showCustomInput ? 'transparent' : 'var(--c-border)'}`,
+                  }}
+                >
+                  {t('topbar.modelCustom')}
+                </button>
               </div>
+              {showCustomInput && (
+                <div style={{ display: 'flex', alignItems: 'center', gap: 8, borderRadius: 8, padding: '8px 10px', marginTop: 8, background: 'var(--c-surface-2)', border: '1px solid var(--c-border)' }}>
+                  <input
+                    value={model}
+                    onChange={event => setModel(event.target.value.trim())}
+                    placeholder={t('topbar.modelCustomPlaceholder')}
+                    className="mono"
+                    style={{ flex: 1, background: 'transparent', outline: 'none', border: 'none', fontSize: 11.5, color: 'var(--c-text)' }}
+                  />
+                </div>
+              )}
 
-              <div className="mono" style={{ ...MONO_LABEL, margin: '12px 0 6px' }}>{t('topbar.model')}</div>
-              <div
-                style={{
-                  display: 'flex',
-                  alignItems: 'center',
-                  gap: 8,
-                  borderRadius: 8,
-                  padding: '8px 10px',
-                  background: 'var(--c-surface-2)',
-                  border: '1px solid var(--c-border)',
-                }}
+              {/* 高级：Base URL（代理 / 自建网关）默认折叠，90% 的人用不到 */}
+              <button
+                type="button"
+                onClick={() => setAdvancedOpen(open => !open)}
+                className="no-drag"
+                style={{ display: 'flex', alignItems: 'center', gap: 6, marginTop: 12, background: 'transparent', border: 'none', padding: 0, color: 'var(--c-text-3)', fontSize: 11.5 }}
               >
-                <input
-                  value={model}
-                  onChange={event => setModel(event.target.value.trim())}
-                  placeholder={provider === 'moonshot' ? 'moonshot-v1-8k / kimi-k2-…' : provider === 'deepseek' ? 'deepseek-chat' : 'gpt-4o-mini'}
-                  className="mono"
-                  style={{ flex: 1, background: 'transparent', outline: 'none', border: 'none', fontSize: 11.5, color: 'var(--c-text)' }}
-                />
-              </div>
+                <Icon name="chevDown" size={13} style={{ transform: advancedOpen ? 'none' : 'rotate(-90deg)', transition: 'transform .15s' }} />
+                {t('topbar.advanced')}
+              </button>
+              {advancedOpen && (
+                <>
+                  <div className="mono" style={{ ...MONO_LABEL, margin: '8px 0 6px' }}>{t('topbar.apiBaseUrl')}</div>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: 8, borderRadius: 8, padding: '8px 10px', background: 'var(--c-surface-2)', border: '1px solid var(--c-border)' }}>
+                    <input
+                      value={proxy}
+                      onChange={event => setProxy(event.target.value.trim())}
+                      placeholder={provider === 'moonshot' ? 'https://api.moonshot.cn/v1' : 'https://api.openai.com/v1'}
+                      className="mono"
+                      style={{ flex: 1, background: 'transparent', outline: 'none', border: 'none', fontSize: 11.5, color: 'var(--c-text)' }}
+                    />
+                  </div>
+                </>
+              )}
 
               <div style={{ height: 1, margin: '12px 0', background: 'var(--c-border)' }} />
 
