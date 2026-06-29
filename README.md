@@ -1,6 +1,6 @@
 # Tendril
 
-> **Upload a document — an AI agent reads it and draws an editable mind map, live.**
+> **A self-hostable AI agent that turns your documents into editable mind maps — your files and API keys never leave your machine.**
 
 <p>
   <a href="https://mindgenius.onrender.com"><img src="https://img.shields.io/badge/Live%20Demo-online-brightgreen?style=flat" alt="Live Demo" /></a>
@@ -13,11 +13,23 @@
 
 Chat with **Hermas**, Tendril's AI agent that plans, reads your PDFs, and draws editable mind maps live — every tool call visible as it works.
 
-Turn a dense paper, meeting notes, or a half-formed idea into a structured, editable mind map in seconds — then refine it by chatting or dragging nodes. Great for **students** summarizing papers, **researchers** mapping a field, and **PMs** breaking down a plan.
+Most AI mind-map tools are cloud SaaS — your documents get uploaded to *their* servers and your model key lives in *their* backend. Tendril runs entirely on infrastructure you control: **one Docker image, bring-your-own-key, nothing stored server-side.** Built for **privacy-conscious knowledge workers**, **self-hosters**, and **teams with sensitive documents** (legal, research, internal specs) that can't be pasted into a third-party cloud.
 
 🔗 **[Try the live demo →](https://mindgenius.onrender.com)** · bring your own API key (stays in your browser). _First load may take ~30s to wake._ · ⭐ **Star it** if it's useful — it helps others find it.
 
 ![Tendril — Hermas plans, then draws an editable mind map live](docs/assets/demo.gif)
+
+## 🔒 Why Tendril
+
+|  | **Tendril** | Typical cloud AI mind-map tools |
+| --- | --- | --- |
+| Runs on your own machine | ✅ one Docker image | ❌ their cloud only |
+| Your documents stay local | ✅ never leave your box | ❌ uploaded to their servers |
+| Model API key | ✅ in your browser only | ❌ held in their backend |
+| Bring your own model | ✅ OpenAI · Claude · DeepSeek · Kimi · any compatible endpoint | ❌ locked to their pick |
+| Real multi-step agent | ✅ visible tool calls (plan → retrieve → draw → edit) | ❌ one-shot prompt → static tree |
+| Edits the existing map | ✅ surgical, by node id | ❌ regenerates the whole thing |
+| Source-available & hackable | ✅ BSL 1.1, RAG in ~100 lines | ❌ closed SaaS |
 
 ## ⚡️ Quick Start
 
@@ -31,6 +43,7 @@ No key at setup? Skip it and paste one later in the app's **Settings** (top-righ
 
 ## ✨ Features
 
+- 🔒 **Self-hosted & private** — ships as one Docker image you run anywhere; your PDFs are chunked/embedded in memory and your key lives in the browser. Nothing is written to the server's disk, no telemetry on your content.
 - 🤖 **Real agent, not a prompt wrapper** — multi-step tool loop (Vercel AI SDK v5) that decides when to search docs, generate the map, and expand branches, each shown as a live tool card.
 - ✏️ **Surgical edits** — "rename the pricing branch" patches exact nodes by id, so your manual tweaks survive (no full re-render).
 - 🤝 **Two-way canvas** — edit nodes by hand (rename, add, drag, delete) and Hermas sees *exactly what you changed* on your next message, then builds on it like a collaborator — not just the latest snapshot.
