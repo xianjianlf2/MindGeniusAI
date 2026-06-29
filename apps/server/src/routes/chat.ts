@@ -11,14 +11,23 @@ import { enforceDemoQuota, llmConfigFrom } from './middleware'
 
 export const chatRoutes = new Hono()
 
-/** 把 streamText 的增量输出按旧协议推给前端 */
+/**
+ * 把 streamText 的增量输出按旧协议推给前端。
+ * 走 fullStream 而非 textStream：AI SDK 的 textStream 会**静默吞掉**流内错误
+ * （如服务端 Key 无效），导致空内容却以 done 收尾。fullStream 能拿到 error part，
+ * 抛出后由 legacySSE 归类成 failed 提示，避免「啥也没生成还不报错」。
+ */
 function pipeTextStream(c: Context, run: (cfg: LLMRequestConfig) => ReturnType<typeof streamText>) {
   return legacySSE(c, async (emit) => {
     const cfg = llmConfigFrom(c)
     enforceDemoQuota(c, cfg)
     const result = run(cfg)
-    for await (const delta of result.textStream)
-      await emit.send(delta)
+    for await (const part of result.fullStream) {
+      if (part.type === 'text-delta')
+        await emit.send(part.text)
+      else if (part.type === 'error')
+        throw part.error
+    }
     await emit.done()
   })
 }
